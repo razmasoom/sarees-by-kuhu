@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register | Smart Shop</title>
+    <style>
+        body { 
+            background: #f4f7f6; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .auth-card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            width: 350px; 
+            text-align: center; 
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            box-sizing: border-box;
+        }
+        .btn { 
+            width: 100%; 
+            padding: 12px; 
+            background: #27ae60; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin-top: 10px; 
+        }
+        .btn:hover { background: #219150; }
+        .toggle-link { 
+            margin-top: 15px; 
+            font-size: 0.9em; 
+            color: #2980b9; 
+            cursor: pointer; 
+            text-decoration: underline; 
+        }
+        #phone-input-container {
+            display: none; /* Hidden by default for Login */
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <h2 id="title">Buyer Login</h2>
+    
+    <input type="text" id="username" placeholder="Username">
+    
+    <div id="phone-input-container">
+        <input type="tel" id="phone" placeholder="Mobile Number (10 Digits)" maxlength="10">
+    </div>
+    
+    <input type="password" id="password" placeholder="Password">
+    
+    <button class="btn" id="main-btn" onclick="handleAuth()">Login</button>
+    
+    <div class="toggle-link" id="toggle-txt" onclick="toggle()">New here? Create an account.</div>
+    <br>
+    <a href="index.html" style="font-size: 0.8em; color: gray; text-decoration: none;">← Back to Shop</a>
+</div>
+
+<script>
+    let isLoginMode = true;
+    const API = "http://localhost:3000/users";
+
+    function toggle() {
+        isLoginMode = !isLoginMode;
+        document.getElementById('title').innerText = isLoginMode ? "Buyer Login" : "Register Account";
+        document.getElementById('main-btn').innerText = isLoginMode ? "Login" : "Register";
+        document.getElementById('toggle-txt').innerText = isLoginMode ? "New here? Create an account." : "Already have an account? Login.";
+        
+        // Show/Hide phone field
+        document.getElementById('phone-input-container').style.display = isLoginMode ? "none" : "block";
+    }
+
+    async function handleAuth() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        const ph = document.getElementById('phone').value.trim();
+
+        if(!u || !p) return alert("Username and Password are required");
+        if(!isLoginMode && (!ph || ph.length !== 10)) return alert("Please enter a valid 10-digit mobile number");
+
+        try {
+            const response = await fetch(API);
+            const users = await response.json();
+
+         if (isLoginMode) {
+    const found = users.find(user => user.username === u && user.password === p);
+  if (found) {
+    if (found.status !== 'Verified') {
+        alert("Account Pending Verification. Please contact admin.");
+        return;
+    }
+    localStorage.setItem('user', u);
+    window.location.href = "index.html";
+} else {
+        alert("Invalid username or password");
+    }
+} else {
+                // REGISTRATION LOGIC
+                // 1. Check if Username exists
+                if (users.find(user => user.username === u)) {
+                    return alert("Username already taken!");
+                }
+                
+                // 2. Check if Phone Number exists (Duplicate Mobile Prevention)
+                if (users.find(user => user.phone === ph)) {
+                    return alert("This mobile number is already registered!");
+                }
+                
+                // 3. Register New User
+               const newUser = { 
+    username: u, 
+    password: p, 
+    phone: ph, 
+    status: 'Pending',  // Changed to Pending - requires admin approval
+    id: Date.now() 
+};
+
+                await fetch(API, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(newUser)
+                });
+
+                alert("Registered successfully! Now please login.");
+                toggle();
+            }
+        } catch (error) {
+            console.error("Auth Error:", error);
+            alert("Connection error. Ensure your backend server is running.");
+        }
+    }
+</script>
+</body>
+</html>

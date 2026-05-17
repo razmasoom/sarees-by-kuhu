@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sarees By Kuhu | Buyer View</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; margin: 0; }
+        
+        /* User Profile Bar */
+        .user-bar {
+            background: #131921;
+            color: #ccc;
+            padding: 8px 50px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .user-bar b { color: white; }
+        .user-bar a { color: #f0c14b; text-decoration: none; margin-left: 15px; cursor: pointer; font-weight: bold; }
+        .user-bar a:hover { text-decoration: underline; }
+        .store-name-header {
+            float: left;
+            font-weight: bold;
+            color: #f0c14b;
+            font-size: 16px;
+        }
+
+        /* Header & Navigation */
+        header { 
+            background: #232f3e; color: white; padding: 15px; 
+            position: sticky; top: 0; display: flex; 
+            justify-content: space-around; align-items: center; z-index: 1000; 
+        }
+        header h1 { 
+            margin: 0; 
+            font-size: 24px; 
+            cursor: pointer;
+            color: #f0c14b;
+        }
+        #search-bar { padding: 10px; border-radius: 5px; border: none; width: 300px; outline: none; }
+        
+        /* Category Menu */
+        .category-nav { background: #37475a; padding: 10px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .cat-btn { background: none; border: 1px solid #ffffff55; color: white; padding: 5px 15px; font-size: 14px; cursor: pointer; border-radius: 4px; }
+        .cat-btn:hover, .cat-btn.active { background: white; color: #232f3e; }
+
+        /* Product Grid */
+        #shop-container, #orders-history-container { padding: 30px; }
+        #shop-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+        .product-card { 
+            background: white; border: 1px solid #ddd; padding: 15px; 
+            border-radius: 8px; width: 220px; transition: 0.2s; text-align: center;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; cursor: pointer; }
+        
+        /* Buttons */
+        button { background: #f0c14b; border: 1px solid #a88734; padding: 8px 15px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        button:hover { background: #ddb347; }
+        button:disabled { background: #ccc !important; border: none !important; cursor: not-allowed !important; color: #666; }
+        
+        .checkout-btn { background: #28a745; color: white; width: 100%; border: none; padding: 12px; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; }
+
+        /* Cart Drawer */
+        .cart-drawer { 
+            position: fixed; top: 0; right: -400px; 
+            width: 350px; height: 100%; background: white; 
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3); 
+            transition: 0.3s ease-in-out; padding: 20px; z-index: 2000;
+            overflow-y: auto;
+        }
+        .cart-drawer.open { right: 0; }
+        .close-btn { cursor: pointer; float: right; font-size: 28px; font-weight: bold; color: #888; }
+        
+        #cart-items { list-style: none; padding: 0; margin-top: 40px; }
+        .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; }
+
+        /* Order History Specific Styling */
+        .history-heading { color: #232f3e; border-bottom: 2px solid #ccc; padding-bottom: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .order-history-card { background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; }
+        .order-history-header { display: flex; justify-content: space-between; color: #718096; font-size: 13px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #edf2f7; }
+        .user-status-badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; text-transform: uppercase; }
+        .cancel-order-btn { 
+            background: #dc3545; 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .cancel-order-btn:hover { background: #c82333; }
+        .cancel-order-btn:disabled { background: #6c757d; cursor: not-allowed; }
+        
+        /* Status colors */
+        .status-pending { background: #ffc107; color: #333; }
+        .status-shipped { background: #17a2b8; }
+        .status-delivered { background: #28a745; }
+        .status-cancelled { background: #dc3545; }
+
+        /* Tracking Details Styling */
+        .tracking-info {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #2b6cb0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            text-align: left;
+        }
+        
+        .tracking-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #2b6cb0;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .tracking-id {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            color: #1a365d;
+            background: white;
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+        
+        .order-timeline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #666;
+            flex-wrap: wrap;
+        }
+        
+        .timeline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            display: inline-block;
+        }
+        
+        .timeline-dot.active {
+            background: #28a745;
+            box-shadow: 0 0 0 2px #d4edda;
+        }
+        
+        .timeline-dot.shipped {
+            background: #17a2b8;
+            box-shadow: 0 0 0 2px #d1ecf1;
+        }
+        
+        .shipping-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .shipping-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .shipping-address {
+            font-size: 11px;
+            color: #718096;
+            line-height: 1.4;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        /* General Modals */
+        .modal {
+            display: none; 
+            position: fixed; z-index: 3000; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background-color: white; margin: 10% auto; padding: 25px;
+            width: 85%; max-width: 450px; border-radius: 10px; text-align: left;
+            position: relative; animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+        /* Form Inputs inside Shipping Form */
+        .shipping-form input, .shipping-form textarea {
+            width: 100%; padding: 10px; margin: 8px 0 15px 0;
+            box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+            font-family: inherit;
+        }
+        .shipping-form textarea { resize: vertical; height: 80px; }
+        .form-submit-btn { background: #28a745; color: white; border: none; width: 100%; padding: 12px; font-size: 16px; border-radius: 5px; }
+        .form-submit-btn:hover { background: #218838; }
+
+        /* Footer Styles */
+        .footer {
+            background: #232f3e;
+            color: #ccc;
+            padding: 30px 50px;
+            margin-top: 50px;
+            text-align: center;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+        }
+        .footer-section h3 {
+            color: #f0c14b;
+            margin-bottom: 15px;
+        }
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .footer-section a:hover {
+            color: #f0c14b;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .social-links a {
+            display: inline-block;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #37475a;
+            font-size: 12px;
+        }
+    </style>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+    <div class="user-bar" id="user-bar">
+        <span class="store-name-header">🏪 Sarees By Kuhu</span>
+    </div>
+
+    <header>
+        <h1 onclick="showStorefront()">Sarees By Kuhu</h1>
+        <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
+        <div onclick="toggleCart()" style="cursor:pointer; font-weight: bold;">
+            🛒 Cart (<span id="cart-count">0</span>)
+        </div>
+    </header>
+
+    <nav class="category-nav" id="category-menu"></nav>
+
+    <div class="cart-drawer" id="cart-view">
+        <span class="close-btn" onclick="toggleCart()">&times;</span>
+        <h3>Your Shopping Cart</h3>
+        <ul id="cart-items"></ul>
+        <div id="cart-total-display"></div>
+        <button class="checkout-btn" onclick="openShippingModal()">Place Order</button>
+    </div>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="shippingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeShippingModal()">&times;</span>
+            <h2 style="margin-top: 0; text-align: center; color: #232f3e;">Shipping Details</h2>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            <div class="shipping-form">
+                <label for="ship-email"><strong>Email Address</strong></label>
+                <input type="email" id="ship-email" placeholder="E.g., john@example.com" required>
+                <label for="ship-name"><strong>Receiver's Full Name</strong></label>
+                <input type="text" id="ship-name" placeholder="E.g., John Doe" required>
+                <label for="ship-phone"><strong>Contact Phone Number</strong></label>
+                <input type="text" id="ship-phone" placeholder="E.g., 9876543210" required>
+                <label for="ship-address"><strong>Complete Address</strong></label>
+                <textarea id="ship-address" placeholder="House/Office No., Locality, Landmark, City, State, PIN" required></textarea>
+                <button class="form-submit-btn" onclick="checkout()">Confirm & Submit Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeContactModal()">&times;</span>
+            <h2 style="margin-top: 0; text-align: center; color: #232f3e;">Contact Us</h2>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            <div style="text-align: center;">
+                <p>📞 <strong>Phone:</strong> +91 9304288748</p>
+                <p>✉️ <strong>Email:</strong> sareesbykuhu@gmail.com</p>
+                <p>📍 <strong>Address:</strong> PS-Sadar, Purnea<br>Near-Industrial Area, Purneacity<br>Bihar 854302</p>
+                <p>🕐 <strong>Business Hours:</strong> Mon-Sat: 10 AM - 7 PM</p>
+                <hr style="margin: 20px 0;">
+                <h3>Send us a message</h3>
+                <input type="text" id="contact-name" placeholder="Your Name" style="width: 100%; margin-bottom: 10px;">
+                <input type="email" id="contact-email" placeholder="Your Email" style="width: 100%; margin-bottom: 10px;">
+                <textarea id="contact-message" placeholder="Your Message" rows="4" style="width: 100%; margin-bottom: 10px;"></textarea>
+                <button onclick="sendContactMessage()" style="background: #28a745; color: white; width: 100%;">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shop-container"></div>
+
+    <div id="orders-history-container" style="display: none; max-width: 800px; margin: auto;">
+        <div class="history-heading">
+            <h2>Your Order History & Tracking Details</h2>
+            <button onclick="showStorefront()" style="background:#37475a; color:white; border:none;">← Back to Shopping</button>
+        </div>
+        <div id="history-items-list">Loading orders...</div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#" onclick="showStorefront(); return false;">Shop Now</a>
+                <a href="#" onclick="toggleOrderHistoryView(); return false;">My Orders</a>
+                <a href="#" onclick="openContactModal(); return false;">Contact Us</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p>📞 +91 9304288748</p>
+                <p>✉️ sareesbykuhu@gmail.com</p>
+                <p>📍 Lalbagh, Purneacity<br>Bihar 854302</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#">📘 Facebook</a>
+                    <a href="#">📸 Instagram</a>
+                    <a href="#">🐦 Twitter</a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2024 Sarees By Kuhu. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:3000";
+        let cart = [];
+        let allProducts = [];
+        let currentCategory = 'All';
+        let sessionCheckInterval = null;
+
+        // Contact Modal Functions
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = "block";
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = "none";
+            document.getElementById('contact-name').value = '';
+            document.getElementById('contact-email').value = '';
+            document.getElementById('contact-message').value = '';
+        }
+
+        function sendContactMessage() {
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
+            
+            if (!name || !email || !message) {
+                alert("Please fill in all fields");
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                alert("Please enter a valid email address");
+                return;
+            }
+            
+            alert(`Thank you ${name}!\n\nWe have received your message and will get back to you soon.\n\nRegards,\nSarees By Kuhu Team`);
+            closeContactModal();
+        }
+
+        // Session Validation
+        async function validateUserSession() {
+            const currentUser = localStorage.getItem('user');
+            if (!currentUser) return false;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/check/${encodeURIComponent(currentUser)}`);
+                const result = await response.json();
+                
+                if (!result.exists) {
+                    alert("Your account has been deleted. You will be logged out.");
+                    logout();
+                    return false;
+                }
+                
+                if (!result.verified) {
+                    alert("Your account is not verified. Please contact admin.");
+                    logout();
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error("Session validation error:", error);
+                return true;
+            }
+        }
+
+        function startSessionMonitoring() {
+            if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+            
+            sessionCheckInterval = setInterval(async () => {
+                const currentUser = localStorage.getItem('user');
+                if (currentUser) {
+                    const isValid = await validateUserSession();
+                    if (!isValid) {
+                        clearInterval(sessionCheckInterval);
+                        window.location.href = "auth.html";
+                    }
+                }
+            }, 30000);
+        }
+
+        // Authentication Functions
+        function checkAuth() {
+            const userBar = document.getElementById('user-bar');
+            const loggedInUser = localStorage.getItem('user');
+
+            if (loggedInUser) {
+                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | <a onclick="toggleOrderHistoryView()">📋 My Orders</a> | <a onclick="logout()">Logout</a> | <a onclick="openContactModal()">📞 Contact</a>`;
+                startSessionMonitoring();
+            } else {
+                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register to Buy</a> | <a onclick="openContactModal()">📞 Contact</a>`;
+                if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+            }
+        }
+
+        function logout() {
+            if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+            localStorage.removeItem('user');
+            window.location.href = "index.html";
+        }
+
+        function showStorefront() {
+            document.getElementById('orders-history-container').style.display = 'none';
+            document.getElementById('shop-container').style.display = 'flex';
+            document.getElementById('category-menu').style.display = 'flex';
+            document.getElementById('search-bar').style.display = 'block';
+            filterProducts();
+        }
+
+        // Order Functions
+        async function cancelOrder(orderId) {
+            if (!confirm("Cancel this order? This cannot be undone.")) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/orders/${orderId}/cancel`, { method: 'PATCH' });
+                if (response.ok) {
+                    alert("Order cancelled successfully!");
+                    await toggleOrderHistoryView();
+                    await loadProducts();
+                } else {
+                    alert("Failed to cancel order");
+                }
+            } catch (error) {
+                console.error("Error cancelling order:", error);
+                alert("Error connecting to server");
+            }
+        }
+
+        async function toggleOrderHistoryView() {
+            const isValid = await validateUserSession();
+            if (!isValid) {
+                window.location.href = "auth.html";
+                return;
+            }
+            
+            const username = localStorage.getItem('user');
+            if (!username) {
+                alert("Please login to view orders");
+                window.location.href = "auth.html";
+                return;
+            }
+
+            document.getElementById('shop-container').style.display = 'none';
+            document.getElementById('category-menu').style.display = 'none';
+            document.getElementById('search-bar').style.display = 'none';
+            document.getElementById('orders-history-container').style.display = 'block';
+
+            const listArea = document.getElementById('history-items-list');
+            listArea.innerHTML = "<p>Loading orders...</p>";
+
+            try {
+                const res = await fetch(`${API_BASE}/history`);
+                const allOrders = await res.json();
+                const userOrders = allOrders.filter(o => o.username === username);
+
+                if (userOrders.length === 0) {
+                    listArea.innerHTML = `<p style="text-align:center; padding:40px;">You haven't placed any orders yet.</p>`;
+                    return;
+                }
+
+                const statusColors = { Pending: '#ffc107', Shipped: '#17a2b8', Delivered: '#28a745', Cancelled: '#dc3545' };
+                const statusTextColors = { Pending: '#333', Shipped: 'white', Delivered: 'white', Cancelled: 'white' };
+
+                listArea.innerHTML = [...userOrders].reverse().map(o => {
+                    // Generate tracking info HTML with styling
+                    let trackingHtml = '';
+                    if (o.trackingId && o.trackingId !== '') {
+                        trackingHtml = `
+                            <div class="tracking-info">
+                                <div class="tracking-label">📦 TRACKING INFORMATION</div>
+                                <div class="tracking-id">${o.trackingId}</div>
+                                <div class="order-timeline">
+                                    <span>📍 Placed</span>
+                                    <span>→</span>
+                                    <span class="timeline-dot ${o.status === 'Shipped' || o.status === 'Delivered' ? 'shipped' : ''}"></span>
+                                    <span>🚚 Shipped</span>
+                                    <span>→</span>
+                                    <span class="timeline-dot ${o.status === 'Delivered' ? 'active' : ''}"></span>
+                                    <span>✅ Delivered</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (o.status === 'Pending') {
+                        trackingHtml = `
+                            <div class="tracking-info" style="background: #fff3cd; border-left-color: #ffc107;">
+                                <div class="tracking-label">⏳ ORDER STATUS</div>
+                                <div>Awaiting shipment confirmation</div>
+                                <div class="order-timeline">
+                                    <span>📍 Placed</span>
+                                    <span>→</span>
+                                    <span class="timeline-dot"></span>
+                                    <span>🚚 Awaiting Shipping</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (o.status === 'Shipped') {
+                        trackingHtml = `
+                            <div class="tracking-info" style="background: #d1ecf1; border-left-color: #17a2b8;">
+                                <div class="tracking-label">🚚 ORDER SHIPPED</div>
+                                <div>Your order is on the way!</div>
+                                <div class="order-timeline">
+                                    <span>📍 Placed</span>
+                                    <span>→</span>
+                                    <span class="timeline-dot shipped"></span>
+                                    <span>🚚 Shipped</span>
+                                    <span>→</span>
+                                    <span class="timeline-dot"></span>
+                                    <span>⏳ Awaiting Delivery</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    return `
+                        <div class="order-history-card">
+                            <div class="order-history-header">
+                                <span>🆔 Order #${o.orderId}</span>
+                                <span>📅 ${o.date || 'N/A'}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
+                                <div style="flex: 2; min-width: 200px;">
+                                    <strong style="font-size:16px; color:#232f3e;">${o.productName}</strong>
+                                    <div style="color:#555; margin-top:4px; font-size:14px;">
+                                        📦 Quantity: ${o.quantity} | 💰 Amount: <b>₹${o.totalPrice}</b>
+                                    </div>
+                                    <div class="shipping-card">
+                                        <div class="shipping-title">
+                                            📍 SHIPPING ADDRESS
+                                        </div>
+                                        <div><strong>${o.customerName}</strong></div>
+                                        <div class="shipping-address">
+                                            ${o.address || 'No Address'}<br>
+                                            📞 Phone: ${o.phone || 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align:right; min-width: 180px;">
+                                    <span class="user-status-badge" style="background:${statusColors[o.status] || '#888'}; color:${statusTextColors[o.status] || 'white'}">
+                                        ${o.status || 'Pending'}
+                                    </span>
+                                    ${trackingHtml}
+                                    ${o.status !== 'Cancelled' && o.status !== 'Delivered' ? `<button class="cancel-order-btn" onclick="cancelOrder(${o.orderId})">❌ Cancel Order</button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                listArea.innerHTML = "<p style='color:red;'>Failed to load orders.</p>";
+            }
+        }
+
+        // Product Functions
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                allProducts = await response.json();
+                generateCategoryMenu(allProducts);
+                filterProducts(); 
+            } catch (error) {
+                console.error("Failed to load products:", error);
+            }
+        }
+
+        function generateCategoryMenu(products) {
+            const menu = document.getElementById('category-menu');
+            const categories = ['All', ...new Set(products.map(p => p.category).filter(c => c))];
+            menu.innerHTML = categories.map(cat => `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`).join('');
+        }
+
+        function displayProducts(productsToDisplay) {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '';
+            productsToDisplay.forEach(product => {
+                const isOutOfStock = parseInt(product.stock) <= 0;
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${product.image || 'https://via.placeholder.com/150'}" onclick="openModal(${product.id})">
+                        <h3>${product.name}</h3>
+                        <p style="color:#B12704; font-weight:bold;">₹${product.price}</p>
+                        <p style="font-size:12px; color:${isOutOfStock ? 'red' : '#28a745'};">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
+                        <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
+                    </div>
+                `;
+            });
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm) && (currentCategory === 'All' || p.category === currentCategory));
+            displayProducts(filtered);
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            generateCategoryMenu(allProducts);
+            filterProducts();
+        }
+
+        // Cart Functions
+        function toggleCart() {
+            document.getElementById('cart-view').classList.toggle('open');
+        }
+
+        async function addToCart(id, name, price) {
+            const isValid = await validateUserSession();
+            if (!isValid) {
+                window.location.href = "auth.html";
+                return;
+            }
+            
+            if (!localStorage.getItem('user')) {
+                alert("Please login first");
+                window.location.href = "auth.html";
+                return;
+            }
+
+            const productInfo = allProducts.find(p => p.id === id);
+            const existingItem = cart.find(item => item.productId === id);
+            
+            if (existingItem && existingItem.quantity >= parseInt(productInfo.stock)) {
+                alert("Stock limit reached!");
+                return;
+            }
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ productId: id, name: name, price: price, quantity: 1 });
+            }
+            
+            updateCartUI();
+            document.getElementById('cart-view').classList.add('open');
+        }
+
+        function updateCartUI() {
+            const list = document.getElementById('cart-items');
+            const countSpan = document.getElementById('cart-count');
+            const totalDisplay = document.getElementById('cart-total-display');
+            
+            list.innerHTML = '';
+            let totalItems = 0, totalPrice = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+                totalItems += item.quantity;
+                list.innerHTML += `<li class="cart-item"><div><strong>${item.name}</strong><br>₹${item.price} x ${item.quantity}</div><div>₹${itemTotal} <button class="remove-btn" onclick="removeFromCart(${index})">x</button></div></li>`;
+            });
+
+            countSpan.innerText = totalItems;
+            if (cart.length > 0) {
+                totalDisplay.innerHTML = `<h4 style="text-align:right;">Total: ₹${totalPrice}</h4>`;
+            } else {
+                list.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
+                totalDisplay.innerHTML = '';
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // Modal Functions
+        function openModal(id) {
+            const product = allProducts.find(p => p.id === id);
+            const modal = document.getElementById('productModal');
+            const body = document.getElementById('modal-body');
+            const isOutOfStock = parseInt(product.stock) <= 0;
+
+            body.innerHTML = `
+                <img src="${product.image || 'https://via.placeholder.com/150'}" style="width:100%; max-height:250px; object-fit:contain;">
+                <h2>${product.name}</h2>
+                <p style="font-size:1.2em; color:#B12704;">Price: ₹${product.price}</p>
+                <p style="color:${isOutOfStock ? 'red' : 'green'}">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
+                <button onclick="addToCart(${product.id}, '${product.name}', ${product.price}); closeModal();" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
+            `;
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = "none";
+        }
+
+        function openShippingModal() {
+            if (cart.length === 0) return alert("Add items to cart first!");
+            if (!localStorage.getItem('user')) {
+                alert("Please login first");
+                window.location.href = "auth.html";
+                return;
+            }
+            document.getElementById('cart-view').classList.remove('open');
+            document.getElementById('shippingModal').style.display = "block";
+        }
+
+        function closeShippingModal() {
+            document.getElementById('shippingModal').style.display = "none";
+        }
+
+        // Payment Functions
+        async function placeOrder(orderData, paymentId) {
+            const username = localStorage.getItem('user');
+            for (let item of orderData.cartItems) {
+                const response = await fetch(`${API_BASE}/order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        username: username,
+                        customerName: orderData.customerName,
+                        phone: orderData.phone,
+                        address: orderData.address
+                    })
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert(`Error: ${error.message}`);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function checkout() {
+            const isValid = await validateUserSession();
+            if (!isValid) {
+                window.location.href = "auth.html";
+                return;
+            }
+            
+            const customerName = document.getElementById('ship-name').value.trim();
+            const phone = document.getElementById('ship-phone').value.trim();
+            const address = document.getElementById('ship-address').value.trim();
+            const email = document.getElementById('ship-email')?.value.trim() || '';
+
+            if (!customerName || !phone || !address) {
+                alert("Please fill all shipping fields");
+                return;
+            }
+
+            let totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const orderData = {
+                totalAmount: totalAmount,
+                customerName: customerName,
+                customerEmail: email,
+                phone: phone,
+                address: address,
+                cartItems: [...cart],
+                productNames: cart.map(item => item.name)
+            };
+            
+            closeShippingModal();
+            
+            const paymentMethod = confirm("Choose Payment:\n\n• Click OK for Card/NetBanking (Razorpay Test)\n• Click Cancel for Test Mode (No Real Payment)");
+            
+            if (paymentMethod) {
+                try {
+                    const createOrderResponse = await fetch(`${API_BASE}/create-order`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: totalAmount, currency: 'INR' })
+                    });
+                    
+                    const orderResult = await createOrderResponse.json();
+                    if (!orderResult.success) throw new Error('Failed to create order');
+                    
+                    const keyResponse = await fetch(`${API_BASE}/get-razorpay-key`);
+                    const { key } = await keyResponse.json();
+                    
+                    const options = {
+                        key: key,
+                        amount: orderResult.amount,
+                        currency: orderResult.currency,
+                        name: 'Sarees By Kuhu',
+                        description: `Payment for ${orderData.productNames.join(', ')}`,
+                        order_id: orderResult.order_id,
+                        prefill: { name: customerName, email: email, contact: phone },
+                        theme: { color: '#27ae60' },
+                        handler: async function(response) {
+                            const verifyRes = await fetch(`${API_BASE}/verify-payment`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+                            const verifyResult = await verifyRes.json();
+                            if (verifyResult.success) {
+                                await placeOrder(orderData, response.razorpay_payment_id);
+                                alert('Payment Successful! Order placed.');
+                                cart = [];
+                                updateCartUI();
+                                await loadProducts();
+                                toggleOrderHistoryView();
+                            } else {
+                                alert('Payment verification failed!');
+                            }
+                        }
+                    };
+                    const razorpayInstance = new Razorpay(options);
+                    razorpayInstance.open();
+                } catch (error) {
+                    console.error(error);
+                    alert('Payment failed. Please try again or use Test Mode.');
+                }
+            } else {
+                await placeOrder(orderData, "test_payment");
+                alert('[TEST MODE] Order placed successfully without real payment!');
+                cart = [];
+                updateCartUI();
+                await loadProducts();
+                toggleOrderHistoryView();
+            }
+        }
+
+        // Initialize
+        checkAuth();
+        loadProducts();
+    </script>
+</body>
+</html>
