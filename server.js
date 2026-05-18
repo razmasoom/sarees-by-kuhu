@@ -48,9 +48,9 @@ const initDataFile = () => {
     if (!data || Array.isArray(data)) {
         data = {
             products: [
-                { id: 1, name: "Banarasi Silk Saree", price: 2500, stock: 50, category: "Silk", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
-                { id: 2, name: "Cotton Saree", price: 1200, stock: 100, category: "Cotton", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
-                { id: 3, name: "Kanchipuram Saree", price: 3500, stock: 30, category: "Silk", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] }
+                { id: 1, name: "Banarasi Silk Saree", price: 2500, stock: 50, category: "Silk", description: "Pure Banarasi silk saree with heavy zari work. Perfect for weddings.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
+                { id: 2, name: "Cotton Saree", price: 1200, stock: 100, category: "Cotton", description: "Comfortable cotton saree for daily wear. Easy to maintain.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
+                { id: 3, name: "Kanchipuram Saree", price: 3500, stock: 30, category: "Silk", description: "Authentic Kanchipuram silk saree with traditional designs.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] }
             ],
             users: [
                 { id: 1, username: "admin", password: "123", phone: "9999999999", status: "Verified", registeredAt: new Date().toISOString() }
@@ -163,7 +163,7 @@ app.post('/products', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let products = data.products || [];
     
-    // Handle multiple images - support both single image and images array
+    // Handle multiple images
     let images = [];
     if (req.body.images && Array.isArray(req.body.images) && req.body.images.length > 0) {
         images = req.body.images;
@@ -179,8 +179,9 @@ app.post('/products', (req, res) => {
         price: Number(req.body.price),
         stock: Number(req.body.stock),
         category: req.body.category || 'General',
-        image: images[0], // Keep for backward compatibility
-        images: images,    // Array of multiple images for gallery
+        description: req.body.description || '',  // ADD THIS LINE
+        image: images[0],
+        images: images,
         createdAt: new Date().toISOString()
     };
     
@@ -213,7 +214,6 @@ app.patch('/products/:id/stock', (req, res) => {
     res.json({ success: true, product: products[productIndex] });
 });
 
-// Update product (for adding multiple images)
 app.patch('/products/:id', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let products = data.products || [];
@@ -224,11 +224,11 @@ app.patch('/products/:id', (req, res) => {
         return res.status(404).json({ message: "Product not found" });
     }
     
-    // Update product fields
     if (req.body.name) products[productIndex].name = req.body.name;
     if (req.body.price) products[productIndex].price = Number(req.body.price);
     if (req.body.stock !== undefined) products[productIndex].stock = Number(req.body.stock);
     if (req.body.category) products[productIndex].category = req.body.category;
+    if (req.body.description !== undefined) products[productIndex].description = req.body.description;  // ADD THIS LINE
     if (req.body.image) {
         products[productIndex].image = req.body.image;
         if (!products[productIndex].images) products[productIndex].images = [req.body.image];
@@ -456,6 +456,7 @@ app.listen(PORT, () => {
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
     console.log(`\n📸 FEATURES ENABLED:`);
     console.log(`   - Multiple Product Images (Gallery)`);
+    console.log(`   - Product Descriptions`);
     console.log(`   - Category Management`);
     console.log(`   - User Verification`);
     console.log(`   - Order Tracking`);
