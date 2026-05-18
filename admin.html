@@ -256,6 +256,44 @@
             50% { opacity: 0.6; }
         }
         
+        /* Category Input Group Styles */
+        .category-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .category-input-group select {
+            flex: 2;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .category-input-group input {
+            flex: 2;
+            margin: 0;
+            display: none;
+        }
+        
+        .category-input-group button {
+            flex: 0.5;
+            white-space: nowrap;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .category-input-group button:hover {
+            background: #2980b9;
+        }
+        
         /* Login Overlay */
         .login-overlay {
             position: fixed;
@@ -498,6 +536,17 @@
                 padding: 25px;
                 margin: 20px;
             }
+            
+            /* Category input group on mobile */
+            .category-input-group {
+                flex-direction: column;
+            }
+            
+            .category-input-group select, 
+            .category-input-group input,
+            .category-input-group button {
+                width: 100%;
+            }
         }
         
         /* Tablet Styles */
@@ -583,19 +632,26 @@
                 <div id="orders-container"></div>
             </div>
 
-            <!-- INVENTORY SECTION -->
+            <!-- INVENTORY SECTION with Category Dropdown -->
             <div id="section-inventory" class="section-content" style="display: none;">
                 <h2>📦 Inventory Matrix</h2>
                 <div class="card">
                     <h3>Add New Item</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                         <input type="text" id="p-name" placeholder="Product Name">
                         <input type="number" id="p-price" placeholder="Price (₹)">
                         <input type="number" id="p-stock" placeholder="Stock Qty">
                         <input type="text" id="p-img" placeholder="Image URL">
-                        <input type="text" id="p-cat" placeholder="Category">
-                        <button class="btn btn-add" onclick="addProduct()">Save Product</button>
                     </div>
+                    <!-- Category Dropdown with Add New Option -->
+                    <div class="category-input-group">
+                        <select id="p-cat">
+                            <option value="">Select Category</option>
+                        </select>
+                        <input type="text" id="p-cat-new" placeholder="Enter new category">
+                        <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
+                    </div>
+                    <button class="btn btn-add" onclick="addProduct()" style="margin-top: 10px;">Save Product</button>
                 </div>
                 <div id="inventory-container"></div>
             </div>
@@ -637,6 +693,47 @@
         let lastUserCount = 0;
         let notificationCheckInterval = null;
         let previousUsers = [];
+
+        // ============ CATEGORY FUNCTIONS ============
+        
+        // Toggle between dropdown and new category input
+        function toggleNewCategory() {
+            const select = document.getElementById('p-cat');
+            const newInput = document.getElementById('p-cat-new');
+            const btn = document.getElementById('toggle-cat-btn');
+            
+            if (select.style.display === 'none') {
+                select.style.display = 'block';
+                newInput.style.display = 'none';
+                btn.textContent = '+ New';
+                newInput.value = '';
+            } else {
+                select.style.display = 'none';
+                newInput.style.display = 'block';
+                btn.textContent = '← Select';
+                newInput.focus();
+            }
+        }
+        
+        // Load categories from existing products
+        async function loadCategories() {
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const products = await response.json();
+                const categories = [...new Set(products.map(p => p.category).filter(c => c && c !== 'General'))];
+                const select = document.getElementById('p-cat');
+                select.innerHTML = '<option value="">Select Category</option>';
+                categories.forEach(cat => {
+                    select.innerHTML += `<option value="${cat}">${cat}</option>\n`;
+                });
+                // Add General as option if not exists
+                if (!categories.includes('General')) {
+                    select.innerHTML += `<option value="General">General</option>\n`;
+                }
+            } catch (error) {
+                console.error("Failed to load categories:", error);
+            }
+        }
 
         // ============ ADMIN AUTH ============
         function checkAdminSession() {
@@ -689,6 +786,7 @@
             testConnection();
             startUserMonitoring();
             loadAll();
+            loadCategories(); // Load categories when admin panel starts
         }
 
         function showServerStatus(message, type) {
@@ -863,6 +961,8 @@
                     </div>
                 `).join('');
                 
+                // Refresh categories after loading products
+                loadCategories();
                 showServerStatus('✅ Data loaded!', 'success');
             } catch (e) { 
                 console.error("Load failed", e); 
@@ -973,20 +1073,77 @@
             } catch(e) { alert("Error: " + e.message); }
         }
 
+        // Updated addProduct function with category handling
         async function addProduct() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
             const stock = document.getElementById('p-stock').value;
-            if (!name || !price || !stock) { alert("Fill all fields"); return; }
-            await fetch(`${API_BASE}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price: parseFloat(price), stock: parseInt(stock), category: document.getElementById('p-cat').value || 'General', image: document.getElementById('p-img').value || 'https://via.placeholder.com/150' }) });
-            document.getElementById('p-name').value = ''; document.getElementById('p-price').value = ''; document.getElementById('p-stock').value = ''; document.getElementById('p-img').value = ''; document.getElementById('p-cat').value = '';
-            loadAll();
-            alert("Product added!");
+            const image = document.getElementById('p-img').value;
+            
+            // Get category value (either from dropdown or new input)
+            const select = document.getElementById('p-cat');
+            const newCategoryInput = document.getElementById('p-cat-new');
+            let category = '';
+            
+            if (select.style.display !== 'none' && select.value) {
+                category = select.value;
+            } else if (newCategoryInput.style.display !== 'none' && newCategoryInput.value.trim()) {
+                category = newCategoryInput.value.trim();
+            } else {
+                category = 'General';
+            }
+            
+            if (!name || !price || !stock) { 
+                alert("Please fill in all required fields (Name, Price, Stock)"); 
+                return; 
+            }
+            
+            const data = {
+                name: name,
+                price: parseFloat(price),
+                stock: parseInt(stock),
+                category: category,
+                image: image || 'https://via.placeholder.com/150',
+                images: [image || 'https://via.placeholder.com/150']
+            };
+            
+            try {
+                await fetch(`${API_BASE}/products`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                });
+                
+                // Reset form
+                document.getElementById('p-name').value = '';
+                document.getElementById('p-price').value = '';
+                document.getElementById('p-stock').value = '';
+                document.getElementById('p-img').value = '';
+                
+                // Reset category dropdown
+                const select = document.getElementById('p-cat');
+                const newInput = document.getElementById('p-cat-new');
+                const btn = document.getElementById('toggle-cat-btn');
+                select.style.display = 'block';
+                newInput.style.display = 'none';
+                select.value = '';
+                btn.textContent = '+ New';
+                newInput.value = '';
+                
+                loadAll();
+                loadCategories();
+                alert("Product added successfully!");
+            } catch (error) {
+                alert("Error adding product: " + error.message);
+            }
         }
 
         async function deleteItem(endpoint, id) {
             if(!confirm("Are you sure?")) return;
             await fetch(`${API_BASE}/${endpoint}/${id}`, { method: 'DELETE' });
+            if (endpoint === 'products') {
+                loadCategories(); // Refresh categories if product deleted
+            }
             loadAll();
         }
 
