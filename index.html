@@ -1335,25 +1335,30 @@
         }
 
         function displayProducts(productsToDisplay) {
-            const container = document.getElementById('shop-container');
-            container.innerHTML = '';
-            productsToDisplay.forEach(product => {
-                const isOutOfStock = parseInt(product.stock) <= 0;
-                const hasMultipleImages = product.images && product.images.length > 1;
-                const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
-                
-                container.innerHTML += `
-                    <div class="product-card">
-                        <img src="${imageUrl}" onclick="openProductGallery(${product.id})" alt="${product.name}">
-                        ${hasMultipleImages ? '<span class="multi-image-badge">📸</span>' : ''}
-                        <h3>${product.name}</h3>
-                        <p style="color:#B12704; font-weight:bold;">₹${product.price}</p>
-                        <p style="font-size:12px; color:${isOutOfStock ? 'red' : '#28a745'};">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
-                        <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
-                    </div>
-                `;
-            });
-        }
+    const container = document.getElementById('shop-container');
+    container.innerHTML = '';
+    productsToDisplay.forEach(product => {
+        const isOutOfStock = parseInt(product.stock) <= 0;
+        const hasMultipleImages = product.images && product.images.length > 1;
+        const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
+        
+        // Shorten description for card view (max 60 characters)
+        const shortDescription = product.description ? 
+            (product.description.length > 60 ? product.description.substring(0, 60) + '...' : product.description) : '';
+        
+        container.innerHTML += `
+            <div class="product-card">
+                <img src="${imageUrl}" onclick="openProductGallery(${product.id})" alt="${product.name}">
+                ${hasMultipleImages ? '<span class="multi-image-badge">📸</span>' : ''}
+                <h3>${product.name}</h3>
+                <p style="color:#B12704; font-weight:bold;">₹${product.price}</p>
+                ${shortDescription ? `<p style="font-size:11px; color:#666; margin:5px 0;">${shortDescription}</p>` : ''}
+                <p style="font-size:12px; color:${isOutOfStock ? 'red' : '#28a745'};">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
+                <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
+            </div>
+        `;
+    });
+}
         
         function openProductGallery(productId) {
             const product = allProducts.find(p => p.id === productId);
@@ -1444,24 +1449,25 @@
 
         // ============ MODAL FUNCTIONS ============
         
-        function openModal(id) {
-            const product = allProducts.find(p => p.id === id);
-            const modal = document.getElementById('productModal');
-            const body = document.getElementById('modal-body');
-            const isOutOfStock = parseInt(product.stock) <= 0;
-            const hasMultipleImages = product.images && product.images.length > 1;
-            const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
+ function openModal(id) {
+    const product = allProducts.find(p => p.id === id);
+    const modal = document.getElementById('productModal');
+    const body = document.getElementById('modal-body');
+    const isOutOfStock = parseInt(product.stock) <= 0;
+    const hasMultipleImages = product.images && product.images.length > 1;
+    const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
 
-            body.innerHTML = `
-                <img src="${imageUrl}" style="width:100%; max-height:250px; object-fit:contain; cursor:pointer;" onclick="openProductGallery(${product.id})">
-                ${hasMultipleImages ? '<p style="font-size:11px; color:#666;">📸 Click image to view gallery (' + product.images.length + ' photos)</p>' : ''}
-                <h2>${product.name}</h2>
-                <p style="font-size:1.2em; color:#B12704;">Price: ₹${product.price}</p>
-                <p style="color:${isOutOfStock ? 'red' : 'green'}">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
-                <button onclick="addToCart(${product.id}, '${product.name}', ${product.price}); closeModal();" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
-            `;
-            modal.style.display = "block";
-        }
+    body.innerHTML = `
+        <img src="${imageUrl}" style="width:100%; max-height:250px; object-fit:contain; cursor:pointer;" onclick="openProductGallery(${product.id})">
+        ${hasMultipleImages ? '<p style="font-size:11px; color:#666;">📸 Click image to view gallery (' + product.images.length + ' photos)</p>' : ''}
+        <h2>${product.name}</h2>
+        <p style="font-size:1.2em; color:#B12704;">Price: ₹${product.price}</p>
+        ${product.description ? `<div style="background:#f9f9f9; padding:10px; border-radius:8px; margin:10px 0;"><strong>📝 Description:</strong><br>${product.description}</div>` : ''}
+        <p style="color:${isOutOfStock ? 'red' : 'green'}">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
+        <button onclick="addToCart(${product.id}, '${product.name}', ${product.price}); closeModal();" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
+    `;
+    modal.style.display = "block";
+}
 
         function closeModal() {
             document.getElementById('productModal').style.display = "none";
