@@ -36,12 +36,8 @@
             width: calc(100% - 280px);
         }
         
-        /* Mobile Bottom Navigation (Hidden on Desktop) */
-        .mobile-bottom-nav {
-            display: none;
-        }
-        
-        .mobile-header {
+        /* Mobile Elements (Hidden on Desktop) */
+        .mobile-bottom-nav, .mobile-header, .order-mobile-card {
             display: none;
         }
         
@@ -53,9 +49,38 @@
             margin-bottom: 30px; 
         }
         
-        /* Mobile Stats (Hidden on Desktop) */
         .mobile-stats {
             display: none;
+        }
+        
+        /* Table Styles for Desktop */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .data-table th {
+            background: #ecf0f1;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
         }
         
         /* Common Styles */
@@ -80,30 +105,6 @@
             margin: 10px 0 0; 
             color: #2c3e50;
         }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            background: white; 
-            border-radius: 12px; 
-            overflow-x: auto;
-            display: table;
-            margin-bottom: 30px; 
-        }
-        
-        th, td { 
-            padding: 12px 15px; 
-            text-align: left; 
-            border-bottom: 1px solid #eee; 
-        }
-        
-        th { 
-            background: #ecf0f1; 
-            font-weight: 600; 
-            font-size: 13px;
-        }
-        
-        td { font-size: 13px; }
         
         input { 
             padding: 8px; 
@@ -290,10 +291,6 @@
             font-size: 12px;
         }
         
-        .category-input-group button:hover {
-            background: #2980b9;
-        }
-        
         /* Multi Image Styles */
         .multi-image-section {
             margin-bottom: 15px;
@@ -323,10 +320,6 @@
             cursor: pointer;
             font-size: 11px;
             margin-top: 5px;
-        }
-        
-        .add-image-btn:hover {
-            background: #219150;
         }
         
         /* Login Overlay */
@@ -376,23 +369,45 @@
         /* Print Styles */
         @media print {
             body * { visibility: hidden; }
-            #bulk-label-printout, #bulk-label-printout * { visibility: visible; }
-            #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; }
+            #shipping-label-printout, #shipping-label-printout * { visibility: visible; }
+            #shipping-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
         }
         
-        .shipping-label, .print-label-card {
+        .shipping-label {
+            width: 600px;
+            min-height: 350px;
             border: 2px solid #000;
-            padding: 20px;
+            padding: 30px;
             font-family: 'Courier New', monospace;
+            position: relative;
             background: white;
         }
+        
+        .bulk-label-container { width: 100%; background: white; }
         
         .label-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             page-break-after: always;
+            break-after: page;
+            margin-bottom: 20px;
         }
+        
+        .print-label-card {
+            border: 2px solid #000;
+            padding: 20px;
+            min-height: 350px;
+            position: relative;
+            background: white;
+        }
+        
+        .shop-name-center { text-align: center; font-size: 28px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        .order-id-center { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 60px; }
+        .buyer-section { position: absolute; top: 180px; right: 30px; text-align: right; }
+        .seller-section { position: absolute; bottom: 30px; left: 30px; text-align: left; }
+        .section-title { font-weight: bold; margin-bottom: 10px; font-size: 14px; text-decoration: underline; }
+        .label-line { margin: 5px 0; font-size: 12px; }
         
         /* ========== MOBILE LAYOUT (max-width: 768px) ========== */
         @media screen and (max-width: 768px) {
@@ -446,7 +461,6 @@
             }
             
             .mobile-header h1 { font-size: 18px; }
-            
             .logout-mobile {
                 background: #e74c3c;
                 color: white;
@@ -483,34 +497,18 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             }
             
-            .mobile-stat-card h4 {
-                font-size: 11px;
-                color: #7f8c8d;
-                margin-bottom: 5px;
-                text-transform: uppercase;
-            }
-            
-            .mobile-stat-card p {
-                font-size: 20px;
-                font-weight: bold;
-                color: #2c3e50;
-            }
-            
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-                font-size: 12px;
-            }
-            
-            th, td { padding: 10px 12px; font-size: 11px; }
-            
             .order-mobile-card {
+                display: block;
                 background: white;
                 border-radius: 12px;
                 padding: 15px;
                 margin-bottom: 12px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            
+            /* Hide tables on mobile */
+            .data-table {
+                display: none;
             }
             
             .bulk-actions-bar {
@@ -523,12 +521,6 @@
             .stock-control button { width: 100%; }
             
             .category-input-group { flex-direction: column; }
-            .category-input-group select, 
-            .category-input-group input,
-            .category-input-group button { width: 100%; }
-            
-            .image-row { flex-wrap: wrap; }
-            .image-row button { width: auto; }
             
             .notification {
                 left: 10px;
@@ -537,7 +529,17 @@
                 min-width: auto;
             }
             
-            .login-card { width: 90%; padding: 25px; margin: 20px; }
+            .login-card { width: 90%; padding: 25px; }
+        }
+        
+        /* Desktop: Hide mobile cards */
+        @media screen and (min-width: 769px) {
+            .order-mobile-card {
+                display: none;
+            }
+            .data-table {
+                display: table;
+            }
         }
         
         /* Tablet Styles */
@@ -613,10 +615,20 @@
                     <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected</button>
                     <button class="btn btn-verify" onclick="clearSelection()">Clear</button>
                 </div>
-                <div id="orders-container"></div>
+                
+                <!-- DESKTOP TABLE VIEW -->
+                <table class="data-table" id="orders-table">
+                    <thead>
+                        <tr><th>Select</th><th>Order ID</th><th>User</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th>Tracking ID</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="orders-table-body"></tbody>
+                </table>
+                
+                <!-- MOBILE CARD VIEW -->
+                <div id="orders-mobile-container"></div>
             </div>
 
-            <!-- INVENTORY SECTION with Category Dropdown and Multiple Images -->
+            <!-- INVENTORY SECTION -->
             <div id="section-inventory" class="section-content" style="display: none;">
                 <h2>📦 Inventory Matrix</h2>
                 <div class="card">
@@ -627,7 +639,6 @@
                         <input type="number" id="p-stock" placeholder="Stock Qty">
                     </div>
                     
-                    <!-- Category Dropdown with Add New Option -->
                     <div class="category-input-group">
                         <select id="p-cat">
                             <option value="">Select Category</option>
@@ -636,9 +647,8 @@
                         <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
                     </div>
                     
-                    <!-- Multiple Images Section -->
                     <div class="multi-image-section">
-                        <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 8px;">📸 Product Images (First image is main)</label>
+                        <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 8px;">📸 Product Images</label>
                         <div id="image-urls-container">
                             <div class="image-row">
                                 <input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;">
@@ -646,46 +656,50 @@
                             </div>
                         </div>
                         <button type="button" class="add-image-btn" onclick="addImageRow()">+ Add Another Image</button>
-                        <small style="display: block; color: #888; margin-top: 5px;">You can add up to 8 images. First image appears in product listings.</small>
                     </div>
                     
                     <button class="btn btn-add" onclick="addProduct()">Save Product</button>
                 </div>
-                <div id="inventory-container"></div>
+                
+                <!-- DESKTOP TABLE VIEW -->
+                <table class="data-table">
+                    <thead><tr><th>Name</th><th>Stock</th><th>Price</th><th>Update Stock</th><th>Actions</th></tr></thead>
+                    <tbody id="inventory-table-body"></tbody>
+                </table>
+                
+                <!-- MOBILE CARD VIEW -->
+                <div id="inventory-mobile-container"></div>
             </div>
 
             <!-- USER VERIFICATION SECTION -->
             <div id="section-users" class="section-content" style="display: none;">
                 <h2>👥 User Verification</h2>
-                <div id="users-container"></div>
+                
+                <!-- DESKTOP TABLE VIEW -->
+                <table class="data-table">
+                    <thead><tr><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+                
+                <!-- MOBILE CARD VIEW -->
+                <div id="users-mobile-container"></div>
             </div>
         </div>
     </div>
 
     <!-- MOBILE BOTTOM NAVIGATION -->
     <div class="mobile-bottom-nav">
-        <button class="mobile-nav-item active" onclick="mobileNavigate('orders')">
-            <span>📋</span>
-            <div>Orders</div>
-        </button>
-        <button class="mobile-nav-item" onclick="mobileNavigate('inventory')">
-            <span>📦</span>
-            <div>Inventory</div>
-        </button>
-        <button class="mobile-nav-item" onclick="mobileNavigate('users')">
-            <span>👥</span>
-            <div>Users</div>
-        </button>
+        <button class="mobile-nav-item active" onclick="mobileNavigate('orders')"><span>📋</span><div>Orders</div></button>
+        <button class="mobile-nav-item" onclick="mobileNavigate('inventory')"><span>📦</span><div>Inventory</div></button>
+        <button class="mobile-nav-item" onclick="mobileNavigate('users')"><span>👥</span><div>Users</div></button>
     </div>
 
     <div id="shipping-label-printout" style="display: none;"></div>
     <div id="bulk-label-printout" style="display: none;"></div>
 
     <script>
-        // Admin credentials
         const ADMIN_USERNAME = "admin";
         const ADMIN_PASSWORD = "123";
-        
         const API_BASE = window.location.origin;
         let selectedOrders = new Set();
         let lastUserCount = 0;
@@ -693,68 +707,39 @@
         let previousUsers = [];
 
         // ============ MULTIPLE IMAGES FUNCTIONS ============
-        
         function addImageRow() {
             const container = document.getElementById('image-urls-container');
-            const rowCount = container.children.length;
-            
-            if (rowCount >= 8) {
-                alert("Maximum 8 images allowed per product");
-                return;
-            }
-            
+            if (container.children.length >= 8) { alert("Maximum 8 images allowed"); return; }
             const newRow = document.createElement('div');
             newRow.className = 'image-row';
-            newRow.innerHTML = `
-                <input type="text" class="image-url" placeholder="Image URL ${rowCount + 1}" style="flex: 1;">
-                <button type="button" class="btn btn-delete remove-image-btn" onclick="removeImageRow(this)" style="padding: 8px 12px;">✕</button>
-            `;
+            newRow.innerHTML = `<input type="text" class="image-url" placeholder="Image URL ${container.children.length + 1}" style="flex: 1;"><button type="button" class="btn btn-delete remove-image-btn" onclick="removeImageRow(this)" style="padding: 8px 12px;">✕</button>`;
             container.appendChild(newRow);
         }
         
         function removeImageRow(button) {
-            const row = button.parentElement;
             const container = document.getElementById('image-urls-container');
-            
-            if (container.children.length <= 1) {
-                alert("At least one image is required");
-                return;
-            }
-            
-            row.remove();
-            
-            // Update placeholder numbers
+            if (container.children.length <= 1) { alert("At least one image required"); return; }
+            button.parentElement.remove();
             const rows = container.children;
             for (let i = 0; i < rows.length; i++) {
                 const input = rows[i].querySelector('.image-url');
-                if (input) {
-                    input.placeholder = `Image URL ${i + 1}${i === 0 ? ' (Main Image)' : ''}`;
-                }
+                if (input) input.placeholder = `Image URL ${i + 1}${i === 0 ? ' (Main Image)' : ''}`;
             }
         }
         
         function getAllImageUrls() {
             const inputs = document.querySelectorAll('#image-urls-container .image-url');
             const urls = [];
-            inputs.forEach(input => {
-                const url = input.value.trim();
-                if (url) {
-                    urls.push(url);
-                }
-            });
-            if (urls.length === 0) {
-                urls.push('https://via.placeholder.com/150');
-            }
+            inputs.forEach(input => { const url = input.value.trim(); if (url) urls.push(url); });
+            if (urls.length === 0) urls.push('https://via.placeholder.com/150');
             return urls;
         }
 
         // ============ CATEGORY FUNCTIONS ============
-        
         function toggleNewCategory() {
             const select = document.getElementById('p-cat');
             const newInput = document.getElementById('p-cat-new');
             const btn = document.getElementById('toggle-cat-btn');
-            
             if (select.style.display === 'none') {
                 select.style.display = 'block';
                 newInput.style.display = 'none';
@@ -775,15 +760,9 @@
                 const categories = [...new Set(products.map(p => p.category).filter(c => c && c !== 'General'))];
                 const select = document.getElementById('p-cat');
                 select.innerHTML = '<option value="">Select Category</option>';
-                categories.forEach(cat => {
-                    select.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
-                if (!categories.includes('General')) {
-                    select.innerHTML += `<option value="General">General</option>`;
-                }
-            } catch (error) {
-                console.error("Failed to load categories:", error);
-            }
+                categories.forEach(cat => select.innerHTML += `<option value="${cat}">${cat}</option>`);
+                if (!categories.includes('General')) select.innerHTML += `<option value="General">General</option>`;
+            } catch (error) { console.error("Failed to load categories:", error); }
         }
 
         // ============ ADMIN AUTH ============
@@ -803,7 +782,6 @@
             const username = document.getElementById('admin-username').value.trim();
             const password = document.getElementById('admin-password').value.trim();
             const errorDiv = document.getElementById('login-error');
-            
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
                 sessionStorage.setItem('adminLoggedIn', 'true');
                 errorDiv.textContent = '';
@@ -815,27 +793,15 @@
             }
         }
 
-        function adminLogout() {
-            sessionStorage.removeItem('adminLoggedIn');
-            window.location.reload();
-        }
+        function adminLogout() { sessionStorage.removeItem('adminLoggedIn'); window.location.reload(); }
 
-        // ============ MOBILE NAVIGATION ==========
         function mobileNavigate(section) {
-            document.querySelectorAll('.mobile-nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
+            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
             event.target.closest('.mobile-nav-item').classList.add('active');
             showSection(section, null);
         }
 
-        // ============ EXISTING FUNCTIONS ==========
-        function startAdminFunctions() {
-            testConnection();
-            startUserMonitoring();
-            loadAll();
-            loadCategories();
-        }
+        function startAdminFunctions() { testConnection(); startUserMonitoring(); loadAll(); loadCategories(); }
 
         function showServerStatus(message, type) {
             const statusDiv = document.getElementById('server-status');
@@ -845,36 +811,16 @@
         }
 
         async function testConnection() {
-            try {
-                const response = await fetch(`${API_BASE}/users`);
-                if (response.ok) {
-                    showServerStatus('✅ Connected to server!', 'success');
-                    return true;
-                }
-            } catch (error) {
-                showServerStatus('❌ Cannot connect to server', 'error');
-                return false;
-            }
+            try { const response = await fetch(`${API_BASE}/users`); if (response.ok) { showServerStatus('✅ Connected to server!', 'success'); return true; } } 
+            catch (error) { showServerStatus('❌ Cannot connect to server', 'error'); return false; }
             return false;
         }
 
         function showNotification(title, message, type = 'success') {
             const notification = document.createElement('div');
             notification.className = 'notification';
-            notification.innerHTML = `
-                <div class="notification-icon">${type === 'user' ? '👤' : '✅'}</div>
-                <div class="notification-content">
-                    <div class="notification-title">${title}</div>
-                    <div class="notification-message">${message}</div>
-                </div>
-                <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
-            `;
-            notification.onclick = (e) => {
-                if (e.target.className !== 'notification-close') {
-                    showSection('users', null);
-                    notification.remove();
-                }
-            };
+            notification.innerHTML = `<div class="notification-icon">${type === 'user' ? '👤' : '✅'}</div><div class="notification-content"><div class="notification-title">${title}</div><div class="notification-message">${message}</div></div><div class="notification-close" onclick="this.parentElement.remove()">✕</div>`;
+            notification.onclick = (e) => { if (e.target.className !== 'notification-close') { showSection('users', null); notification.remove(); } };
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 8000);
         }
@@ -884,21 +830,15 @@
                 const response = await fetch(`${API_BASE}/users`);
                 const users = await response.json();
                 const currentCount = users.length;
-                
                 if (currentCount > lastUserCount && lastUserCount !== 0) {
                     const oldUserIds = previousUsers.map(u => u.id);
                     const actualNewUsers = users.filter(u => !oldUserIds.includes(u.id));
-                    
                     if (actualNewUsers.length > 0) {
                         const userCountElement = document.getElementById('user-count');
                         const mobileUserCount = document.getElementById('mobile-user-count');
                         userCountElement.innerHTML = `${currentCount} <span class="user-count-badge">+${actualNewUsers.length}</span>`;
                         if (mobileUserCount) mobileUserCount.innerHTML = currentCount;
-                        setTimeout(() => {
-                            userCountElement.innerHTML = currentCount;
-                            if (mobileUserCount) mobileUserCount.innerHTML = currentCount;
-                        }, 3000);
-                        
+                        setTimeout(() => { userCountElement.innerHTML = currentCount; if (mobileUserCount) mobileUserCount.innerHTML = currentCount; }, 3000);
                         const usersTab = document.getElementById('users-tab-link');
                         const existingIndicator = usersTab?.querySelector('.new-user-indicator');
                         if (!existingIndicator && usersTab) {
@@ -908,24 +848,18 @@
                             usersTab.appendChild(indicator);
                             setTimeout(() => indicator.remove(), 15000);
                         }
-                        
                         showNotification('🔔 New User Registration!', `${actualNewUsers.length} user(s) registered. Click to verify.`, 'user');
                         loadAll();
                     }
                 }
                 lastUserCount = currentCount;
                 previousUsers = [...users];
-            } catch (error) {
-                console.error("Error checking new users:", error);
-            }
+            } catch (error) { console.error("Error checking new users:", error); }
         }
 
         function startUserMonitoring() {
             if (notificationCheckInterval) clearInterval(notificationCheckInterval);
-            fetch(`${API_BASE}/users`).then(r => r.json()).then(users => {
-                lastUserCount = users.length;
-                previousUsers = [...users];
-            }).catch(e => console.error(e));
+            fetch(`${API_BASE}/users`).then(r => r.json()).then(users => { lastUserCount = users.length; previousUsers = [...users]; }).catch(e => console.error(e));
             notificationCheckInterval = setInterval(checkForNewUsers, 10000);
         }
 
@@ -952,12 +886,37 @@
                 if (mobileOrders) mobileOrders.innerText = orders.length;
                 if (mobileUsers) mobileUsers.innerText = users.length;
 
-                // Render Orders
-                const ordersContainer = document.getElementById('orders-container');
-                ordersContainer.innerHTML = '';
+                // ============ RENDER ORDERS - DESKTOP TABLE VIEW ============
+                const ordersTableBody = document.getElementById('orders-table-body');
+                ordersTableBody.innerHTML = '';
                 [...orders].reverse().forEach(o => {
                     const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
-                    ordersContainer.innerHTML += `
+                    ordersTableBody.innerHTML += `
+                        <tr>
+                            <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
+                            <td>${o.orderId || 'N/A'}</td>
+                            <td>${o.username || 'N/A'}</td>
+                            <td>${o.customerName || 'N/A'}</td>
+                            <td>${o.productName || 'N/A'}</td>
+                            <td>${o.quantity || 0}</td>
+                            <td>₹${o.totalPrice || 0}</td>
+                            <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
+                            <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
+                            <td>
+                                <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
+                                <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
+                                <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // ============ RENDER ORDERS - MOBILE CARD VIEW ============
+                const ordersMobileContainer = document.getElementById('orders-mobile-container');
+                ordersMobileContainer.innerHTML = '';
+                [...orders].reverse().forEach(o => {
+                    const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                    ordersMobileContainer.innerHTML += `
                         <div class="order-mobile-card">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                 <strong>Order #${o.orderId}</strong>
@@ -968,9 +927,9 @@
                             <div><strong>Total:</strong> ₹${o.totalPrice}</div>
                             <div><strong>User:</strong> ${o.username}</div>
                             <div style="margin-top: 10px;">
-                                <input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;">
+                                <input type="text" id="tracking-mob-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;">
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                    <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
+                                    <button class="btn btn-verify" onclick="updateTrackingMobile(${o.orderId})">Update</button>
                                     <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
                                     <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
                                 </div>
@@ -979,35 +938,69 @@
                     `;
                 });
 
-                // Render Inventory
-                const inventoryContainer = document.getElementById('inventory-container');
-                inventoryContainer.innerHTML = products.map(p => `
-                    <div class="order-mobile-card">
-                        <strong>${p.name}</strong>
-                        <div>Price: ₹${p.price} | Stock: <strong id="stock-${p.id}">${p.stock}</strong></div>
-                        <div><small>📸 ${p.images ? p.images.length : 1} image(s)</small></div>
-                        <div class="stock-control" style="margin-top: 10px;">
-                            <input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1">
-                            <button class="btn-update" onclick="updateStock(${p.id})">Update Stock</button>
-                            <button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button>
-                        </div>
-                    </div>
-                `).join('');
+                // ============ RENDER INVENTORY ============
+                const inventoryTableBody = document.getElementById('inventory-table-body');
+                inventoryTableBody.innerHTML = '';
+                products.forEach(p => {
+                    inventoryTableBody.innerHTML += `
+                        <tr>
+                            <td>${p.name}</td>
+                            <td><strong id="stock-${p.id}">${p.stock}</strong></td>
+                            <td>₹${p.price}</td>
+                            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></td>
+                            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></td>
+                        </tr>
+                    `;
+                });
 
-                // Render Users
-                const usersContainer = document.getElementById('users-container');
-                usersContainer.innerHTML = users.map(u => `
-                    <div class="order-mobile-card">
-                        <div><strong>${u.username}</strong> (ID: ${u.id})</div>
-                        <div>Phone: ${u.phone || 'N/A'}</div>
-                        <div>Status: <span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></div>
-                        <div>Registered: ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</div>
-                        <div style="margin-top: 10px;">
-                            <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
-                            <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
+                const inventoryMobileContainer = document.getElementById('inventory-mobile-container');
+                inventoryMobileContainer.innerHTML = '';
+                products.forEach(p => {
+                    inventoryMobileContainer.innerHTML += `
+                        <div class="order-mobile-card">
+                            <strong>${p.name}</strong>
+                            <div>Price: ₹${p.price} | Stock: <strong id="stock-mob-${p.id}">${p.stock}</strong></div>
+                            <div class="stock-control" style="margin-top: 10px;">
+                                <input type="number" id="stock-change-mob-${p.id}" placeholder="+/- amount" value="0" step="1">
+                                <button class="btn-update" onclick="updateStockMobile(${p.id})">Update Stock</button>
+                                <button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                });
+
+                // ============ RENDER USERS ============
+                const usersTableBody = document.getElementById('users-table-body');
+                usersTableBody.innerHTML = '';
+                users.forEach(u => {
+                    usersTableBody.innerHTML += `
+                        <tr>
+                            <td>${u.id || 'N/A'}</td>
+                            <td>${u.username || 'N/A'}</td>
+                            <td>${u.phone || 'N/A'}</td>
+                            <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></td>
+                            <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</td>
+                            <td><button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button><button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button></td>
+                        </tr>
+                    `;
+                });
+
+                const usersMobileContainer = document.getElementById('users-mobile-container');
+                usersMobileContainer.innerHTML = '';
+                users.forEach(u => {
+                    usersMobileContainer.innerHTML += `
+                        <div class="order-mobile-card">
+                            <div><strong>${u.username}</strong> (ID: ${u.id})</div>
+                            <div>Phone: ${u.phone || 'N/A'}</div>
+                            <div>Status: <span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></div>
+                            <div>Registered: ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</div>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
+                                <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                });
                 
                 loadCategories();
                 showServerStatus('✅ Data loaded!', 'success');
@@ -1017,20 +1010,36 @@
             }
         }
 
+        // Mobile tracking update wrapper
+        async function updateTrackingMobile(orderId) {
+            const trackingId = document.getElementById(`tracking-mob-${orderId}`).value;
+            if (!trackingId) { alert("Enter tracking ID"); return; }
+            try {
+                await fetch(`${API_BASE}/history/${orderId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trackingId: trackingId, status: 'Shipped' }) });
+                alert("Tracking Updated!");
+                loadAll();
+            } catch(e) { alert("Error: " + e.message); }
+        }
+
+        async function updateStockMobile(productId) {
+            const changeAmount = parseInt(document.getElementById(`stock-change-mob-${productId}`).value);
+            if (isNaN(changeAmount) || changeAmount === 0) { alert("Enter valid number (+ to add, - to subtract)"); return; }
+            try {
+                await fetch(`${API_BASE}/products/${productId}/stock`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: changeAmount }) });
+                alert(`Stock updated by ${changeAmount}`);
+                loadAll();
+            } catch (error) { alert("Error updating stock"); }
+        }
+
         function showSection(id, el) {
-            document.querySelectorAll('.section-content').forEach(section => {
-                section.style.display = 'none';
-            });
+            document.querySelectorAll('.section-content').forEach(section => section.style.display = 'none');
             document.getElementById('section-' + id).style.display = 'block';
-            
             if (el) {
                 document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
                 el.classList.add('active');
             }
-            
             if (id === 'users') {
-                const usersTab = document.getElementById('users-tab-link');
-                const indicator = usersTab?.querySelector('.new-user-indicator');
+                const indicator = document.getElementById('users-tab-link')?.querySelector('.new-user-indicator');
                 if (indicator) indicator.remove();
             }
         }
@@ -1056,9 +1065,7 @@
         function clearSelection() {
             document.querySelectorAll('.order-select').forEach(cb => cb.checked = false);
             selectedOrders.clear();
-            if (document.getElementById('select-all-checkbox')) {
-                document.getElementById('select-all-checkbox').checked = false;
-            }
+            if (document.getElementById('select-all-checkbox')) document.getElementById('select-all-checkbox').checked = false;
             updateSelectionCount();
         }
 
@@ -1069,21 +1076,18 @@
                 const allOrders = await response.json();
                 const ordersToPrint = allOrders.filter(o => selectedOrders.has(o.orderId.toString()));
                 if (ordersToPrint.length === 0) { alert("No orders found"); return; }
-                
                 let bulkHtml = `<div class="bulk-label-container">`;
                 for (let i = 0; i < ordersToPrint.length; i++) {
                     const order = ordersToPrint[i];
                     if (i % 4 === 0) { if (i > 0) bulkHtml += `</div>`; bulkHtml += `<div class="label-grid">`; }
-                    bulkHtml += `<div class="print-label-card"><div style="text-align:center; font-size:20px; font-weight:bold;">SAARES BY KUHU</div><div style="text-align:center; font-size:12px; margin:10px 0 30px;">ORDER #${order.orderId}</div><div style="text-align:right; margin-bottom:30px;"><strong>BUYER:</strong><br>${order.customerName}<br>${order.address}<br>Phone: ${order.phone}</div><div style="margin-top:20px;"><strong>SENDER:</strong><br>Kuhu, Lalbagh, Purneacity<br>Phone: +91 9304288748</div></div>`;
+                    bulkHtml += `<div class="print-label-card"><div class="shop-name-center">SAARES BY KUHU</div><div class="order-id-center">ORDER #${order.orderId}</div><div class="buyer-section"><div class="section-title">BUYER DETAILS:</div><div class="label-line">${order.customerName || 'N/A'}</div><div class="label-line">${order.address || 'No Address'}</div><div class="label-line">Phone: ${order.phone || 'N/A'}</div></div><div class="seller-section"><div class="section-title">SENDER DETAILS:</div><div class="label-line">Kuhu, Lalbagh, Purneacity</div><div class="label-line">Near-Industrial Area, Purneacity</div><div class="label-line">PS-Sadar, Purnea Bihar 854302</div><div class="label-line">Phone: +91 9304288748</div></div></div>`;
                 }
                 bulkHtml += `</div></div>`;
                 document.getElementById('bulk-label-printout').innerHTML = bulkHtml;
                 document.getElementById('bulk-label-printout').style.display = 'block';
                 window.print();
                 document.getElementById('bulk-label-printout').style.display = 'none';
-            } catch (error) {
-                alert("Error printing labels");
-            }
+            } catch (error) { alert("Error printing labels"); }
         }
 
         async function deleteSingleOrder(orderId) {
@@ -1120,50 +1124,24 @@
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
             const stock = document.getElementById('p-stock').value;
-            
             const imageUrls = getAllImageUrls();
             const mainImage = imageUrls[0];
             
             const select = document.getElementById('p-cat');
             const newCategoryInput = document.getElementById('p-cat-new');
             let category = '';
+            if (select.style.display !== 'none' && select.value) category = select.value;
+            else if (newCategoryInput.style.display !== 'none' && newCategoryInput.value.trim()) category = newCategoryInput.value.trim();
+            else category = 'General';
             
-            if (select.style.display !== 'none' && select.value) {
-                category = select.value;
-            } else if (newCategoryInput.style.display !== 'none' && newCategoryInput.value.trim()) {
-                category = newCategoryInput.value.trim();
-            } else {
-                category = 'General';
-            }
-            
-            if (!name || !price || !stock) { 
-                alert("Please fill in all required fields (Name, Price, Stock)"); 
-                return; 
-            }
-            
-            const data = {
-                name: name,
-                price: parseFloat(price),
-                stock: parseInt(stock),
-                category: category,
-                image: mainImage,
-                images: imageUrls
-            };
+            if (!name || !price || !stock) { alert("Please fill all required fields"); return; }
             
             try {
-                await fetch(`${API_BASE}/products`, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(data) 
-                });
-                
+                await fetch(`${API_BASE}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price: parseFloat(price), stock: parseInt(stock), category, image: mainImage, images: imageUrls }) });
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-stock').value = '';
-                
-                const container = document.getElementById('image-urls-container');
-                container.innerHTML = `<div class="image-row"><input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;"><button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button></div>`;
-                
+                document.getElementById('image-urls-container').innerHTML = `<div class="image-row"><input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;"><button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button></div>`;
                 const catSelect = document.getElementById('p-cat');
                 const catNewInput = document.getElementById('p-cat-new');
                 const toggleBtn = document.getElementById('toggle-cat-btn');
@@ -1172,21 +1150,16 @@
                 catSelect.value = '';
                 if (toggleBtn) toggleBtn.textContent = '+ New';
                 catNewInput.value = '';
-                
                 loadAll();
                 loadCategories();
                 alert("Product added successfully with " + imageUrls.length + " image(s)!");
-            } catch (error) {
-                alert("Error adding product: " + error.message);
-            }
+            } catch (error) { alert("Error adding product: " + error.message); }
         }
 
         async function deleteItem(endpoint, id) {
             if(!confirm("Are you sure?")) return;
             await fetch(`${API_BASE}/${endpoint}/${id}`, { method: 'DELETE' });
-            if (endpoint === 'products') {
-                loadCategories();
-            }
+            if (endpoint === 'products') loadCategories();
             loadAll();
         }
 
@@ -1210,11 +1183,12 @@
 
         function printLabel(order) {
             const buffer = document.getElementById('shipping-label-printout');
-            buffer.innerHTML = `<div class="shipping-label"><div style="text-align:center; font-size:28px; font-weight:bold;">SAARES BY KUHU</div><div style="text-align:center; font-size:16px; margin:10px 0 40px;">ORDER #${order.orderId}</div><div style="position:absolute; top:180px; right:30px; text-align:right;"><strong>BUYER DETAILS:</strong><br>${order.customerName}<br>${order.address}<br>Phone: ${order.phone}</div><div style="position:absolute; bottom:30px; left:30px;"><strong>SENDER DETAILS:</strong><br>Kuhu, Lalbagh, Purneacity<br>Near-Industrial Area, Purneacity<br>PS-Sadar, Purnea Bihar 854302<br>Phone: +91 9304288748</div></div>`;
-            buffer.style.display = 'block'; window.print(); buffer.style.display = 'none';
+            buffer.innerHTML = `<div class="shipping-label"><div class="shop-name-center">SAARES BY KUHU</div><div class="order-id-center">ORDER #${order.orderId}</div><div class="buyer-section"><div class="section-title">BUYER DETAILS:</div><div class="label-line">${order.customerName || 'N/A'}</div><div class="label-line">${order.address || 'No Address'}</div><div class="label-line">Phone: ${order.phone || 'N/A'}</div></div><div class="seller-section"><div class="section-title">SENDER DETAILS:</div><div class="label-line">Kuhu, Lalbagh, Purneacity</div><div class="label-line">Near-Industrial Area, Purneacity</div><div class="label-line">PS-Sadar, Purnea Bihar 854302</div><div class="label-line">Phone: +91 9304288748</div></div></div>`;
+            buffer.style.display = 'block'; 
+            window.print(); 
+            buffer.style.display = 'none';
         }
 
-        // Initialize
         checkAdminSession();
     </script>
 </body>
