@@ -5,25 +5,26 @@
     <title>Sarees By Kuhu | Buyer View</title>
     <style>
         /* Logo Styles */
-.logo-container {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
+        .logo-container {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
 
-.store-logo {
-    height: 50px;
-    width: auto;
-    max-width: 180px;
-    object-fit: contain;
-}
+        .store-logo {
+            height: 50px;
+            width: auto;
+            max-width: 180px;
+            object-fit: contain;
+        }
 
-@media screen and (max-width: 768px) {
-    .store-logo {
-        height: 35px;
-        max-width: 140px;
-    }
-}
+        @media screen and (max-width: 768px) {
+            .store-logo {
+                height: 35px;
+                max-width: 140px;
+            }
+        }
+        
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; margin: 0; }
         
         /* User Profile Bar */
@@ -69,9 +70,127 @@
         .product-card { 
             background: white; border: 1px solid #ddd; padding: 15px; 
             border-radius: 8px; width: 220px; transition: 0.2s; text-align: center;
+            position: relative;
         }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; cursor: pointer; }
+        
+        .multi-image-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+        
+        /* Image Gallery Modal Styles */
+        .gallery-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            cursor: pointer;
+        }
+        
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .gallery-main-image {
+            max-width: 90%;
+            max-height: 70vh;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+        
+        .gallery-main-image.zoomed {
+            transform: scale(2);
+            cursor: zoom-out;
+        }
+        
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            overflow-x: auto;
+            padding: 10px;
+            max-width: 90%;
+        }
+        
+        .gallery-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        
+        .gallery-thumb:hover, .gallery-thumb.active {
+            border-color: #27ae60;
+            transform: scale(1.05);
+        }
+        
+        .gallery-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .gallery-prev, .gallery-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 50px;
+            cursor: pointer;
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-prev { left: 20px; }
+        .gallery-next { right: 20px; }
+        
+        .gallery-prev:hover, .gallery-next:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .image-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
         
         /* Buttons */
         button { background: #f0c14b; border: 1px solid #a88734; padding: 8px 15px; cursor: pointer; border-radius: 5px; font-weight: bold; }
@@ -91,7 +210,7 @@
         .cart-drawer.open { right: 0; }
         .close-btn { cursor: pointer; float: right; font-size: 28px; font-weight: bold; color: #888; }
         
-        #cart-items { list-: none; padding: 0; margin-top: 40px; }
+        #cart-items { list-style: none; padding: 0; margin-top: 40px; }
         .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; }
 
@@ -278,475 +397,463 @@
             border-top: 1px solid #37475a;
             font-size: 12px;
         }
+        
         /* ========== MOBILE RESPONSIVE STYLES ========== */
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-/* Mobile Viewport Fix */
-html {
-    width: 100%;
-    overflow-x: hidden;
-}
+        html {
+            width: 100%;
+            overflow-x: hidden;
+        }
 
-body {
-    width: 100%;
-    overflow-x: hidden;
-}
+        body {
+            width: 100%;
+            overflow-x: hidden;
+        }
 
-/* Mobile Styles (up to 768px) */
-@media screen and (max-width: 768px) {
-    /* Sidebar becomes horizontal top bar */
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-    
-    .sidebar h2 {
-        width: 100%;
-        text-align: center;
-        margin: 0 0 8px 0;
-        font-size: 18px;
-    }
-    
-    .sidebar-link {
-        display: inline-block;
-        padding: 6px 12px;
-        font-size: 12px;
-        margin-bottom: 0;
-    }
-    
-    .sidebar hr {
-        display: none;
-    }
-    
-    /* Main content adjustment */
-    .main-content {
-        margin-left: 0;
-        padding: 15px;
-        width: 100%;
-    }
-    
-    /* Stats grid - single column */
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    
-    .card {
-        padding: 12px;
-    }
-    
-    .card h3 {
-        font-size: 12px;
-    }
-    
-    .card p {
-        font-size: 20px;
-    }
-    
-    /* Make tables scroll horizontally */
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        font-size: 12px;
-    }
-    
-    th, td {
-        padding: 8px 10px;
-        font-size: 11px;
-    }
-    
-    /* Product grid - 2 columns on mobile */
-    #shop-container {
-        gap: 10px;
-        padding: 15px;
-    }
-    
-    .product-card {
-        width: calc(50% - 10px);
-        padding: 10px;
-    }
-    
-    .product-card img {
-        height: 120px;
-    }
-    
-    .product-card h3 {
-        font-size: 13px;
-        margin: 8px 0;
-    }
-    
-    .product-card p {
-        font-size: 12px;
-    }
-    
-    .product-card button {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
-    
-    /* Header responsive */
-    header {
-        flex-direction: column;
-        gap: 8px;
-        padding: 10px;
-    }
-    
-    header h1 {
-        font-size: 18px;
-    }
-    
-    #search-bar {
-        width: 90%;
-        padding: 8px;
-        font-size: 14px;
-    }
-    
-    /* Category menu */
-    .category-nav {
-        gap: 8px;
-        padding: 8px;
-    }
-    
-    .cat-btn {
-        padding: 4px 10px;
-        font-size: 11px;
-    }
-    
-    /* Cart drawer */
-    .cart-drawer {
-        width: 85%;
-        right: -85%;
-    }
-    
-    /* Order history cards */
-    .order-history-card {
-        padding: 12px;
-    }
-    
-    .order-history-header {
-        flex-direction: column;
-        gap: 5px;
-        font-size: 11px;
-    }
-    
-    .order-history-card > div {
-        flex-direction: column !important;
-    }
-    
-    .order-history-card > div > div {
-        width: 100% !important;
-        text-align: left !important;
-        margin-bottom: 10px;
-    }
-    
-    /* Tracking info on mobile */
-    .tracking-info {
-        padding: 8px 10px;
-        margin-top: 8px;
-    }
-    
-    .tracking-id {
-        font-size: 11px;
-        word-break: break-all;
-    }
-    
-    .order-timeline {
-        font-size: 9px;
-        gap: 4px;
-        flex-wrap: wrap;
-    }
-    
-    /* Shipping card on mobile */
-    .shipping-card {
-        padding: 8px;
-        margin-top: 8px;
-    }
-    
-    .shipping-title {
-        font-size: 10px;
-    }
-    
-    .shipping-address {
-        font-size: 10px;
-    }
-    
-    /* Buttons on mobile */
-    .btn, button {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
-    
-    .checkout-btn, .form-submit-btn {
-        padding: 10px;
-        font-size: 14px;
-    }
-    
-    /* Bulk actions bar */
-    .bulk-actions-bar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        padding: 10px;
-    }
-    
-    .bulk-actions-bar .selection-info {
-        text-align: center;
-        font-size: 12px;
-    }
-    
-    /* Stock control */
-    .stock-control {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .stock-control input {
-        width: 100%;
-    }
-    
-    .stock-control button {
-        width: 100%;
-    }
-    
-    /* Labels for printing on mobile */
-    .shipping-label {
-        width: 100%;
-        min-height: auto;
-        padding: 15px;
-    }
-    
-    .shop-name-center {
-        font-size: 18px;
-        letter-spacing: 2px;
-    }
-    
-    .order-id-center {
-        font-size: 12px;
-        margin-bottom: 30px;
-    }
-    
-    .buyer-section, .seller-section {
-        position: static;
-        text-align: left;
-        margin-top: 15px;
-    }
-    
-    .buyer-section {
-        text-align: right;
-    }
-    
-    .section-title {
-        font-size: 11px;
-    }
-    
-    .label-line {
-        font-size: 10px;
-    }
-    
-    /* Bulk label grid */
-    .label-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .print-label-card {
-        min-height: auto;
-        padding: 12px;
-    }
-    
-    .print-shop-name {
-        font-size: 14px;
-    }
-    
-    .print-order-id {
-        font-size: 10px;
-        margin-bottom: 20px;
-    }
-    
-    .print-buyer-section {
-        text-align: left;
-        margin-bottom: 20px;
-    }
-    
-    .print-seller-section {
-        margin-top: 15px;
-    }
-    
-    /* User bar */
-    .user-bar {
-        padding: 8px 12px;
-        font-size: 11px;
-        text-align: center;
-    }
-    
-    .store-name-header {
-        float: none;
-        display: block;
-        margin-bottom: 5px;
-        font-size: 12px;
-    }
-    
-    /* Login card */
-    .auth-card, .login-card {
-        width: 90%;
-        padding: 20px;
-        margin: 20px auto;
-    }
-    
-    .auth-card h2, .login-card h2 {
-        font-size: 20px;
-    }
-    
-    /* Modal */
-    .modal-content {
-        width: 90%;
-        margin: 20% auto;
-        padding: 15px;
-    }
-    
-    /* Footer */
-    .footer {
-        padding: 20px 15px;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-    }
-    
-    .footer-section {
-        text-align: center;
-    }
-    
-    .footer-section h3 {
-        font-size: 14px;
-    }
-    
-    .footer-section p, .footer-section a {
-        font-size: 11px;
-    }
-    
-    .copyright {
-        font-size: 10px;
-    }
-    
-    /* Notification on mobile */
-    .notification {
-        min-width: 280px;
-        padding: 10px 15px;
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        width: auto;
-    }
-    
-    .notification-icon {
-        font-size: 22px;
-    }
-    
-    .notification-title {
-        font-size: 12px;
-    }
-    
-    .notification-message {
-        font-size: 10px;
-    }
-    
-    /* Form inputs */
-    input, textarea, select {
-        font-size: 14px !important; /* Prevents zoom on iOS */
-    }
-    
-    /* Add product form */
-    #section-inventory .card div[style*="grid-template-columns"] {
-        grid-template-columns: 1fr !important;
-        gap: 8px;
-    }
-}
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            
+            .sidebar h2 {
+                width: 100%;
+                text-align: center;
+                margin: 0 0 8px 0;
+                font-size: 18px;
+            }
+            
+            .sidebar-link {
+                display: inline-block;
+                padding: 6px 12px;
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+            
+            .sidebar hr {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .card {
+                padding: 12px;
+            }
+            
+            .card h3 {
+                font-size: 12px;
+            }
+            
+            .card p {
+                font-size: 20px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+            
+            #shop-container {
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .product-card {
+                width: calc(50% - 10px);
+                padding: 10px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-card h3 {
+                font-size: 13px;
+                margin: 8px 0;
+            }
+            
+            .product-card p {
+                font-size: 12px;
+            }
+            
+            .product-card button {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 18px;
+            }
+            
+            #search-bar {
+                width: 90%;
+                padding: 8px;
+                font-size: 14px;
+            }
+            
+            .category-nav {
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .cat-btn {
+                padding: 4px 10px;
+                font-size: 11px;
+            }
+            
+            .cart-drawer {
+                width: 85%;
+                right: -85%;
+            }
+            
+            .order-history-card {
+                padding: 12px;
+            }
+            
+            .order-history-header {
+                flex-direction: column;
+                gap: 5px;
+                font-size: 11px;
+            }
+            
+            .order-history-card > div {
+                flex-direction: column !important;
+            }
+            
+            .order-history-card > div > div {
+                width: 100% !important;
+                text-align: left !important;
+                margin-bottom: 10px;
+            }
+            
+            .tracking-info {
+                padding: 8px 10px;
+                margin-top: 8px;
+            }
+            
+            .tracking-id {
+                font-size: 11px;
+                word-break: break-all;
+            }
+            
+            .order-timeline {
+                font-size: 9px;
+                gap: 4px;
+                flex-wrap: wrap;
+            }
+            
+            .shipping-card {
+                padding: 8px;
+                margin-top: 8px;
+            }
+            
+            .shipping-title {
+                font-size: 10px;
+            }
+            
+            .shipping-address {
+                font-size: 10px;
+            }
+            
+            .btn, button {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            
+            .checkout-btn, .form-submit-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .bulk-actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .bulk-actions-bar .selection-info {
+                text-align: center;
+                font-size: 12px;
+            }
+            
+            .stock-control {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .stock-control input {
+                width: 100%;
+            }
+            
+            .stock-control button {
+                width: 100%;
+            }
+            
+            .shipping-label {
+                width: 100%;
+                min-height: auto;
+                padding: 15px;
+            }
+            
+            .shop-name-center {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+            
+            .order-id-center {
+                font-size: 12px;
+                margin-bottom: 30px;
+            }
+            
+            .buyer-section, .seller-section {
+                position: static;
+                text-align: left;
+                margin-top: 15px;
+            }
+            
+            .buyer-section {
+                text-align: right;
+            }
+            
+            .section-title {
+                font-size: 11px;
+            }
+            
+            .label-line {
+                font-size: 10px;
+            }
+            
+            .label-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .print-label-card {
+                min-height: auto;
+                padding: 12px;
+            }
+            
+            .print-shop-name {
+                font-size: 14px;
+            }
+            
+            .print-order-id {
+                font-size: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .print-buyer-section {
+                text-align: left;
+                margin-bottom: 20px;
+            }
+            
+            .print-seller-section {
+                margin-top: 15px;
+            }
+            
+            .user-bar {
+                padding: 8px 12px;
+                font-size: 11px;
+                text-align: center;
+            }
+            
+            .store-name-header {
+                float: none;
+                display: block;
+                margin-bottom: 5px;
+                font-size: 12px;
+            }
+            
+            .auth-card, .login-card {
+                width: 90%;
+                padding: 20px;
+                margin: 20px auto;
+            }
+            
+            .auth-card h2, .login-card h2 {
+                font-size: 20px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+                padding: 15px;
+            }
+            
+            .footer {
+                padding: 20px 15px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .footer-section {
+                text-align: center;
+            }
+            
+            .footer-section h3 {
+                font-size: 14px;
+            }
+            
+            .footer-section p, .footer-section a {
+                font-size: 11px;
+            }
+            
+            .copyright {
+                font-size: 10px;
+            }
+            
+            .notification {
+                min-width: 280px;
+                padding: 10px 15px;
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+            
+            .notification-icon {
+                font-size: 22px;
+            }
+            
+            .notification-title {
+                font-size: 12px;
+            }
+            
+            .notification-message {
+                font-size: 10px;
+            }
+            
+            input, textarea, select {
+                font-size: 14px !important;
+            }
+            
+            #section-inventory .card div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                gap: 8px;
+            }
+            
+            .gallery-thumb {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .gallery-prev, .gallery-next {
+                font-size: 30px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .gallery-main-image.zoomed {
+                transform: scale(1.5);
+            }
+        }
 
-/* Tablet Styles (769px to 1024px) */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .product-card {
-        width: calc(33.33% - 20px);
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .sidebar {
-        width: 200px;
-    }
-    
-    .main-content {
-        margin-left: 220px;
-    }
-    
-    .label-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .product-card {
+                width: calc(33.33% - 20px);
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 220px;
+            }
+            
+            .label-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
-/* Small phones (up to 480px) */
-@media screen and (max-width: 480px) {
-    .product-card {
-        width: calc(50% - 8px);
-    }
-    
-    .product-card img {
-        height: 100px;
-    }
-    
-    .product-card h3 {
-        font-size: 11px;
-    }
-    
-    .stats-grid .card p {
-        font-size: 18px;
-    }
-    
-    th, td {
-        padding: 6px 8px;
-        font-size: 10px;
-    }
-    
-    .btn, button {
-        padding: 5px 8px;
-        font-size: 10px;
-    }
-    
-    .user-bar {
-        font-size: 10px;
-    }
-}
+        @media screen and (max-width: 480px) {
+            .product-card {
+                width: calc(50% - 8px);
+            }
+            
+            .product-card img {
+                height: 100px;
+            }
+            
+            .product-card h3 {
+                font-size: 11px;
+            }
+            
+            .stats-grid .card p {
+                font-size: 18px;
+            }
+            
+            th, td {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+            
+            .btn, button {
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+            
+            .user-bar {
+                font-size: 10px;
+            }
+        }
 
-/* Landscape mode for phones */
-@media screen and (max-width: 768px) and (orientation: landscape) {
-    .sidebar {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-    
-    .main-content {
-        padding: 10px;
-    }
-    
-    .product-card img {
-        height: 80px;
-    }
-}
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            .sidebar {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .product-card img {
+                height: 80px;
+            }
+        }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -756,15 +863,15 @@ body {
         <span class="store-name-header">🏪 Sarees By Kuhu</span>
     </div>
 
- <header>
-    <div class="logo-container" onclick="showStorefront()">
-        <img src="logo.png" alt="Sarees By Kuhu" class="store-logo">
-    </div>
-    <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
-    <div onclick="toggleCart()" style="cursor:pointer; font-weight: bold;">
-        🛒 Cart (<span id="cart-count">0</span>)
-    </div>
-</header>
+    <header>
+        <div class="logo-container" onclick="showStorefront()">
+            <img src="logo.png" alt="Sarees By Kuhu" class="store-logo">
+        </div>
+        <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
+        <div onclick="toggleCart()" style="cursor:pointer; font-weight: bold;">
+            🛒 Cart (<span id="cart-count">0</span>)
+        </div>
+    </header>
 
     <nav class="category-nav" id="category-menu"></nav>
 
@@ -774,6 +881,18 @@ body {
         <ul id="cart-items"></ul>
         <div id="cart-total-display"></div>
         <button class="checkout-btn" onclick="openShippingModal()">Place Order</button>
+    </div>
+
+    <!-- Image Gallery Modal -->
+    <div id="galleryModal" class="gallery-modal" onclick="closeGallery()">
+        <div class="gallery-container" onclick="event.stopPropagation()">
+            <span class="gallery-close" onclick="closeGallery()">&times;</span>
+            <div class="gallery-prev" onclick="changeImage(-1)">❮</div>
+            <div class="gallery-next" onclick="changeImage(1)">❯</div>
+            <img id="galleryMainImage" class="gallery-main-image" src="" alt="" onclick="toggleZoom()">
+            <div class="gallery-thumbnails" id="galleryThumbnails"></div>
+            <div class="image-counter" id="imageCounter"></div>
+        </div>
     </div>
 
     <div id="productModal" class="modal">
@@ -808,7 +927,6 @@ body {
             <h2 style="margin-top: 0; text-align: center; color: #232f3e;">Contact Us</h2>
             <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
             <div style="text-align: center;">
-               <!-- <p>📞 <strong>Phone:</strong> +91 9304288748</p>//-->
                 <p>✉️ <strong>Email:</strong> Kahkashanp7@gmail.com</p>
                 <p>📍 <strong>Address:</strong> PS-Sadar, Purnea<br>Near-Industrial Area, Purneacity<br>Bihar 854302</p>
                 <p>🕐 <strong>Business Hours:</strong> Mon-Sat: 10 AM - 7 PM</p>
@@ -846,16 +964,13 @@ body {
             </div>
             <div class="footer-section">
                 <h3>Contact Info</h3>
-                <!--<p>📞 +91 9304288748</p>-->
                 <p>✉️ Kahkashanp7@gmail.com</p>
                 <p>📍 Lalbagh, Purneacity<br>Bihar 854302</p>
             </div>
             <div class="footer-section">
                 <h3>Follow Us</h3>
                 <div class="social-links">
-                   <a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
-                    <!--<a href="#">📸 Instagram</a>
-                    <a href="#">🐦 Twitter</a>-->
+                    <a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
                 </div>
             </div>
         </div>
@@ -870,8 +985,91 @@ body {
         let allProducts = [];
         let currentCategory = 'All';
         let sessionCheckInterval = null;
+        
+        // Gallery variables
+        let currentGalleryImages = [];
+        let currentGalleryIndex = 0;
+        let isZoomed = false;
 
-        // Contact Modal Functions
+        // ============ IMAGE GALLERY FUNCTIONS ============
+        
+        function openGallery(images, startIndex = 0) {
+            if (!images || images.length === 0) return;
+            currentGalleryImages = images;
+            currentGalleryIndex = startIndex;
+            isZoomed = false;
+            
+            const modal = document.getElementById('galleryModal');
+            const mainImage = document.getElementById('galleryMainImage');
+            const thumbnails = document.getElementById('galleryThumbnails');
+            const counter = document.getElementById('imageCounter');
+            
+            mainImage.src = images[startIndex];
+            mainImage.classList.remove('zoomed');
+            
+            thumbnails.innerHTML = '';
+            images.forEach((img, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = img;
+                thumb.className = 'gallery-thumb' + (idx === startIndex ? ' active' : '');
+                thumb.onclick = (e) => {
+                    e.stopPropagation();
+                    currentGalleryIndex = idx;
+                    updateGalleryImage();
+                };
+                thumbnails.appendChild(thumb);
+            });
+            
+            counter.textContent = `${startIndex + 1} / ${images.length}`;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeGallery() {
+            document.getElementById('galleryModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            isZoomed = false;
+        }
+        
+        function updateGalleryImage() {
+            const mainImage = document.getElementById('galleryMainImage');
+            const thumbnails = document.querySelectorAll('.gallery-thumb');
+            const counter = document.getElementById('imageCounter');
+            
+            mainImage.src = currentGalleryImages[currentGalleryIndex];
+            mainImage.classList.remove('zoomed');
+            isZoomed = false;
+            
+            thumbnails.forEach((thumb, idx) => {
+                if (idx === currentGalleryIndex) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+            
+            counter.textContent = `${currentGalleryIndex + 1} / ${currentGalleryImages.length}`;
+        }
+        
+        function changeImage(direction) {
+            currentGalleryIndex += direction;
+            if (currentGalleryIndex < 0) currentGalleryIndex = currentGalleryImages.length - 1;
+            if (currentGalleryIndex >= currentGalleryImages.length) currentGalleryIndex = 0;
+            updateGalleryImage();
+        }
+        
+        function toggleZoom() {
+            const mainImage = document.getElementById('galleryMainImage');
+            isZoomed = !isZoomed;
+            if (isZoomed) {
+                mainImage.classList.add('zoomed');
+            } else {
+                mainImage.classList.remove('zoomed');
+            }
+        }
+
+        // ============ CONTACT MODAL FUNCTIONS ============
+        
         function openContactModal() {
             document.getElementById('contactModal').style.display = "block";
         }
@@ -902,7 +1100,8 @@ body {
             closeContactModal();
         }
 
-        // Session Validation
+        // ============ SESSION VALIDATION ============
+        
         async function validateUserSession() {
             const currentUser = localStorage.getItem('user');
             if (!currentUser) return false;
@@ -945,7 +1144,8 @@ body {
             }, 30000);
         }
 
-        // Authentication Functions
+        // ============ AUTHENTICATION FUNCTIONS ============
+        
         function checkAuth() {
             const userBar = document.getElementById('user-bar');
             const loggedInUser = localStorage.getItem('user');
@@ -973,7 +1173,8 @@ body {
             filterProducts();
         }
 
-        // Order Functions
+        // ============ ORDER FUNCTIONS ============
+        
         async function cancelOrder(orderId) {
             if (!confirm("Cancel this order? This cannot be undone.")) return;
             
@@ -1028,7 +1229,6 @@ body {
                 const statusTextColors = { Pending: '#333', Shipped: 'white', Delivered: 'white', Cancelled: 'white' };
 
                 listArea.innerHTML = [...userOrders].reverse().map(o => {
-                    // Generate tracking info HTML with styling
                     let trackingHtml = '';
                     if (o.trackingId && o.trackingId !== '') {
                         trackingHtml = `
@@ -1090,9 +1290,7 @@ body {
                                         📦 Quantity: ${o.quantity} | 💰 Amount: <b>₹${o.totalPrice}</b>
                                     </div>
                                     <div class="shipping-card">
-                                        <div class="shipping-title">
-                                            📍 SHIPPING ADDRESS
-                                        </div>
+                                        <div class="shipping-title">📍 SHIPPING ADDRESS</div>
                                         <div><strong>${o.customerName}</strong></div>
                                         <div class="shipping-address">
                                             ${o.address || 'No Address'}<br>
@@ -1117,7 +1315,8 @@ body {
             }
         }
 
-        // Product Functions
+        // ============ PRODUCT FUNCTIONS ============
+        
         async function loadProducts() {
             try {
                 const response = await fetch(`${API_BASE}/products`);
@@ -1140,9 +1339,13 @@ body {
             container.innerHTML = '';
             productsToDisplay.forEach(product => {
                 const isOutOfStock = parseInt(product.stock) <= 0;
+                const hasMultipleImages = product.images && product.images.length > 1;
+                const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
+                
                 container.innerHTML += `
                     <div class="product-card">
-                        <img src="${product.image || 'https://via.placeholder.com/150'}" onclick="openModal(${product.id})">
+                        <img src="${imageUrl}" onclick="openProductGallery(${product.id})" alt="${product.name}">
+                        ${hasMultipleImages ? '<span class="multi-image-badge">📸</span>' : ''}
                         <h3>${product.name}</h3>
                         <p style="color:#B12704; font-weight:bold;">₹${product.price}</p>
                         <p style="font-size:12px; color:${isOutOfStock ? 'red' : '#28a745'};">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
@@ -1150,6 +1353,15 @@ body {
                     </div>
                 `;
             });
+        }
+        
+        function openProductGallery(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (product && product.images && product.images.length > 0) {
+                openGallery(product.images, 0);
+            } else if (product && product.image) {
+                openGallery([product.image], 0);
+            }
         }
 
         function filterProducts() {
@@ -1164,7 +1376,8 @@ body {
             filterProducts();
         }
 
-        // Cart Functions
+        // ============ CART FUNCTIONS ============
+        
         function toggleCart() {
             document.getElementById('cart-view').classList.toggle('open');
         }
@@ -1229,15 +1442,19 @@ body {
             updateCartUI();
         }
 
-        // Modal Functions
+        // ============ MODAL FUNCTIONS ============
+        
         function openModal(id) {
             const product = allProducts.find(p => p.id === id);
             const modal = document.getElementById('productModal');
             const body = document.getElementById('modal-body');
             const isOutOfStock = parseInt(product.stock) <= 0;
+            const hasMultipleImages = product.images && product.images.length > 1;
+            const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
 
             body.innerHTML = `
-                <img src="${product.image || 'https://via.placeholder.com/150'}" style="width:100%; max-height:250px; object-fit:contain;">
+                <img src="${imageUrl}" style="width:100%; max-height:250px; object-fit:contain; cursor:pointer;" onclick="openProductGallery(${product.id})">
+                ${hasMultipleImages ? '<p style="font-size:11px; color:#666;">📸 Click image to view gallery (' + product.images.length + ' photos)</p>' : ''}
                 <h2>${product.name}</h2>
                 <p style="font-size:1.2em; color:#B12704;">Price: ₹${product.price}</p>
                 <p style="color:${isOutOfStock ? 'red' : 'green'}">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
@@ -1265,7 +1482,8 @@ body {
             document.getElementById('shippingModal').style.display = "none";
         }
 
-        // Payment Functions
+        // ============ PAYMENT FUNCTIONS ============
+        
         async function placeOrder(orderData, paymentId) {
             const username = localStorage.getItem('user');
             for (let item of orderData.cartItems) {
@@ -1385,7 +1603,7 @@ body {
             }
         }
 
-        // Initialize
+        // ============ INITIALIZATION ============
         checkAuth();
         loadProducts();
     </script>
