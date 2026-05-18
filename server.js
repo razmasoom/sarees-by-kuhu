@@ -295,6 +295,7 @@ app.post('/order', (req, res) => {
         phone: phone || 'N/A',
         productId: product.id,
         productName: product.name,
+        description: product.description || '',  // ADD THIS LINE
         quantity: Number(quantity),
         totalPrice: product.price * Number(quantity),
         date: new Date().toLocaleString(),
