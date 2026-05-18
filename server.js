@@ -7,13 +7,12 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));  // ← ADD THIS LINE - Fixes the HTML file loading issue
+app.use(express.static(__dirname));
 
 const DATA_FILE = './data.json';
 const ORDERS_FILE = './orders.json';
 
-// ============ RAZORPAY INITIALIZATION (ONLY ONCE) ============
-// Replace these with your actual Razorpay keys
+// ============ RAZORPAY INITIALIZATION ============
 const RAZORPAY_KEY_ID = 'rzp_test_SqTRTOBs6qninO';
 const RAZORPAY_KEY_SECRET = 'TOqeBfLRRuZ2qrG6YrgnKByK';
 
@@ -49,9 +48,9 @@ const initDataFile = () => {
     if (!data || Array.isArray(data)) {
         data = {
             products: [
-                { id: 1, name: "Banarasi Silk Saree", price: 2500, stock: 50, category: "Silk", image: "https://via.placeholder.com/150" },
-                { id: 2, name: "Cotton Saree", price: 1200, stock: 100, category: "Cotton", image: "https://via.placeholder.com/150" },
-                { id: 3, name: "Kanchipuram Saree", price: 3500, stock: 30, category: "Silk", image: "https://via.placeholder.com/150" }
+                { id: 1, name: "Banarasi Silk Saree", price: 2500, stock: 50, category: "Silk", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
+                { id: 2, name: "Cotton Saree", price: 1200, stock: 100, category: "Cotton", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
+                { id: 3, name: "Kanchipuram Saree", price: 3500, stock: 30, category: "Silk", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] }
             ],
             users: [
                 { id: 1, username: "admin", password: "123", phone: "9999999999", status: "Verified", registeredAt: new Date().toISOString() }
@@ -152,9 +151,27 @@ app.get('/products', (req, res) => {
     res.json(data.products || []);
 });
 
+// Get all unique categories
+app.get('/categories', (req, res) => {
+    const data = readJSON(DATA_FILE, { products: [], users: [] });
+    const products = data.products || [];
+    const categories = [...new Set(products.map(p => p.category).filter(c => c && c !== 'General'))];
+    res.json(categories);
+});
+
 app.post('/products', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let products = data.products || [];
+    
+    // Handle multiple images - support both single image and images array
+    let images = [];
+    if (req.body.images && Array.isArray(req.body.images) && req.body.images.length > 0) {
+        images = req.body.images;
+    } else if (req.body.image) {
+        images = [req.body.image];
+    } else {
+        images = ['https://via.placeholder.com/150'];
+    }
     
     const newProduct = {
         id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
@@ -162,7 +179,9 @@ app.post('/products', (req, res) => {
         price: Number(req.body.price),
         stock: Number(req.body.stock),
         category: req.body.category || 'General',
-        image: req.body.image || 'https://via.placeholder.com/150'
+        image: images[0], // Keep for backward compatibility
+        images: images,    // Array of multiple images for gallery
+        createdAt: new Date().toISOString()
     };
     
     products.push(newProduct);
@@ -194,6 +213,36 @@ app.patch('/products/:id/stock', (req, res) => {
     res.json({ success: true, product: products[productIndex] });
 });
 
+// Update product (for adding multiple images)
+app.patch('/products/:id', (req, res) => {
+    let data = readJSON(DATA_FILE, { products: [], users: [] });
+    let products = data.products || [];
+    const productId = parseInt(req.params.id);
+    const productIndex = products.findIndex(p => p.id === productId);
+    
+    if (productIndex === -1) {
+        return res.status(404).json({ message: "Product not found" });
+    }
+    
+    // Update product fields
+    if (req.body.name) products[productIndex].name = req.body.name;
+    if (req.body.price) products[productIndex].price = Number(req.body.price);
+    if (req.body.stock !== undefined) products[productIndex].stock = Number(req.body.stock);
+    if (req.body.category) products[productIndex].category = req.body.category;
+    if (req.body.image) {
+        products[productIndex].image = req.body.image;
+        if (!products[productIndex].images) products[productIndex].images = [req.body.image];
+    }
+    if (req.body.images && Array.isArray(req.body.images)) {
+        products[productIndex].images = req.body.images;
+        products[productIndex].image = req.body.images[0];
+    }
+    
+    data.products = products;
+    writeJSON(DATA_FILE, data);
+    res.json({ success: true, product: products[productIndex] });
+});
+
 app.delete('/products/:id', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let products = data.products || [];
@@ -216,7 +265,7 @@ app.post('/order', (req, res) => {
     const products = data.products || [];
     const users = data.users || [];
     
-    const { productId, quantity, username, customerName, address, phone } = req.body;
+    const { productId, quantity, username, customerName, address, phone, payment_id, payment_status } = req.body;
     
     const user = users.find(u => u.username === username);
     if (!user) {
@@ -250,7 +299,9 @@ app.post('/order', (req, res) => {
         totalPrice: product.price * Number(quantity),
         date: new Date().toLocaleString(),
         status: "Pending",
-        trackingId: ""
+        trackingId: "",
+        payment_status: payment_status || "pending",
+        payment_id: payment_id || ""
     };
     
     orders.push(newOrder);
@@ -349,6 +400,8 @@ app.get('/get-razorpay-key', (req, res) => {
     res.json({ key: RAZORPAY_KEY_ID });
 });
 
+// ============ ADMIN ROUTES ============
+
 app.post('/reset-completed-orders', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     const activeOrders = orders.filter(order => order.status === 'Pending' || order.status === 'Shipped');
@@ -367,6 +420,8 @@ app.post('/reset-history', (req, res) => {
     writeJSON(ORDERS_FILE, []);
     res.json({ success: true, message: "All orders deleted" });
 });
+
+// ============ AUTH ROUTES ============
 
 app.get('/auth/check/:username', (req, res) => {
     const data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -388,19 +443,9 @@ app.get('/user/:username', (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ id: user.id, username: user.username, status: user.status, phone: user.phone });
 });
-// Get all unique categories from products
-app.get('/categories', (req, res) => {
-    const data = readJSON(DATA_FILE, { products: [], users: [] });
-    const products = data.products || [];
-    const categories = [...new Set(products.map(p => p.category).filter(c => c))];
-    res.json(categories);
-});
-
-// Add this to product creation to handle multiple images
-// Modify the product schema in POST /products
 
 // ============ START SERVER ============
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`\n✅ ========================================`);
     console.log(`✅ SERVER RUNNING ON http://localhost:${PORT}`);
@@ -408,6 +453,12 @@ app.listen(PORT, () => {
     console.log(`📁 Data file: ${DATA_FILE}`);
     console.log(`📁 Orders file: ${ORDERS_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
+    console.log(`\n📸 FEATURES ENABLED:`);
+    console.log(`   - Multiple Product Images (Gallery)`);
+    console.log(`   - Category Management`);
+    console.log(`   - User Verification`);
+    console.log(`   - Order Tracking`);
+    console.log(`   - Bulk Label Printing`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
