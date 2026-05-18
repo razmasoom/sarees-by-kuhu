@@ -106,13 +106,19 @@
             color: #2c3e50;
         }
         
-        input { 
-            padding: 8px; 
+        input, textarea, select { 
+            padding: 10px; 
             border: 1px solid #ddd; 
             border-radius: 8px; 
             margin-bottom: 5px; 
             width: 100%; 
             box-sizing: border-box; 
+            font-family: inherit;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
         }
         
         .btn { 
@@ -267,7 +273,7 @@
         
         .category-input-group select {
             flex: 2;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
@@ -285,7 +291,7 @@
             background: #3498db;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
@@ -320,6 +326,76 @@
             cursor: pointer;
             font-size: 11px;
             margin-top: 5px;
+        }
+        
+        /* Description field style */
+        .description-field {
+            margin-bottom: 15px;
+        }
+        
+        .description-field textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        /* Confirmation Modal Styles */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30000;
+        }
+        
+        .confirm-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .confirm-modal-content h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .confirm-modal-content p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+        
+        .confirm-modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .confirm-modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .confirm-yes {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .confirm-no {
+            background: #95a5a6;
+            color: white;
         }
         
         /* Login Overlay */
@@ -583,6 +659,12 @@
             .print-label-card {
                 margin-bottom: 15px;
             }
+            
+            .confirm-modal-content {
+                width: 90%;
+                margin: 20px;
+                padding: 20px;
+            }
         }
         
         /* Desktop: Hide mobile cards */
@@ -628,7 +710,7 @@
             <div class="sidebar-link" onclick="showSection('inventory', this)">📦 Inventory Matrix</div>
             <div class="sidebar-link" onclick="showSection('users', this)" id="users-tab-link">👥 User Verification</div>
             <hr style="opacity: 0.1; margin: 15px 0;">
-            <button class="btn btn-reset" onclick="resetAllHistory()">🗑️ Reset Orders</button>
+            <button class="btn btn-reset" onclick="showResetConfirmation()">🗑️ Reset Orders</button>
             <button class="btn btn-delete" style="width: 100%; margin-top: 10px;" onclick="adminLogout()">🚪 Logout</button>
             <div class="sidebar-link" style="margin-top: 20px;" onclick="window.location.href='index.html'">🛒 Storefront</div>
         </div>
@@ -681,15 +763,20 @@
                 <div id="orders-mobile-container"></div>
             </div>
 
-            <!-- INVENTORY SECTION -->
+            <!-- INVENTORY SECTION with Description Field -->
             <div id="section-inventory" class="section-content" style="display: none;">
                 <h2>📦 Inventory Matrix</h2>
                 <div class="card">
                     <h3>Add New Item</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                         <input type="text" id="p-name" placeholder="Product Name">
                         <input type="number" id="p-price" placeholder="Price (₹)">
                         <input type="number" id="p-stock" placeholder="Stock Qty">
+                    </div>
+                    
+                    <!-- Product Description Field -->
+                    <div class="description-field">
+                        <textarea id="p-description" placeholder="Product Description (Fabric, Care Instructions, Features, etc.)" rows="3"></textarea>
                     </div>
                     
                     <div class="category-input-group">
@@ -716,7 +803,7 @@
                 
                 <!-- DESKTOP TABLE VIEW -->
                 <table class="data-table">
-                    <thead><tr><th>Name</th><th>Stock</th><th>Price</th><th>Update Stock</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Stock</th><th>Price</th><th>Description</th><th>Update Stock</th><th>Actions</th></tr></thead>
                     <tbody id="inventory-table-body"></tbody>
                 </table>
                 
@@ -730,12 +817,26 @@
                 
                 <!-- DESKTOP TABLE VIEW -->
                 <table class="data-table">
-                    <thead><tr><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
+                    <thead><td><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
                     <tbody id="users-table-body"></tbody>
                 </table>
                 
                 <!-- MOBILE CARD VIEW -->
                 <div id="users-mobile-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Reset Orders -->
+    <div id="resetConfirmModal" class="confirm-modal" style="display: none;">
+        <div class="confirm-modal-content">
+            <h3>⚠️ WARNING: Reset Orders</h3>
+            <p>Are you sure you want to reset orders?</p>
+            <p style="font-size: 14px; color: #e74c3c;">This will delete ALL completed and delivered orders.<br>Pending and Shipped orders will remain.</p>
+            <p style="font-size: 12px; color: #666;">This action CANNOT be undone!</p>
+            <div class="confirm-modal-buttons">
+                <button class="confirm-no" onclick="closeResetConfirmation()">❌ Cancel</button>
+                <button class="confirm-yes" onclick="confirmResetHistory()">⚠️ Yes, Reset Orders</button>
             </div>
         </div>
     </div>
@@ -758,6 +859,31 @@
         let lastUserCount = 0;
         let notificationCheckInterval = null;
         let previousUsers = [];
+
+        // ============ RESET CONFIRMATION FUNCTIONS ============
+        function showResetConfirmation() {
+            document.getElementById('resetConfirmModal').style.display = 'flex';
+        }
+        
+        function closeResetConfirmation() {
+            document.getElementById('resetConfirmModal').style.display = 'none';
+        }
+        
+        async function confirmResetHistory() {
+            closeResetConfirmation();
+            try {
+                const response = await fetch(`${API_BASE}/reset-completed-orders`, { method: 'POST' });
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    loadAll();
+                } else {
+                    alert("Failed to reset history");
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
 
         // ============ MULTIPLE IMAGES FUNCTIONS ============
         function addImageRow() {
@@ -991,15 +1117,17 @@
                     `;
                 });
 
-                // ============ RENDER INVENTORY ============
+                // ============ RENDER INVENTORY with Description ============
                 const inventoryTableBody = document.getElementById('inventory-table-body');
                 inventoryTableBody.innerHTML = '';
                 products.forEach(p => {
+                    const description = p.description ? (p.description.length > 50 ? p.description.substring(0, 50) + '...' : p.description) : 'No description';
                     inventoryTableBody.innerHTML += `
                         <tr>
                             <td>${p.name}</span>
                             <td><strong id="stock-${p.id}">${p.stock}</strong></span>
                             <td>₹${p.price}</span>
+                            <td>${description}</span>
                             <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></span>
                             <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></span>
                         </tr>
@@ -1013,6 +1141,7 @@
                         <div class="order-mobile-card">
                             <strong>${p.name}</strong>
                             <div>Price: ₹${p.price} | Stock: <strong id="stock-mob-${p.id}">${p.stock}</strong></div>
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">📝 ${p.description ? p.description.substring(0, 80) : 'No description'}</div>
                             <div class="stock-control" style="margin-top: 10px;">
                                 <input type="number" id="stock-change-mob-${p.id}" placeholder="+/- amount" value="0" step="1">
                                 <button class="btn-update" onclick="updateStockMobile(${p.id})">Update Stock</button>
@@ -1122,7 +1251,7 @@
             updateSelectionCount();
         }
 
-        // ============ FIXED BULK PRINT FUNCTION ============
+        // ============ BULK PRINT FUNCTION ============
         async function printBulkLabels() {
             if (selectedOrders.size === 0) { 
                 alert("Please select at least one order to print labels."); 
@@ -1140,7 +1269,6 @@
                 let bulkHtml = `<div class="bulk-label-container">`;
                 for (let i = 0; i < ordersToPrint.length; i++) {
                     const order = ordersToPrint[i];
-                    // Start new grid every 4 labels
                     if (i % 4 === 0) { 
                         if (i > 0) bulkHtml += `</div>`; 
                         bulkHtml += `<div class="label-grid">`; 
@@ -1179,7 +1307,7 @@
             }
         }
 
-        // ============ FIXED SINGLE PRINT FUNCTION ============
+        // ============ SINGLE PRINT FUNCTION ============
         function printLabel(order) {
             const buffer = document.getElementById('shipping-label-printout');
             buffer.innerHTML = `
@@ -1240,6 +1368,7 @@
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
             const stock = document.getElementById('p-stock').value;
+            const description = document.getElementById('p-description').value;
             const imageUrls = getAllImageUrls();
             const mainImage = imageUrls[0];
             
@@ -1253,10 +1382,23 @@
             if (!name || !price || !stock) { alert("Please fill all required fields"); return; }
             
             try {
-                await fetch(`${API_BASE}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price: parseFloat(price), stock: parseInt(stock), category, image: mainImage, images: imageUrls }) });
+                await fetch(`${API_BASE}/products`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ 
+                        name, 
+                        price: parseFloat(price), 
+                        stock: parseInt(stock), 
+                        category, 
+                        description: description || '',
+                        image: mainImage, 
+                        images: imageUrls 
+                    }) 
+                });
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-stock').value = '';
+                document.getElementById('p-description').value = '';
                 document.getElementById('image-urls-container').innerHTML = `<div class="image-row"><input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;"><button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button></div>`;
                 const catSelect = document.getElementById('p-cat');
                 const catNewInput = document.getElementById('p-cat-new');
@@ -1268,7 +1410,7 @@
                 catNewInput.value = '';
                 loadAll();
                 loadCategories();
-                alert("Product added successfully with " + imageUrls.length + " image(s)!");
+                alert("Product added successfully with " + imageUrls.length + " image(s) and description!");
             } catch (error) { alert("Error adding product: " + error.message); }
         }
 
@@ -1286,15 +1428,6 @@
                 await loadAll();
                 alert(`User ${newStatus === 'Verified' ? 'verified' : 'unverified'}!`);
             } catch (error) { alert("Error updating user"); }
-        }
-
-        async function resetAllHistory() {
-            if(!confirm("Delete completed/delivered orders? Pending/Shipped remain.")) return;
-            try {
-                await fetch(`${API_BASE}/reset-completed-orders`, { method: 'POST' });
-                alert("Reset completed!");
-                loadAll();
-            } catch (error) { alert("Error: " + error.message); }
         }
 
         // Initialize
