@@ -328,7 +328,6 @@
             margin-top: 5px;
         }
         
-        /* Description field style */
         .description-field {
             margin-bottom: 15px;
         }
@@ -488,7 +487,6 @@
             width: 100%;
         }
         
-        /* Label Content Styles */
         .label-shop-name { 
             text-align: center; 
             font-size: 24px; 
@@ -652,7 +650,6 @@
             
             .login-card { width: 90%; padding: 25px; }
             
-            /* Label adjustments for mobile print */
             .label-grid {
                 grid-template-columns: 1fr;
             }
@@ -754,7 +751,7 @@
                 <!-- DESKTOP TABLE VIEW -->
                 <table class="data-table" id="orders-table">
                     <thead>
-                        <tr><th>Select</th><th>Order ID</th><th>User</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th>Tracking ID</th><th>Actions</th></tr>
+                        <tr><th style="width:40px">Select</th><th>Order ID</th><th>User</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th>Tracking ID</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="orders-table-body"></tbody>
                 </table>
@@ -776,7 +773,7 @@
                     
                     <!-- Product Description Field -->
                     <div class="description-field">
-                        <textarea id="p-description" placeholder="Product Description (Fabric, Care Instructions, Features, etc.)" rows="3"></textarea>
+                        <textarea id="p-description" placeholder="Product Description (Fabric, Care Instructions, Features, Size, Color, etc.)" rows="3"></textarea>
                     </div>
                     
                     <div class="category-input-group">
@@ -811,13 +808,23 @@
                 <div id="inventory-mobile-container"></div>
             </div>
 
-            <!-- USER VERIFICATION SECTION -->
+            <!-- USER VERIFICATION SECTION - FIXED -->
             <div id="section-users" class="section-content" style="display: none;">
                 <h2>👥 User Verification</h2>
                 
                 <!-- DESKTOP TABLE VIEW -->
                 <table class="data-table">
-                    <thead><td><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th style="width:60px">S.No</th>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
+                            <th style="width:150px">Actions</th>
+                        </tr>
+                    </thead>
                     <tbody id="users-table-body"></tbody>
                 </table>
                 
@@ -1068,6 +1075,7 @@
                 // ============ RENDER ORDERS - DESKTOP TABLE VIEW ============
                 const ordersTableBody = document.getElementById('orders-table-body');
                 ordersTableBody.innerHTML = '';
+                let serialNo = 1;
                 [...orders].reverse().forEach(o => {
                     const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
                     ordersTableBody.innerHTML += `
@@ -1090,7 +1098,7 @@
                     `;
                 });
 
-                // ============ RENDER ORDERS - MOBILE CARD VIEW ============
+                // ============ RENDER ORDERS - MOBILE CARD VIEW with Selection ============
                 const ordersMobileContainer = document.getElementById('orders-mobile-container');
                 ordersMobileContainer.innerHTML = '';
                 [...orders].reverse().forEach(o => {
@@ -1098,7 +1106,10 @@
                     ordersMobileContainer.innerHTML += `
                         <div class="order-mobile-card">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <strong>Order #${o.orderId}</strong>
+                                <div>
+                                    <input type="checkbox" class="order-select-mobile" value="${o.orderId}" onchange="updateMobileSelectionCount()" style="margin-right: 10px;">
+                                    <strong>Order #${o.orderId}</strong>
+                                </div>
                                 <span style="background:${statusColor}; color:white; padding:2px 8px; border-radius:12px; font-size:11px;">${o.status}</span>
                             </div>
                             <div><strong>Customer:</strong> ${o.customerName}</div>
@@ -1151,31 +1162,38 @@
                     `;
                 });
 
-                // ============ RENDER USERS ============
+                // ============ RENDER USERS - FIXED with Serial Number ============
                 const usersTableBody = document.getElementById('users-table-body');
                 usersTableBody.innerHTML = '';
-                users.forEach(u => {
+                users.forEach((u, index) => {
                     usersTableBody.innerHTML += `
                         <tr>
+                            <td>${index + 1}</span>
                             <td>${u.id || 'N/A'}</span>
                             <td>${u.username || 'N/A'}</span>
                             <td>${u.phone || 'N/A'}</span>
                             <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></span>
                             <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</span>
-                            <td><button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button><button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button></span>
+                            <td>
+                                <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
+                                <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
+                            </span>
                         </tr>
                     `;
                 });
 
+                // ============ RENDER USERS - MOBILE CARD VIEW ============
                 const usersMobileContainer = document.getElementById('users-mobile-container');
                 usersMobileContainer.innerHTML = '';
-                users.forEach(u => {
+                users.forEach((u, index) => {
                     usersMobileContainer.innerHTML += `
                         <div class="order-mobile-card">
-                            <div><strong>${u.username}</strong> (ID: ${u.id})</div>
-                            <div>Phone: ${u.phone || 'N/A'}</div>
-                            <div>Status: <span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></div>
-                            <div>Registered: ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</div>
+                            <div><strong>${index + 1}. ${u.username}</strong> (ID: ${u.id})</div>
+                            <div>📞 Phone: ${u.phone || 'N/A'}</div>
+                            <div>📅 Registered: ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</div>
+                            <div style="margin-top: 8px;">
+                                <span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span>
+                            </div>
                             <div style="margin-top: 10px;">
                                 <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
                                 <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
@@ -1190,6 +1208,14 @@
                 console.error("Load failed", e); 
                 showServerStatus('❌ Error loading data', 'error');
             }
+        }
+
+        // Mobile selection functions
+        function updateMobileSelectionCount() {
+            const checkboxes = document.querySelectorAll('.order-select-mobile:checked');
+            selectedOrders.clear();
+            checkboxes.forEach(cb => selectedOrders.add(cb.value));
+            document.getElementById('selection-info').innerText = `${selectedOrders.size} order(s) selected`;
         }
 
         // Mobile tracking update wrapper
@@ -1236,16 +1262,26 @@
         function toggleSelectAll() {
             const selectAllCheckbox = document.getElementById('select-all-checkbox');
             const checkboxes = document.querySelectorAll('.order-select');
+            const mobileCheckboxes = document.querySelectorAll('.order-select-mobile');
+            
             checkboxes.forEach(cb => {
                 cb.checked = selectAllCheckbox.checked;
                 if (selectAllCheckbox.checked) selectedOrders.add(cb.value);
                 else selectedOrders.delete(cb.value);
             });
+            
+            mobileCheckboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+                if (selectAllCheckbox.checked) selectedOrders.add(cb.value);
+                else selectedOrders.delete(cb.value);
+            });
+            
             updateSelectionCount();
         }
 
         function clearSelection() {
             document.querySelectorAll('.order-select').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.order-select-mobile').forEach(cb => cb.checked = false);
             selectedOrders.clear();
             if (document.getElementById('select-all-checkbox')) document.getElementById('select-all-checkbox').checked = false;
             updateSelectionCount();
