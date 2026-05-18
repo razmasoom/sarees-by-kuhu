@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register | Smart Shop</title>
+    <title>Login / Register | Sarees By Kuhu</title>
     <style>
         body { 
             background: #f4f7f6; 
@@ -52,6 +52,21 @@
         #phone-input-container {
             display: none; /* Hidden by default for Login */
         }
+        
+        /* Mobile Responsive */
+        @media screen and (max-width: 480px) {
+            .auth-card {
+                width: 90%;
+                padding: 25px;
+                margin: 20px;
+            }
+            input, .btn {
+                padding: 10px;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -76,7 +91,9 @@
 
 <script>
     let isLoginMode = true;
-    const API = "http://localhost:3000/users";
+    // FIXED: Use relative URL - works on localhost AND Render
+    const API_BASE = "";
+    const API = `${API_BASE}/users`;
 
     function toggle() {
         isLoginMode = !isLoginMode;
@@ -100,19 +117,19 @@
             const response = await fetch(API);
             const users = await response.json();
 
-         if (isLoginMode) {
-    const found = users.find(user => user.username === u && user.password === p);
-  if (found) {
-    if (found.status !== 'Verified') {
-        alert("Account Pending Verification. Please contact admin.");
-        return;
-    }
-    localStorage.setItem('user', u);
-    window.location.href = "index.html";
-} else {
-        alert("Invalid username or password");
-    }
-} else {
+            if (isLoginMode) {
+                const found = users.find(user => user.username === u && user.password === p);
+                if (found) {
+                    if (found.status !== 'Verified') {
+                        alert("Account Pending Verification. Please contact admin.");
+                        return;
+                    }
+                    localStorage.setItem('user', u);
+                    window.location.href = "index.html";
+                } else {
+                    alert("Invalid username or password");
+                }
+            } else {
                 // REGISTRATION LOGIC
                 // 1. Check if Username exists
                 if (users.find(user => user.username === u)) {
@@ -125,22 +142,26 @@
                 }
                 
                 // 3. Register New User
-               const newUser = { 
-    username: u, 
-    password: p, 
-    phone: ph, 
-    status: 'Pending',  // Changed to Pending - requires admin approval
-    id: Date.now() 
-};
+                const newUser = { 
+                    username: u, 
+                    password: p, 
+                    phone: ph, 
+                    status: 'Pending',  // Changed to Pending - requires admin approval
+                    id: Date.now() 
+                };
 
-                await fetch(API, {
+                const registerResponse = await fetch(API, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newUser)
                 });
 
-                alert("Registered successfully! Now please login.");
-                toggle();
+                if (registerResponse.ok) {
+                    alert("Registered successfully! Please wait for admin approval.");
+                    toggle();
+                } else {
+                    alert("Registration failed. Please try again.");
+                }
             }
         } catch (error) {
             console.error("Auth Error:", error);
