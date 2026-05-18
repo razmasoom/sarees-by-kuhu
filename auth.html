@@ -67,6 +67,475 @@
                 font-size: 1.5em;
             }
         }
+        /* ========== MOBILE RESPONSIVE STYLES ========== */
+* {
+    box-sizing: border-box;
+}
+
+/* Mobile Viewport Fix */
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Mobile Styles (up to 768px) */
+@media screen and (max-width: 768px) {
+    /* Sidebar becomes horizontal top bar */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    
+    .sidebar h2 {
+        width: 100%;
+        text-align: center;
+        margin: 0 0 8px 0;
+        font-size: 18px;
+    }
+    
+    .sidebar-link {
+        display: inline-block;
+        padding: 6px 12px;
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+    
+    .sidebar hr {
+        display: none;
+    }
+    
+    /* Main content adjustment */
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+        width: 100%;
+    }
+    
+    /* Stats grid - single column */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .card {
+        padding: 12px;
+    }
+    
+    .card h3 {
+        font-size: 12px;
+    }
+    
+    .card p {
+        font-size: 20px;
+    }
+    
+    /* Make tables scroll horizontally */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+    
+    th, td {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    
+    /* Product grid - 2 columns on mobile */
+    #shop-container {
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .product-card {
+        width: calc(50% - 10px);
+        padding: 10px;
+    }
+    
+    .product-card img {
+        height: 120px;
+    }
+    
+    .product-card h3 {
+        font-size: 13px;
+        margin: 8px 0;
+    }
+    
+    .product-card p {
+        font-size: 12px;
+    }
+    
+    .product-card button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    /* Header responsive */
+    header {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 18px;
+    }
+    
+    #search-bar {
+        width: 90%;
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    /* Category menu */
+    .category-nav {
+        gap: 8px;
+        padding: 8px;
+    }
+    
+    .cat-btn {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+    
+    /* Cart drawer */
+    .cart-drawer {
+        width: 85%;
+        right: -85%;
+    }
+    
+    /* Order history cards */
+    .order-history-card {
+        padding: 12px;
+    }
+    
+    .order-history-header {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 11px;
+    }
+    
+    .order-history-card > div {
+        flex-direction: column !important;
+    }
+    
+    .order-history-card > div > div {
+        width: 100% !important;
+        text-align: left !important;
+        margin-bottom: 10px;
+    }
+    
+    /* Tracking info on mobile */
+    .tracking-info {
+        padding: 8px 10px;
+        margin-top: 8px;
+    }
+    
+    .tracking-id {
+        font-size: 11px;
+        word-break: break-all;
+    }
+    
+    .order-timeline {
+        font-size: 9px;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+    
+    /* Shipping card on mobile */
+    .shipping-card {
+        padding: 8px;
+        margin-top: 8px;
+    }
+    
+    .shipping-title {
+        font-size: 10px;
+    }
+    
+    .shipping-address {
+        font-size: 10px;
+    }
+    
+    /* Buttons on mobile */
+    .btn, button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .checkout-btn, .form-submit-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    /* Bulk actions bar */
+    .bulk-actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    .bulk-actions-bar .selection-info {
+        text-align: center;
+        font-size: 12px;
+    }
+    
+    /* Stock control */
+    .stock-control {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .stock-control input {
+        width: 100%;
+    }
+    
+    .stock-control button {
+        width: 100%;
+    }
+    
+    /* Labels for printing on mobile */
+    .shipping-label {
+        width: 100%;
+        min-height: auto;
+        padding: 15px;
+    }
+    
+    .shop-name-center {
+        font-size: 18px;
+        letter-spacing: 2px;
+    }
+    
+    .order-id-center {
+        font-size: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .buyer-section, .seller-section {
+        position: static;
+        text-align: left;
+        margin-top: 15px;
+    }
+    
+    .buyer-section {
+        text-align: right;
+    }
+    
+    .section-title {
+        font-size: 11px;
+    }
+    
+    .label-line {
+        font-size: 10px;
+    }
+    
+    /* Bulk label grid */
+    .label-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .print-label-card {
+        min-height: auto;
+        padding: 12px;
+    }
+    
+    .print-shop-name {
+        font-size: 14px;
+    }
+    
+    .print-order-id {
+        font-size: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .print-buyer-section {
+        text-align: left;
+        margin-bottom: 20px;
+    }
+    
+    .print-seller-section {
+        margin-top: 15px;
+    }
+    
+    /* User bar */
+    .user-bar {
+        padding: 8px 12px;
+        font-size: 11px;
+        text-align: center;
+    }
+    
+    .store-name-header {
+        float: none;
+        display: block;
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+    
+    /* Login card */
+    .auth-card, .login-card {
+        width: 90%;
+        padding: 20px;
+        margin: 20px auto;
+    }
+    
+    .auth-card h2, .login-card h2 {
+        font-size: 20px;
+    }
+    
+    /* Modal */
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+        padding: 15px;
+    }
+    
+    /* Footer */
+    .footer {
+        padding: 20px 15px;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .footer-section {
+        text-align: center;
+    }
+    
+    .footer-section h3 {
+        font-size: 14px;
+    }
+    
+    .footer-section p, .footer-section a {
+        font-size: 11px;
+    }
+    
+    .copyright {
+        font-size: 10px;
+    }
+    
+    /* Notification on mobile */
+    .notification {
+        min-width: 280px;
+        padding: 10px 15px;
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+    
+    .notification-icon {
+        font-size: 22px;
+    }
+    
+    .notification-title {
+        font-size: 12px;
+    }
+    
+    .notification-message {
+        font-size: 10px;
+    }
+    
+    /* Form inputs */
+    input, textarea, select {
+        font-size: 14px !important; /* Prevents zoom on iOS */
+    }
+    
+    /* Add product form */
+    #section-inventory .card div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+}
+
+/* Tablet Styles (769px to 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .product-card {
+        width: calc(33.33% - 20px);
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .sidebar {
+        width: 200px;
+    }
+    
+    .main-content {
+        margin-left: 220px;
+    }
+    
+    .label-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Small phones (up to 480px) */
+@media screen and (max-width: 480px) {
+    .product-card {
+        width: calc(50% - 8px);
+    }
+    
+    .product-card img {
+        height: 100px;
+    }
+    
+    .product-card h3 {
+        font-size: 11px;
+    }
+    
+    .stats-grid .card p {
+        font-size: 18px;
+    }
+    
+    th, td {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+    
+    .btn, button {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+    
+    .user-bar {
+        font-size: 10px;
+    }
+}
+
+/* Landscape mode for phones */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .main-content {
+        padding: 10px;
+    }
+    
+    .product-card img {
+        height: 80px;
+    }
+}
     </style>
 </head>
 <body>
