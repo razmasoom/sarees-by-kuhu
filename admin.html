@@ -366,13 +366,16 @@
         }
         .error-msg { color: #e74c3c; margin-top: 10px; font-size: 14px; }
         
-        /* Print Styles */
+        /* Print Styles for Labels */
         @media print {
             body * { visibility: hidden; }
             #shipping-label-printout, #shipping-label-printout * { visibility: visible; }
-            #shipping-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+            #shipping-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
+            #bulk-label-printout, #bulk-label-printout * { visibility: visible; }
+            #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
         }
         
+        /* Single Label Style */
         .shipping-label {
             width: 600px;
             min-height: 350px;
@@ -381,9 +384,15 @@
             font-family: 'Courier New', monospace;
             position: relative;
             background: white;
+            margin: 0 auto;
         }
         
-        .bulk-label-container { width: 100%; background: white; }
+        /* Bulk Label Container */
+        .bulk-label-container { 
+            width: 100%; 
+            background: white; 
+            padding: 20px;
+        }
         
         .label-grid {
             display: grid;
@@ -400,14 +409,50 @@
             min-height: 350px;
             position: relative;
             background: white;
+            width: 100%;
         }
         
-        .shop-name-center { text-align: center; font-size: 28px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
-        .order-id-center { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 60px; }
-        .buyer-section { position: absolute; top: 180px; right: 30px; text-align: right; }
-        .seller-section { position: absolute; bottom: 30px; left: 30px; text-align: left; }
-        .section-title { font-weight: bold; margin-bottom: 10px; font-size: 14px; text-decoration: underline; }
-        .label-line { margin: 5px 0; font-size: 12px; }
+        /* Label Content Styles */
+        .label-shop-name { 
+            text-align: center; 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+        }
+        
+        .label-order-id { 
+            text-align: center; 
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 50px; 
+        }
+        
+        .label-buyer-section { 
+            position: absolute; 
+            top: 130px; 
+            right: 20px; 
+            text-align: right; 
+        }
+        
+        .label-seller-section { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            text-align: left; 
+        }
+        
+        .label-section-title { 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            font-size: 12px; 
+            text-decoration: underline; 
+        }
+        
+        .label-line { 
+            margin: 4px 0; 
+            font-size: 11px; 
+        }
         
         /* ========== MOBILE LAYOUT (max-width: 768px) ========== */
         @media screen and (max-width: 768px) {
@@ -530,6 +575,14 @@
             }
             
             .login-card { width: 90%; padding: 25px; }
+            
+            /* Label adjustments for mobile print */
+            .label-grid {
+                grid-template-columns: 1fr;
+            }
+            .print-label-card {
+                margin-bottom: 15px;
+            }
         }
         
         /* Desktop: Hide mobile cards */
@@ -893,20 +946,20 @@
                     const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
                     ordersTableBody.innerHTML += `
                         <tr>
-                            <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
-                            <td>${o.orderId || 'N/A'}</td>
-                            <td>${o.username || 'N/A'}</td>
-                            <td>${o.customerName || 'N/A'}</td>
-                            <td>${o.productName || 'N/A'}</td>
-                            <td>${o.quantity || 0}</td>
-                            <td>₹${o.totalPrice || 0}</td>
-                            <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
-                            <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
+                            <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></span>
+                            <td>${o.orderId || 'N/A'}</span>
+                            <td>${o.username || 'N/A'}</span>
+                            <td>${o.customerName || 'N/A'}</span>
+                            <td>${o.productName || 'N/A'}</span>
+                            <td>${o.quantity || 0}</span>
+                            <td>₹${o.totalPrice || 0}</span>
+                            <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></span>
+                            <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></span>
                             <td>
                                 <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
                                 <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
                                 <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
-                            </td>
+                             </span>
                         </tr>
                     `;
                 });
@@ -944,11 +997,11 @@
                 products.forEach(p => {
                     inventoryTableBody.innerHTML += `
                         <tr>
-                            <td>${p.name}</td>
-                            <td><strong id="stock-${p.id}">${p.stock}</strong></td>
-                            <td>₹${p.price}</td>
-                            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></td>
-                            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></td>
+                            <td>${p.name}</span>
+                            <td><strong id="stock-${p.id}">${p.stock}</strong></span>
+                            <td>₹${p.price}</span>
+                            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></span>
+                            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></span>
                         </tr>
                     `;
                 });
@@ -975,12 +1028,12 @@
                 users.forEach(u => {
                     usersTableBody.innerHTML += `
                         <tr>
-                            <td>${u.id || 'N/A'}</td>
-                            <td>${u.username || 'N/A'}</td>
-                            <td>${u.phone || 'N/A'}</td>
-                            <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></td>
-                            <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</td>
-                            <td><button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button><button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button></td>
+                            <td>${u.id || 'N/A'}</span>
+                            <td>${u.username || 'N/A'}</span>
+                            <td>${u.phone || 'N/A'}</span>
+                            <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></span>
+                            <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</span>
+                            <td><button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button><button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button></span>
                         </tr>
                     `;
                 });
@@ -1069,25 +1122,88 @@
             updateSelectionCount();
         }
 
+        // ============ FIXED BULK PRINT FUNCTION ============
         async function printBulkLabels() {
-            if (selectedOrders.size === 0) { alert("Select orders to print"); return; }
+            if (selectedOrders.size === 0) { 
+                alert("Please select at least one order to print labels."); 
+                return; 
+            }
             try {
                 const response = await fetch(`${API_BASE}/history`);
                 const allOrders = await response.json();
                 const ordersToPrint = allOrders.filter(o => selectedOrders.has(o.orderId.toString()));
-                if (ordersToPrint.length === 0) { alert("No orders found"); return; }
+                if (ordersToPrint.length === 0) { 
+                    alert("No orders found to print."); 
+                    return; 
+                }
+                
                 let bulkHtml = `<div class="bulk-label-container">`;
                 for (let i = 0; i < ordersToPrint.length; i++) {
                     const order = ordersToPrint[i];
-                    if (i % 4 === 0) { if (i > 0) bulkHtml += `</div>`; bulkHtml += `<div class="label-grid">`; }
-                    bulkHtml += `<div class="print-label-card"><div class="shop-name-center">SAARES BY KUHU</div><div class="order-id-center">ORDER #${order.orderId}</div><div class="buyer-section"><div class="section-title">BUYER DETAILS:</div><div class="label-line">${order.customerName || 'N/A'}</div><div class="label-line">${order.address || 'No Address'}</div><div class="label-line">Phone: ${order.phone || 'N/A'}</div></div><div class="seller-section"><div class="section-title">SENDER DETAILS:</div><div class="label-line">Kuhu, Lalbagh, Purneacity</div><div class="label-line">Near-Industrial Area, Purneacity</div><div class="label-line">PS-Sadar, Purnea Bihar 854302</div><div class="label-line">Phone: +91 9304288748</div></div></div>`;
+                    // Start new grid every 4 labels
+                    if (i % 4 === 0) { 
+                        if (i > 0) bulkHtml += `</div>`; 
+                        bulkHtml += `<div class="label-grid">`; 
+                    }
+                    bulkHtml += `
+                        <div class="print-label-card">
+                            <div class="label-shop-name">SAARES BY KUHU</div>
+                            <div class="label-order-id">ORDER #${order.orderId}</div>
+                            <div class="label-buyer-section">
+                                <div class="label-section-title">BUYER DETAILS:</div>
+                                <div class="label-line">${order.customerName || 'N/A'}</div>
+                                <div class="label-line">${order.address || 'No Address'}</div>
+                                <div class="label-line">Phone: ${order.phone || 'N/A'}</div>
+                            </div>
+                            <div class="label-seller-section">
+                                <div class="label-section-title">SENDER DETAILS:</div>
+                                <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                                <div class="label-line">Near-Industrial Area, Purneacity</div>
+                                <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                                <div class="label-line">Phone: +91 9304288748</div>
+                            </div>
+                        </div>
+                    `;
                 }
                 bulkHtml += `</div></div>`;
-                document.getElementById('bulk-label-printout').innerHTML = bulkHtml;
-                document.getElementById('bulk-label-printout').style.display = 'block';
+                
+                const printContainer = document.getElementById('bulk-label-printout');
+                printContainer.innerHTML = bulkHtml;
+                printContainer.style.display = 'block';
                 window.print();
-                document.getElementById('bulk-label-printout').style.display = 'none';
-            } catch (error) { alert("Error printing labels"); }
+                printContainer.style.display = 'none';
+                alert(`${ordersToPrint.length} label(s) printed successfully!`);
+            } catch (error) { 
+                console.error("Error printing bulk labels:", error);
+                alert("Error printing labels. Please try again."); 
+            }
+        }
+
+        // ============ FIXED SINGLE PRINT FUNCTION ============
+        function printLabel(order) {
+            const buffer = document.getElementById('shipping-label-printout');
+            buffer.innerHTML = `
+                <div class="shipping-label">
+                    <div class="label-shop-name">SAARES BY KUHU</div>
+                    <div class="label-order-id">ORDER #${order.orderId}</div>
+                    <div class="label-buyer-section">
+                        <div class="label-section-title">BUYER DETAILS:</div>
+                        <div class="label-line">${order.customerName || 'N/A'}</div>
+                        <div class="label-line">${order.address || 'No Address'}</div>
+                        <div class="label-line">Phone: ${order.phone || 'N/A'}</div>
+                    </div>
+                    <div class="label-seller-section">
+                        <div class="label-section-title">SENDER DETAILS:</div>
+                        <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                        <div class="label-line">Near-Industrial Area, Purneacity</div>
+                        <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                        <div class="label-line">Phone: +91 9304288748</div>
+                    </div>
+                </div>
+            `;
+            buffer.style.display = 'block'; 
+            window.print(); 
+            buffer.style.display = 'none';
         }
 
         async function deleteSingleOrder(orderId) {
@@ -1181,14 +1297,7 @@
             } catch (error) { alert("Error: " + error.message); }
         }
 
-        function printLabel(order) {
-            const buffer = document.getElementById('shipping-label-printout');
-            buffer.innerHTML = `<div class="shipping-label"><div class="shop-name-center">SAARES BY KUHU</div><div class="order-id-center">ORDER #${order.orderId}</div><div class="buyer-section"><div class="section-title">BUYER DETAILS:</div><div class="label-line">${order.customerName || 'N/A'}</div><div class="label-line">${order.address || 'No Address'}</div><div class="label-line">Phone: ${order.phone || 'N/A'}</div></div><div class="seller-section"><div class="section-title">SENDER DETAILS:</div><div class="label-line">Kuhu, Lalbagh, Purneacity</div><div class="label-line">Near-Industrial Area, Purneacity</div><div class="label-line">PS-Sadar, Purnea Bihar 854302</div><div class="label-line">Phone: +91 9304288748</div></div></div>`;
-            buffer.style.display = 'block'; 
-            window.print(); 
-            buffer.style.display = 'none';
-        }
-
+        // Initialize
         checkAdminSession();
     </script>
 </body>
