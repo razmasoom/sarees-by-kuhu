@@ -388,6 +388,16 @@ app.get('/user/:username', (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ id: user.id, username: user.username, status: user.status, phone: user.phone });
 });
+// Get all unique categories from products
+app.get('/categories', (req, res) => {
+    const data = readJSON(DATA_FILE, { products: [], users: [] });
+    const products = data.products || [];
+    const categories = [...new Set(products.map(p => p.category).filter(c => c))];
+    res.json(categories);
+});
+
+// Add this to product creation to handle multiple images
+// Modify the product schema in POST /products
 
 // ============ START SERVER ============
 const PORT = 3000;
