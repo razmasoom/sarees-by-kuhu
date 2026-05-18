@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Hub | Saares By Kuhu</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: #f4f7f6; color: #333; }
@@ -139,6 +140,81 @@
             animation: pulse 1s infinite;
         }
         
+        /* Login Overlay Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
+        }
+        
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .login-card h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .login-card button:hover {
+            background: #219150;
+        }
+        
+        .error-msg {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
         @media print {
             body * { visibility: hidden; }
             #bulk-label-printout, #bulk-label-printout * { visibility: visible; }
@@ -194,75 +270,104 @@
         .label-line { margin: 5px 0; font-size: 12px; }
         .buyer-details, .seller-details { margin-top: 5px; }
         .select-all-checkbox { margin-right: 10px; }
+        
+        @media screen and (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+            .sidebar h2 { width: 100%; text-align: center; margin: 0 0 10px 0; }
+            .sidebar-link { display: inline-block; padding: 8px 12px; font-size: 14px; }
+            .main-content { margin-left: 0; padding: 20px; width: 100%; }
+            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+            .bulk-actions-bar { flex-wrap: wrap; }
+            .label-grid { grid-template-columns: 1fr; gap: 15px; }
+            .login-card { width: 90%; margin: 20px; padding: 25px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>Seller Hub</h2>
-        <div class="sidebar-link active" onclick="showSection('orders', this)">📋 Order Log</div>
-        <div class="sidebar-link" onclick="showSection('inventory', this)">📦 Inventory Matrix</div>
-        <div class="sidebar-link" onclick="showSection('users', this)" id="users-tab-link">👥 User Verification</div>
-        <hr style="opacity: 0.1;">
-        <button class="btn btn-reset" onclick="resetAllHistory()">🗑️ Reset Orders</button>
-        <div class="sidebar-link" style="margin-top:20px;" onclick="window.location.href='/index.html'">🛒 Storefront</div>
+    <!-- Admin Login Overlay -->
+    <div id="admin-login-overlay" class="login-overlay">
+        <div class="login-card">
+            <h2>🔐 Admin Login</h2>
+            <input type="text" id="admin-username" placeholder="Username" autocomplete="off">
+            <input type="password" id="admin-password" placeholder="Password">
+            <button onclick="verifyAdminLogin()">Login to Admin Panel</button>
+            <div id="login-error" class="error-msg"></div>
+            <hr style="margin: 20px 0;">
+            <a href="index.html" style="color: #2980b9; text-decoration: none;">← Back to Store</a>
+        </div>
     </div>
 
-    <div class="main-content">
-        <div id="server-status" class="server-status"></div>
-        
-        <div class="stats-grid">
-            <div class="card"><h3>Revenue</h3><p id="total-revenue">₹0</p></div>
-            <div class="card"><h3>Orders</h3><p id="order-count">0</p></div>
-            <div class="card"><h3>Registered Users</h3><p id="user-count">0</p></div>
+    <!-- Main Admin Content (Hidden until login) -->
+    <div id="admin-content" style="display: none;">
+        <div class="sidebar">
+            <h2>Seller Hub</h2>
+            <div class="sidebar-link active" onclick="showSection('orders', this)">📋 Order Log</div>
+            <div class="sidebar-link" onclick="showSection('inventory', this)">📦 Inventory Matrix</div>
+            <div class="sidebar-link" onclick="showSection('users', this)" id="users-tab-link">👥 User Verification</div>
+            <hr style="opacity: 0.1;">
+            <button class="btn btn-reset" onclick="resetAllHistory()">🗑️ Reset Orders</button>
+            <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
+            <div class="sidebar-link" style="margin-top:20px;" onclick="window.location.href='index.html'">🛒 Storefront</div>
         </div>
 
-        <div id="section-orders">
-            <h2>Order History & Labels</h2>
+        <div class="main-content">
+            <div id="server-status" class="server-status"></div>
             
-            <div class="bulk-actions-bar">
-                <label style="display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="select-all-checkbox" class="select-all-checkbox" onclick="toggleSelectAll()">
-                    <strong>Select All</strong>
-                </label>
-                <div class="selection-info" id="selection-info">0 orders selected</div>
-                <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected Labels (Max 4 per page)</button>
-                <button class="btn btn-verify" onclick="clearSelection()">Clear Selection</button>
+            <div class="stats-grid">
+                <div class="card"><h3>Revenue</h3><p id="total-revenue">₹0</p></div>
+                <div class="card"><h3>Orders</h3><p id="order-count">0</p></div>
+                <div class="card"><h3>Registered Users</h3><p id="user-count">0</p></div>
             </div>
-            
-            <table>
-                <thead>
-                    <tr><th>Select</th><th>Order ID</th><th>User ID</th><th>Customer Name</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th>Tracking ID</th><th>Actions</th></tr>
-                </thead>
-                <tbody id="orders-body"><tr><td colspan="10" style="text-align:center;">Loading orders...</td></tr></tbody>
-            </table>
-        </div>
 
-        <div id="section-inventory" style="display: none;">
-            <h2>Manage Products</h2>
-            <div class="card">
-                <h3>Add New Item</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
-                    <input type="text" id="p-name" placeholder="Product Name">
-                    <input type="number" id="p-price" placeholder="Price (₹)">
-                    <input type="number" id="p-stock" placeholder="Stock Qty">
-                    <input type="text" id="p-img" placeholder="Image URL">
-                    <input type="text" id="p-cat" placeholder="Category">
-                    <button class="btn btn-add" onclick="addProduct()">Save Product</button>
+            <div id="section-orders">
+                <h2>Order History & Labels</h2>
+                
+                <div class="bulk-actions-bar">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="select-all-checkbox" class="select-all-checkbox" onclick="toggleSelectAll()">
+                        <strong>Select All</strong>
+                    </label>
+                    <div class="selection-info" id="selection-info">0 orders selected</div>
+                    <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected Labels (Max 4 per page)</button>
+                    <button class="btn btn-verify" onclick="clearSelection()">Clear Selection</button>
                 </div>
+                
+                <table>
+                    <thead>
+                        <tr><th>Select</th><th>Order ID</th><th>User ID</th><th>Customer Name</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th>Tracking ID</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="orders-body"><tr><td colspan="10" style="text-align:center;">Loading orders...</td></tr></tbody>
+                </table>
             </div>
-            <table>
-                <thead><tr><th>Name</th><th>Current Stock</th><th>Price</th><th>Update Stock</th><th>Actions</th></tr></thead>
-                <tbody id="inventory-body"><tr><td colspan="5" style="text-align:center;">Loading products...</td></tr></tbody>
-            </table>
-        </div>
 
-        <div id="section-users" style="display: none;">
-            <h2>User Verification</h2>
-            <table>
-                <thead><tr><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
-                <tbody id="users-body"><tr><td colspan="6" style="text-align:center;">Loading users...</td></tr></tbody>
-            </table>
+            <div id="section-inventory" style="display: none;">
+                <h2>Manage Products</h2>
+                <div class="card">
+                    <h3>Add New Item</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+                        <input type="text" id="p-name" placeholder="Product Name">
+                        <input type="number" id="p-price" placeholder="Price (₹)">
+                        <input type="number" id="p-stock" placeholder="Stock Qty">
+                        <input type="text" id="p-img" placeholder="Image URL">
+                        <input type="text" id="p-cat" placeholder="Category">
+                        <button class="btn btn-add" onclick="addProduct()">Save Product</button>
+                    </div>
+                </div>
+                <table>
+                    <thead><tr><th>Name</th><th>Current Stock</th><th>Price</th><th>Update Stock</th><th>Actions</th></tr></thead>
+                    <tbody id="inventory-body"><tr><td colspan="5" style="text-align:center;">Loading products...</td></tr></tbody>
+                </table>
+            </div>
+
+            <div id="section-users" style="display: none;">
+                <h2>User Verification</h2>
+                <table>
+                    <thead><tr><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
+                    <tbody id="users-body"><tr><td colspan="6" style="text-align:center;">Loading users...</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -270,6 +375,10 @@
     <div id="bulk-label-printout" style="display: none;"></div>
 
     <script>
+        // Admin credentials (You can change these)
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "123";
+        
         // Auto-detect API URL
         const API_BASE = window.location.origin;
         let selectedOrders = new Set();
@@ -277,6 +386,49 @@
         let notificationCheckInterval = null;
         let previousUsers = [];
 
+        // ============ ADMIN AUTHENTICATION FUNCTIONS ============
+        
+        function checkAdminSession() {
+            const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+            if (isLoggedIn === 'true') {
+                document.getElementById('admin-login-overlay').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                startAdminFunctions();
+            } else {
+                document.getElementById('admin-login-overlay').style.display = 'flex';
+                document.getElementById('admin-content').style.display = 'none';
+            }
+        }
+
+        function verifyAdminLogin() {
+            const username = document.getElementById('admin-username').value.trim();
+            const password = document.getElementById('admin-password').value.trim();
+            const errorDiv = document.getElementById('login-error');
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                errorDiv.textContent = '';
+                document.getElementById('admin-login-overlay').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                startAdminFunctions();
+            } else {
+                errorDiv.textContent = 'Invalid username or password';
+            }
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            window.location.reload();
+        }
+
+        function startAdminFunctions() {
+            testConnection();
+            startUserMonitoring();
+            loadAll();
+        }
+
+        // ============ EXISTING FUNCTIONS (KEPT INTACT) ============
+        
         function showServerStatus(message, type) {
             const statusDiv = document.getElementById('server-status');
             statusDiv.className = 'server-status ' + type;
@@ -294,7 +446,7 @@
                     return true;
                 }
             } catch (error) {
-                showServerStatus('❌ Cannot connect to server. Make sure server is running on port 3000 and refresh the page.', 'error');
+                showServerStatus('❌ Cannot connect to server. Make sure server is running.', 'error');
                 return false;
             }
             return false;
@@ -452,7 +604,7 @@
                 showServerStatus('✅ Data loaded successfully!', 'success');
             } catch (e) { 
                 console.error("Load failed", e); 
-                showServerStatus('❌ Error loading data. Make sure server is running on port 3000 and refresh the page.', 'error');
+                showServerStatus('❌ Error loading data. Make sure server is running.', 'error');
             }
         }
 
@@ -610,10 +762,8 @@
             buffer.style.display = 'block'; window.print(); buffer.style.display = 'none';
         }
 
-        // Initialize
-        testConnection();
-        startUserMonitoring();
-        loadAll();
+        // Check admin session on page load
+        checkAdminSession();
     </script>
 </body>
 </html>
