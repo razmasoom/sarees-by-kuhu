@@ -1356,7 +1356,7 @@
             menu.innerHTML = categories.map(cat => `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`).join('');
         }
 
-        function displayProducts(productsToDisplay) {
+function displayProducts(productsToDisplay) {
     const container = document.getElementById('shop-container');
     container.innerHTML = '';
     productsToDisplay.forEach(product => {
@@ -1364,15 +1364,14 @@
         const hasMultipleImages = product.images && product.images.length > 1;
         const imageUrl = (product.images && product.images[0]) ? product.images[0] : (product.image || 'https://via.placeholder.com/150');
         
-        // Shorten description for card view (max 60 characters)
         const shortDescription = product.description ? 
             (product.description.length > 60 ? product.description.substring(0, 60) + '...' : product.description) : '';
         
         container.innerHTML += `
             <div class="product-card">
-                <img src="${imageUrl}" onclick="openProductGallery(${product.id})" alt="${product.name}">
+                <img src="${imageUrl}" onclick="window.location.href='product.html?id=${product.id}'" alt="${product.name}" style="cursor:pointer;">
                 ${hasMultipleImages ? '<span class="multi-image-badge">📸</span>' : ''}
-                <h3>${product.name}</h3>
+                <h3 onclick="window.location.href='product.html?id=${product.id}'" style="cursor:pointer;">${product.name}</h3>
                 <p style="color:#B12704; font-weight:bold;">₹${product.price}</p>
                 ${shortDescription ? `<p style="font-size:11px; color:#666; margin:5px 0;">${shortDescription}</p>` : ''}
                 <p style="font-size:12px; color:${isOutOfStock ? 'red' : '#28a745'};">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
