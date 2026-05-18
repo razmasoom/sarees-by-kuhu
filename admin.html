@@ -495,7 +495,7 @@
                     if (i % 4 === 0) { if (i > 0) bulkHtml += `</div>`; bulkHtml += `<div class="label-grid">`; }
                     bulkHtml += `
                         <div class="print-label-card">
-                            <div class="print-shop-name">SAARES BY KUMARI KUHU</div>
+                            <div class="print-shop-name">SAARES BY KUHU</div>
                             <div class="print-order-id">ORDER #${order.orderId}</div>
                             <div class="print-buyer-section">
                                 <div class="print-section-title">BUYER DETAILS:</div>
@@ -505,7 +505,7 @@
                             </div>
                             <div class="print-seller-section">
                                 <div class="print-section-title">SENDER DETAILS:</div>
-                                <div class="print-label-line">Kumari Kuhu</div>
+                                <div class="print-label-line">Kuhu</div>
                                 <div class="print-label-line">Lalbagh, Purneacity</div>
                                 <div class="print-label-line">Near-Industrial Area, Purneacity</div>
                                 <div class="print-label-line">PS-Sadar, Purnea Bihar 854302</div>
@@ -606,7 +606,7 @@
 
         function printLabel(order) {
             const buffer = document.getElementById('shipping-label-printout');
-            buffer.innerHTML = `<div class="shipping-label"><div class="shop-name-center">SAARES BY KUMARI KUHU</div><div class="order-id-center">ORDER #${order.orderId}</div><div class="buyer-section"><div class="section-title">BUYER DETAILS:</div><div class="buyer-details"><div class="label-line">${order.customerName || 'N/A'}</div><div class="label-line">${order.address || 'No Address'}</div><div class="label-line">Phone: ${order.phone || 'N/A'}</div></div></div><div class="seller-section"><div class="section-title">SENDER DETAILS:</div><div class="seller-details"><div class="label-line">Kumari Kuhu</div><div class="label-line">Lalbagh, Purneacity</div><div class="label-line">Near-Industrial Area, Purneacity</div><div class="label-line">PS-Sadar, Purnea Bihar 854302</div><div class="label-line">Phone: +91 9304288748</div><div class="label-line">Email: sareesbykuhu@gmail.com</div></div></div></div>`;
+            buffer.innerHTML = `<div class="shipping-label"><div class="shop-name-center">SAARES BY KUHU</div><div class="order-id-center">ORDER #${order.orderId}</div><div class="buyer-section"><div class="section-title">BUYER DETAILS:</div><div class="buyer-details"><div class="label-line">${order.customerName || 'N/A'}</div><div class="label-line">${order.address || 'No Address'}</div><div class="label-line">Phone: ${order.phone || 'N/A'}</div></div></div><div class="seller-section"><div class="section-title">SENDER DETAILS:</div><div class="seller-details"><div class="label-line">Kuhu</div><div class="label-line">Lalbagh, Purneacity</div><div class="label-line">Near-Industrial Area, Purneacity</div><div class="label-line">PS-Sadar, Purnea Bihar 854302</div><div class="label-line">Phone: +91 9304288748</div><div class="label-line">Email: sareesbykuhu@gmail.com</div></div></div></div>`;
             buffer.style.display = 'block'; window.print(); buffer.style.display = 'none';
         }
 
