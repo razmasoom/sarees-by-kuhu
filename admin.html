@@ -749,12 +749,21 @@
                 </div>
                 
                 <!-- DESKTOP TABLE VIEW -->
-                <table class="data-table" id="orders-table">
-                    <thead>
-                        <tr><th style="width:40px">Select</th><th>Order ID</th><th>User</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th>Tracking ID</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody id="orders-table-body"></tbody>
-                </table>
+               <!-- DESKTOP TABLE VIEW - Updated with Description column -->
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Images</th>
+            <th>Update Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="inventory-table-body"></tbody>
+</table>
                 
                 <!-- MOBILE CARD VIEW -->
                 <div id="orders-mobile-container"></div>
@@ -1129,21 +1138,24 @@
                 });
 
                 // ============ RENDER INVENTORY with Description ============
-                const inventoryTableBody = document.getElementById('inventory-table-body');
-                inventoryTableBody.innerHTML = '';
-                products.forEach(p => {
-                    const description = p.description ? (p.description.length > 50 ? p.description.substring(0, 50) + '...' : p.description) : 'No description';
-                    inventoryTableBody.innerHTML += `
-                        <tr>
-                            <td>${p.name}</span>
-                            <td><strong id="stock-${p.id}">${p.stock}</strong></span>
-                            <td>₹${p.price}</span>
-                            <td>${description}</span>
-                            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></span>
-                            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></span>
-                        </tr>
-                    `;
-                });
+// ============ RENDER INVENTORY with Description ============
+const inventoryTableBody = document.getElementById('inventory-table-body');
+inventoryTableBody.innerHTML = '';
+products.forEach(p => {
+    const description = p.description ? (p.description.length > 60 ? p.description.substring(0, 60) + '...' : p.description) : 'No description';
+    const imageCount = p.images ? p.images.length : 1;
+    inventoryTableBody.innerHTML += `
+        <tr>
+            <td>${p.name}</span>
+            <td><strong id="stock-${p.id}">${p.stock}</strong></span>
+            <td>₹${p.price}</span>
+            <td><span style="font-size: 12px; color: #555;" title="${p.description || ''}">${description}</span></span>
+            <td><span style="font-size: 11px; background: #e8e8e8; padding: 2px 6px; border-radius: 10px;">📸 ${imageCount}</span></span>
+            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></span>
+            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></span>
+        </tr>
+    `;
+});
 
                 const inventoryMobileContainer = document.getElementById('inventory-mobile-container');
                 inventoryMobileContainer.innerHTML = '';
