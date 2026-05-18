@@ -90,10 +90,9 @@
 </div>
 
 <script>
+    // FIXED: Same as admin.html - works on localhost AND Render
+    const API_BASE = window.location.origin;
     let isLoginMode = true;
-    // FIXED: Use relative URL - works on localhost AND Render
-    const API_BASE = "";
-    const API = `${API_BASE}/users`;
 
     function toggle() {
         isLoginMode = !isLoginMode;
@@ -114,7 +113,7 @@
         if(!isLoginMode && (!ph || ph.length !== 10)) return alert("Please enter a valid 10-digit mobile number");
 
         try {
-            const response = await fetch(API);
+            const response = await fetch(`${API_BASE}/users`);
             const users = await response.json();
 
             if (isLoginMode) {
@@ -146,11 +145,12 @@
                     username: u, 
                     password: p, 
                     phone: ph, 
-                    status: 'Pending',  // Changed to Pending - requires admin approval
-                    id: Date.now() 
+                    status: 'Pending',
+                    id: Date.now(),
+                    registeredAt: new Date().toISOString()
                 };
 
-                const registerResponse = await fetch(API, {
+                const registerResponse = await fetch(`${API_BASE}/users`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(newUser)
