@@ -280,8 +280,8 @@ app.post('/order', (req, res) => {
         return res.status(404).json({ message: "Product not found" });
     }
     
-    // IMPORTANT FIX: Check if stock is sufficient (but don't reduce again)
-    // Stock was already reduced when adding to cart, just verify it's not negative
+    // IMPORTANT: Only verify stock is not negative (don't reduce again)
+    // Stock was already reduced when adding to cart
     if (product.stock < 0) {
         return res.status(400).json({ message: "Stock inconsistency. Please contact support." });
     }
@@ -307,9 +307,9 @@ app.post('/order', (req, res) => {
     
     orders.push(newOrder);
     writeJSON(ORDERS_FILE, orders);
-    // IMPORTANT: Do NOT modify product stock here again! Stock already reduced in cart.
+    // DO NOT modify product stock here! Stock already reduced in cart.
     
-    console.log(`✅ Order created for ${username}: ${product.name} x ${quantity} (Stock already reserved in cart)`);
+    console.log(`✅ Order created for ${username}: ${product.name} x ${quantity}`);
     res.status(201).json(newOrder);
 });
 
@@ -491,10 +491,12 @@ app.listen(PORT, () => {
     console.log(`\n✅ FIXES APPLIED:`);
     console.log(`   - Stock deducted ONLY when adding to cart`);
     console.log(`   - Order placement does NOT deduct stock again`);
+    console.log(`   - No more "Insufficient stock" error on checkout`);
     console.log(`   - Cancel/Delete order restores stock properly`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
     console.log(`   - Login: http://localhost:${PORT}/auth.html`);
+    console.log(`   - Product Page: http://localhost:${PORT}/product.html?id=1`);
     console.log(`\n✅ ========================================\n`);
 });
