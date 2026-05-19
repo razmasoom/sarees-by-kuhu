@@ -551,10 +551,50 @@
             saveCart();
         }
         
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-            showMessage('Item removed from cart');
+        // FIXED: Remove from cart and restore stock on server
+        async function removeFromCart(index) {
+            const item = cart[index];
+            if (!item) return;
+            
+            // Show loading state on remove button
+            const removeBtn = event?.target;
+            if (removeBtn) {
+                removeBtn.textContent = '...';
+                removeBtn.disabled = true;
+            }
+            
+            try {
+                // Restore stock on server
+                const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: item.quantity })
+                });
+                
+                if (!stockUpdateResponse.ok) {
+                    throw new Error('Failed to restore stock');
+                }
+                
+                // If this is the current product being viewed, update its stock display
+                if (currentProduct && currentProduct.id === item.productId) {
+                    currentProduct.stock += item.quantity;
+                    updateStockDisplay();
+                }
+                
+                // Remove from cart array
+                cart.splice(index, 1);
+                updateCartUI();
+                showMessage(`✓ Removed ${item.quantity} × ${item.name} from cart. Stock restored.`);
+                
+            } catch (error) {
+                console.error("Error removing from cart:", error);
+                showMessage('Failed to remove item. Please try again.', true);
+            } finally {
+                if (removeBtn) {
+                    removeBtn.textContent = 'x';
+                    removeBtn.disabled = false;
+                }
+            }
         }
         
         function toggleCart() {
@@ -582,6 +622,9 @@
                     stockElement.className = 'product-stock in-stock';
                     addToCartBtn.disabled = false;
                     if (quantityInput) quantityInput.max = currentProduct.stock;
+                    if (quantityInput && quantityInput.value > currentProduct.stock) {
+                        quantityInput.value = currentProduct.stock;
+                    }
                 } else {
                     stockElement.innerHTML = '❌ Out of Stock';
                     stockElement.className = 'product-stock out-of-stock';
@@ -590,7 +633,7 @@
             }
         }
         
-        // FIXED: Simplified add to cart - no double stock update
+        // Add to cart function
         async function addToCart() {
             const quantity = parseInt(document.getElementById('quantity').value);
             
@@ -625,7 +668,7 @@
             addBtn.textContent = 'Adding...';
             
             try {
-                // First update stock on server
+                // Update stock on server
                 const stockUpdateResponse = await fetch(`${API_BASE}/products/${currentProduct.id}/stock`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
