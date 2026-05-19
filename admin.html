@@ -736,86 +736,89 @@
             </div>
 
             <!-- ORDER LOG SECTION -->
-            <div id="section-orders" class="section-content">
-                <h2>📋 Order Log</h2>
-                <div class="bulk-actions-bar">
-                    <label style="display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" id="select-all-checkbox" class="select-all-checkbox" onclick="toggleSelectAll()">
-                        <strong>Select All</strong>
-                    </label>
-                    <div class="selection-info" id="selection-info">0 orders selected</div>
-                    <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected</button>
-                    <button class="btn btn-verify" onclick="clearSelection()">Clear</button>
-                </div>
-                
-                <!-- DESKTOP TABLE VIEW -->
-               <!-- DESKTOP TABLE VIEW - Updated with Description column -->
-<table class="data-table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Stock</th>
-            <th>Price</th>
-            <th>Description</th>
-            <th>Images</th>
-            <th>Update Stock</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="inventory-table-body"></tbody>
-</table>
-                
-                <!-- MOBILE CARD VIEW -->
-                <div id="orders-mobile-container"></div>
-            </div>
+<div id="section-orders" class="section-content">
+    <h2>📋 Order Log</h2>
+    <div class="bulk-actions-bar">
+        <label style="display: flex; align-items: center; gap: 5px;">
+            <input type="checkbox" id="select-all-checkbox" class="select-all-checkbox" onclick="toggleSelectAll()">
+            <strong>Select All</strong>
+        </label>
+        <div class="selection-info" id="selection-info">0 orders selected</div>
+        <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected</button>
+        <button class="btn btn-verify" onclick="clearSelection()">Clear</button>
+    </div>
+    
+    <!-- DESKTOP TABLE VIEW - Orders Table -->
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width:30px"><input type="checkbox" id="select-all-checkbox-table" onchange="toggleSelectAll()"></th>
+                <th>Order ID</th>
+                <th>Username</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Tracking ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="orders-table-body"></tbody>
+    </table>
+    
+    <!-- MOBILE CARD VIEW -->
+    <div id="orders-mobile-container"></div>
+</div>
 
-            <!-- INVENTORY SECTION with Description Field -->
-            <div id="section-inventory" class="section-content" style="display: none;">
-                <h2>📦 Inventory Matrix</h2>
-                <div class="card">
-                    <h3>Add New Item</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                        <input type="text" id="p-name" placeholder="Product Name">
-                        <input type="number" id="p-price" placeholder="Price (₹)">
-                        <input type="number" id="p-stock" placeholder="Stock Qty">
-                    </div>
-                    
-                    <!-- Product Description Field -->
-                    <div class="description-field">
-                        <textarea id="p-description" placeholder="Product Description (Fabric, Care Instructions, Features, Size, Color, etc.)" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="category-input-group">
-                        <select id="p-cat">
-                            <option value="">Select Category</option>
-                        </select>
-                        <input type="text" id="p-cat-new" placeholder="Enter new category">
-                        <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
-                    </div>
-                    
-                    <div class="multi-image-section">
-                        <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 8px;">📸 Product Images</label>
-                        <div id="image-urls-container">
-                            <div class="image-row">
-                                <input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;">
-                                <button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button>
-                            </div>
-                        </div>
-                        <button type="button" class="add-image-btn" onclick="addImageRow()">+ Add Another Image</button>
-                    </div>
-                    
-                    <button class="btn btn-add" onclick="addProduct()">Save Product</button>
+<!-- INVENTORY SECTION - Fix table body ID -->
+<div id="section-inventory" class="section-content" style="display: none;">
+    <h2>📦 Inventory Matrix</h2>
+    <div class="card">
+        <h3>Add New Item</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="p-name" placeholder="Product Name">
+            <input type="number" id="p-price" placeholder="Price (₹)">
+            <input type="number" id="p-stock" placeholder="Stock Qty">
+        </div>
+        
+        <div class="description-field">
+            <textarea id="p-description" placeholder="Product Description (Fabric, Care Instructions, Features, Size, Color, etc.)" rows="3"></textarea>
+        </div>
+        
+        <div class="category-input-group">
+            <select id="p-cat">
+                <option value="">Select Category</option>
+            </select>
+            <input type="text" id="p-cat-new" placeholder="Enter new category">
+            <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
+        </div>
+        
+        <div class="multi-image-section">
+            <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 8px;">📸 Product Images</label>
+            <div id="image-urls-container">
+                <div class="image-row">
+                    <input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;">
+                    <button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button>
                 </div>
-                
-                <!-- DESKTOP TABLE VIEW -->
-                <table class="data-table">
-                    <thead><tr><th>Name</th><th>Stock</th><th>Price</th><th>Description</th><th>Update Stock</th><th>Actions</th></tr></thead>
-                    <tbody id="inventory-table-body"></tbody>
-                </table>
-                
-                <!-- MOBILE CARD VIEW -->
-                <div id="inventory-mobile-container"></div>
             </div>
+            <button type="button" class="add-image-btn" onclick="addImageRow()">+ Add Another Image</button>
+        </div>
+        
+        <button class="btn btn-add" onclick="addProduct()">Save Product</button>
+    </div>
+    
+    <!-- DESKTOP TABLE VIEW - Inventory Table -->
+    <table class="data-table">
+        <thead>
+            <tr><th>Name</th><th>Stock</th><th>Price</th><th>Description</th><th>Images</th><th>Update Stock</th><th>Actions</th</tr>
+        </thead>
+        <tbody id="inventory-table-body"></tbody>
+    </table>
+    
+    <!-- MOBILE CARD VIEW -->
+    <div id="inventory-mobile-container"></div>
+</div>
 
             <!-- USER VERIFICATION SECTION - FIXED -->
             <div id="section-users" class="section-content" style="display: none;">
@@ -1057,108 +1060,121 @@
             fetch(`${API_BASE}/users`).then(r => r.json()).then(users => { lastUserCount = users.length; previousUsers = [...users]; }).catch(e => console.error(e));
             notificationCheckInterval = setInterval(checkForNewUsers, 10000);
         }
+async function loadAll() {
+    try {
+        const [orders, products, users] = await Promise.all([
+            fetch(`${API_BASE}/history`).then(r => r.json()),
+            fetch(`${API_BASE}/products`).then(r => r.json()),
+            fetch(`${API_BASE}/users`).then(r => r.json())
+        ]);
 
-        async function loadAll() {
-            try {
-                const [orders, products, users] = await Promise.all([
-                    fetch(`${API_BASE}/history`).then(r => r.json()),
-                    fetch(`${API_BASE}/products`).then(r => r.json()),
-                    fetch(`${API_BASE}/users`).then(r => r.json())
-                ]);
+        console.log("Products loaded:", products); // Debug log
+        console.log("Users loaded:", users); // Debug log
+        console.log("Orders loaded:", orders); // Debug log
 
-                let rev = 0;
-                const activeOrders = orders.filter(o => o.status !== 'Cancelled');
-                activeOrders.forEach(o => rev += Number(o.totalPrice));
-                
-                document.getElementById('total-revenue').innerText = `₹${rev}`;
-                document.getElementById('order-count').innerText = orders.length;
-                document.getElementById('user-count').innerText = users.length;
-                
-                const mobileRevenue = document.getElementById('mobile-total-revenue');
-                const mobileOrders = document.getElementById('mobile-order-count');
-                const mobileUsers = document.getElementById('mobile-user-count');
-                if (mobileRevenue) mobileRevenue.innerText = `₹${rev}`;
-                if (mobileOrders) mobileOrders.innerText = orders.length;
-                if (mobileUsers) mobileUsers.innerText = users.length;
+        let rev = 0;
+        const activeOrders = orders.filter(o => o.status !== 'Cancelled');
+        activeOrders.forEach(o => rev += Number(o.totalPrice));
+        
+        document.getElementById('total-revenue').innerText = `₹${rev}`;
+        document.getElementById('order-count').innerText = orders.length;
+        document.getElementById('user-count').innerText = users.length;
+        
+        const mobileRevenue = document.getElementById('mobile-total-revenue');
+        const mobileOrders = document.getElementById('mobile-order-count');
+        const mobileUsers = document.getElementById('mobile-user-count');
+        if (mobileRevenue) mobileRevenue.innerText = `₹${rev}`;
+        if (mobileOrders) mobileOrders.innerText = orders.length;
+        if (mobileUsers) mobileUsers.innerText = users.length;
 
-                // ============ RENDER ORDERS - DESKTOP TABLE VIEW ============
-                const ordersTableBody = document.getElementById('orders-table-body');
-                ordersTableBody.innerHTML = '';
-                let serialNo = 1;
-                [...orders].reverse().forEach(o => {
-                    const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
-                    ordersTableBody.innerHTML += `
-                        <tr>
-                            <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></span>
-                            <td>${o.orderId || 'N/A'}</span>
-                            <td>${o.username || 'N/A'}</span>
-                            <td>${o.customerName || 'N/A'}</span>
-                            <td>${o.productName || 'N/A'}</span>
-                            <td>${o.quantity || 0}</span>
-                            <td>₹${o.totalPrice || 0}</span>
-                            <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></span>
-                            <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></span>
-                            <td>
-                                <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
+        // ============ RENDER ORDERS - DESKTOP TABLE VIEW ============
+        const ordersTableBody = document.getElementById('orders-table-body');
+        if (ordersTableBody) {
+            ordersTableBody.innerHTML = '';
+            [...orders].reverse().forEach(o => {
+                const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                ordersTableBody.innerHTML += `
+                    <tr>
+                        <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
+                        <td>${o.orderId || 'N/A'}</td>
+                        <td>${o.username || 'N/A'}</td>
+                        <td>${o.customerName || 'N/A'}</td>
+                        <td>${o.productName || 'N/A'}</td>
+                        <td>${o.quantity || 0}</td>
+                        <td>₹${o.totalPrice || 0}</td>
+                        <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
+                        <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
+                        <td>
+                            <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
+                            <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
+                            <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ============ RENDER ORDERS - MOBILE CARD VIEW ============
+        const ordersMobileContainer = document.getElementById('orders-mobile-container');
+        if (ordersMobileContainer) {
+            ordersMobileContainer.innerHTML = '';
+            [...orders].reverse().forEach(o => {
+                const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                ordersMobileContainer.innerHTML += `
+                    <div class="order-mobile-card">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <div>
+                                <input type="checkbox" class="order-select-mobile" value="${o.orderId}" onchange="updateMobileSelectionCount()" style="margin-right: 10px;">
+                                <strong>Order #${o.orderId}</strong>
+                            </div>
+                            <span style="background:${statusColor}; color:white; padding:2px 8px; border-radius:12px; font-size:11px;">${o.status}</span>
+                        </div>
+                        <div><strong>Customer:</strong> ${o.customerName}</div>
+                        <div><strong>Product:</strong> ${o.productName} (x${o.quantity})</div>
+                        <div><strong>Total:</strong> ₹${o.totalPrice}</div>
+                        <div><strong>User:</strong> ${o.username}</div>
+                        <div style="margin-top: 10px;">
+                            <input type="text" id="tracking-mob-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn btn-verify" onclick="updateTrackingMobile(${o.orderId})">Update</button>
                                 <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
                                 <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
-                             </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        // ============ RENDER INVENTORY with Description ============
+        const inventoryTableBody = document.getElementById('inventory-table-body');
+        if (inventoryTableBody) {
+            inventoryTableBody.innerHTML = '';
+            if (products && products.length > 0) {
+                products.forEach(p => {
+                    const description = p.description ? (p.description.length > 60 ? p.description.substring(0, 60) + '...' : p.description) : 'No description';
+                    const imageCount = p.images ? p.images.length : 1;
+                    inventoryTableBody.innerHTML += `
+                        <tr>
+                            <td><strong>${p.name}</strong></td>
+                            <td><strong id="stock-${p.id}">${p.stock}</strong></td>
+                            <td>₹${p.price}</td>
+                            <td><span style="font-size: 12px; color: #555;" title="${p.description || ''}">${description}</span></td>
+                            <td><span style="font-size: 11px; background: #e8e8e8; padding: 2px 6px; border-radius: 10px;">📸 ${imageCount}</span></td>
+                            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></td>
+                            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></td>
                         </tr>
                     `;
                 });
+            } else {
+                inventoryTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No products found. Add some!</td></tr>';
+            }
+        }
 
-                // ============ RENDER ORDERS - MOBILE CARD VIEW with Selection ============
-                const ordersMobileContainer = document.getElementById('orders-mobile-container');
-                ordersMobileContainer.innerHTML = '';
-                [...orders].reverse().forEach(o => {
-                    const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
-                    ordersMobileContainer.innerHTML += `
-                        <div class="order-mobile-card">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div>
-                                    <input type="checkbox" class="order-select-mobile" value="${o.orderId}" onchange="updateMobileSelectionCount()" style="margin-right: 10px;">
-                                    <strong>Order #${o.orderId}</strong>
-                                </div>
-                                <span style="background:${statusColor}; color:white; padding:2px 8px; border-radius:12px; font-size:11px;">${o.status}</span>
-                            </div>
-                            <div><strong>Customer:</strong> ${o.customerName}</div>
-                            <div><strong>Product:</strong> ${o.productName} (x${o.quantity})</div>
-                            <div><strong>Total:</strong> ₹${o.totalPrice}</div>
-                            <div><strong>User:</strong> ${o.username}</div>
-                            <div style="margin-top: 10px;">
-                                <input type="text" id="tracking-mob-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;">
-                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                    <button class="btn btn-verify" onclick="updateTrackingMobile(${o.orderId})">Update</button>
-                                    <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
-                                    <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                // ============ RENDER INVENTORY with Description ============
-// ============ RENDER INVENTORY with Description ============
-const inventoryTableBody = document.getElementById('inventory-table-body');
-inventoryTableBody.innerHTML = '';
-products.forEach(p => {
-    const description = p.description ? (p.description.length > 60 ? p.description.substring(0, 60) + '...' : p.description) : 'No description';
-    const imageCount = p.images ? p.images.length : 1;
-    inventoryTableBody.innerHTML += `
-        <tr>
-            <td>${p.name}</span>
-            <td><strong id="stock-${p.id}">${p.stock}</strong></span>
-            <td>₹${p.price}</span>
-            <td><span style="font-size: 12px; color: #555;" title="${p.description || ''}">${description}</span></span>
-            <td><span style="font-size: 11px; background: #e8e8e8; padding: 2px 6px; border-radius: 10px;">📸 ${imageCount}</span></span>
-            <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></span>
-            <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></span>
-        </tr>
-    `;
-});
-
-                const inventoryMobileContainer = document.getElementById('inventory-mobile-container');
-                inventoryMobileContainer.innerHTML = '';
+        // Mobile inventory view
+        const inventoryMobileContainer = document.getElementById('inventory-mobile-container');
+        if (inventoryMobileContainer) {
+            inventoryMobileContainer.innerHTML = '';
+            if (products && products.length > 0) {
                 products.forEach(p => {
                     inventoryMobileContainer.innerHTML += `
                         <div class="order-mobile-card">
@@ -1173,30 +1189,42 @@ products.forEach(p => {
                         </div>
                     `;
                 });
+            } else {
+                inventoryMobileContainer.innerHTML = '<div class="order-mobile-card" style="text-align:center;">No products found. Add some!</div>';
+            }
+        }
 
-                // ============ RENDER USERS - FIXED with Serial Number ============
-                const usersTableBody = document.getElementById('users-table-body');
-                usersTableBody.innerHTML = '';
+        // ============ RENDER USERS ============
+        const usersTableBody = document.getElementById('users-table-body');
+        if (usersTableBody) {
+            usersTableBody.innerHTML = '';
+            if (users && users.length > 0) {
                 users.forEach((u, index) => {
                     usersTableBody.innerHTML += `
                         <tr>
-                            <td>${index + 1}</span>
-                            <td>${u.id || 'N/A'}</span>
-                            <td>${u.username || 'N/A'}</span>
-                            <td>${u.phone || 'N/A'}</span>
-                            <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></span>
-                            <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</span>
+                            <td>${index + 1}</td>
+                            <td>${u.id || 'N/A'}</td>
+                            <td>${u.username || 'N/A'}</td>
+                            <td>${u.phone || 'N/A'}</td>
+                            <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></td>
+                            <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</td>
                             <td>
                                 <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
                                 <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
-                            </span>
+                            </td>
                         </tr>
                     `;
                 });
+            } else {
+                usersTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users found.</td></tr>';
+            }
+        }
 
-                // ============ RENDER USERS - MOBILE CARD VIEW ============
-                const usersMobileContainer = document.getElementById('users-mobile-container');
-                usersMobileContainer.innerHTML = '';
+        // Mobile users view
+        const usersMobileContainer = document.getElementById('users-mobile-container');
+        if (usersMobileContainer) {
+            usersMobileContainer.innerHTML = '';
+            if (users && users.length > 0) {
                 users.forEach((u, index) => {
                     usersMobileContainer.innerHTML += `
                         <div class="order-mobile-card">
@@ -1213,15 +1241,19 @@ products.forEach(p => {
                         </div>
                     `;
                 });
-                
-                loadCategories();
-                showServerStatus('✅ Data loaded!', 'success');
-            } catch (e) { 
-                console.error("Load failed", e); 
-                showServerStatus('❌ Error loading data', 'error');
+            } else {
+                usersMobileContainer.innerHTML = '<div class="order-mobile-card" style="text-align:center;">No users found.</div>';
             }
         }
-
+        
+        loadCategories();
+        showServerStatus('✅ Data loaded!', 'success');
+    } catch (e) { 
+        console.error("Load failed", e); 
+        showServerStatus('❌ Error loading data: ' + e.message, 'error');
+    }
+}
+      
         // Mobile selection functions
         function updateMobileSelectionCount() {
             const checkboxes = document.querySelectorAll('.order-select-mobile:checked');
