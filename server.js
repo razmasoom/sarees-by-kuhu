@@ -328,7 +328,9 @@ app.patch('/history/:id', (req, res) => {
     }
 });
 
-// Cancel order - restores stock
+// Cancel order - restores stock (with duplicate prevention)
+const processedCancellations = new Set();
+
 app.patch('/orders/:id/cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -349,20 +351,33 @@ app.patch('/orders/:id/cancel', (req, res) => {
         return res.status(400).json({ message: "Cannot cancel delivered order" });
     }
     
-    // Restore stock
+    // Check if this order was already processed for cancellation
+    const cancelKey = `cancel_${orderId}`;
+    if (processedCancellations.has(cancelKey)) {
+        return res.status(400).json({ message: "Order cancellation already processed" });
+    }
+    processedCancellations.add(cancelKey);
+    
+    // Restore stock (but only if not already restored)
     const products = data.products || [];
     const product = products.find(p => p.id === order.productId);
     
     if (product) {
-        product.stock += order.quantity;
-        data.products = products;
-        writeJSON(DATA_FILE, data);
-        console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
+        // Make sure we're not double-adding stock by checking if order was already cancelled
+        if (order.status !== 'Cancelled') {
+            product.stock += order.quantity;
+            data.products = products;
+            writeJSON(DATA_FILE, data);
+            console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
+        }
     }
     
     order.status = 'Cancelled';
     orders[orderIndex] = order;
     writeJSON(ORDERS_FILE, orders);
+    
+    // Clean up after 5 seconds
+    setTimeout(() => processedCancellations.delete(cancelKey), 5000);
     
     res.json({ 
         success: true, 
@@ -371,8 +386,7 @@ app.patch('/orders/:id/cancel', (req, res) => {
         productId: order.productId
     });
 });
-
-// Delete single order (admin) - restore stock
+// Delete single order (admin) - restore stock (with duplicate prevention)
 app.delete('/orders/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -384,6 +398,12 @@ app.delete('/orders/:id', (req, res) => {
     }
     
     const order = orders[orderIndex];
+    const deleteKey = `delete_${orderId}`;
+    
+    if (processedCancellations.has(deleteKey)) {
+        return res.status(400).json({ message: "Order deletion already processed" });
+    }
+    processedCancellations.add(deleteKey);
     
     // Restore stock when admin deletes order (if not already cancelled)
     if (order.status !== 'Cancelled') {
@@ -399,9 +419,11 @@ app.delete('/orders/:id', (req, res) => {
     
     orders = orders.filter(o => o.orderId !== orderId);
     writeJSON(ORDERS_FILE, orders);
+    
+    setTimeout(() => processedCancellations.delete(deleteKey), 5000);
+    
     res.json({ success: true, message: "Order deleted and stock restored" });
 });
-
 // ============ PAYMENT ROUTES ============
 
 app.post('/create-order', async (req, res) => {
