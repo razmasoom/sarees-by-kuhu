@@ -1091,10 +1091,26 @@
             }
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
+async function removeFromCart(index) {
+    const item = cart[index];
+    
+    // Restore stock on server BEFORE removing from cart
+    await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: item.quantity })  // Add stock back
+    });
+    
+    // Update current product display if it's the same product
+    if (currentProduct && currentProduct.id === item.productId) {
+        currentProduct.stock += item.quantity;
+        updateStockDisplay();
+    }
+    
+    // Then remove from cart
+    cart.splice(index, 1);
+    updateCartUI();
+}
 
         // ============ MODAL FUNCTIONS ============
 
