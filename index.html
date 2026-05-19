@@ -403,18 +403,21 @@
             background: #219150;
         }
 
-        /* Success Modal */
+        /* Success Modal - FIXED */
         .success-modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.8);
-            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 20000;
+        }
+        .success-modal.show {
+            display: flex !important;
         }
         .success-modal-content {
             background: white;
@@ -648,6 +651,10 @@
             .success-modal-content h3 {
                 font-size: 20px;
             }
+            .success-modal-content button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -756,6 +763,17 @@
         </div>
     </div>
 
+    <!-- SUCCESS MODAL - FIXED POSITION -->
+    <div id="successModal" class="success-modal">
+        <div class="success-modal-content">
+            <div class="success-icon">✅</div>
+            <h3>Order Placed Successfully!</h3>
+            <p>Your order has been confirmed and will be processed soon.</p>
+            <button onclick="continueShopping()">🛍️ Continue Shopping</button>
+            <button class="view-orders-btn" onclick="viewMyOrders()">📋 View My Orders</button>
+        </div>
+    </div>
+
     <div id="shop-container"></div>
 
     <div id="orders-history-container" style="display: none; max-width: 800px; margin: auto;">
@@ -796,17 +814,6 @@
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="success-modal" style="display: none;">
-        <div class="success-modal-content">
-            <div class="success-icon">✅</div>
-            <h3>Order Placed Successfully!</h3>
-            <p>Your order has been confirmed and will be processed soon.</p>
-            <button onclick="closeSuccessAndContinue()">Continue Shopping</button>
-            <button class="view-orders-btn" onclick="closeSuccessAndViewOrders()">View My Orders</button>
-        </div>
-    </div>
-
     <script>
         const API_BASE = window.location.origin;
         let cart = [];
@@ -818,6 +825,29 @@
         let currentGalleryImages = [];
         let currentGalleryIndex = 0;
         let isZoomed = false;
+
+        // ============ SUCCESS MODAL FUNCTIONS ============
+        
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+        }
+        
+        function hideSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'none';
+        }
+        
+        function continueShopping() {
+            hideSuccessModal();
+            showStorefront();
+            loadProducts();
+        }
+        
+        function viewMyOrders() {
+            hideSuccessModal();
+            toggleOrderHistoryView();
+        }
 
         // ============ PROFILE FUNCTIONS ============
         
@@ -878,29 +908,6 @@
                     if (profile.email) document.getElementById('ship-email').value = profile.email;
                 }
             }
-        }
-
-        // ============ SUCCESS MODAL FUNCTIONS ============
-        
-        function showSuccessModal() {
-            const modal = document.getElementById('successModal');
-            modal.style.display = 'flex';
-        }
-        
-        function closeSuccessModal() {
-            document.getElementById('successModal').style.display = 'none';
-        }
-        
-        function closeSuccessAndContinue() {
-            closeSuccessModal();
-            showStorefront();
-            // Reload products to update stock
-            loadProducts();
-        }
-        
-        function closeSuccessAndViewOrders() {
-            closeSuccessModal();
-            toggleOrderHistoryView();
         }
 
         // ============ IMAGE GALLERY FUNCTIONS ============
@@ -1089,7 +1096,6 @@
             }
         }
         
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('userDropdown');
             const userName = document.querySelector('.user-name');
@@ -1140,7 +1146,6 @@
                     return;
                 }
                 
-                // Check if cancellation already requested
                 try {
                     const cancelReqResponse = await fetch(`${API_BASE}/cancellation-requests`);
                     const cancelReqs = await cancelReqResponse.json();
@@ -1250,7 +1255,6 @@
                         `;
                     }
                     
-                    // Check cancellation request status
                     const pendingRequest = cancelRequests.find(r => r.orderId === o.orderId && r.status === 'pending');
                     const rejectedRequest = cancelRequests.find(r => r.orderId === o.orderId && r.status === 'rejected');
                     
