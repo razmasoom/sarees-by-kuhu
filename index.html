@@ -194,6 +194,16 @@
             font-size: 14px;
         }
         
+        /* Cart Message Animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .cart-message {
+            animation: slideIn 0.3s ease;
+        }
+        
         /* Buttons */
         .view-details-btn { 
             background: #27ae60; 
@@ -223,7 +233,7 @@
         
         #cart-items { list-style: none; padding: 0; margin-top: 40px; }
         .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; }
+        .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; }
 
         /* Order History Specific Styling */
         .history-heading { color: #232f3e; border-bottom: 2px solid #ccc; padding-bottom: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -718,50 +728,7 @@
             document.getElementById('contact-email').value = '';
             document.getElementById('contact-message').value = '';
         }
-// Sync cart with server stock - prevents stale cart data
-async function syncCartWithServer() {
-    if (cart.length === 0) return;
-    
-    try {
-        const response = await fetch(`${API_BASE}/products`);
-        const serverProducts = await response.json();
-        
-        let cartChanged = false;
-        
-        for (let i = 0; i < cart.length; i++) {
-            const item = cart[i];
-            const serverProduct = serverProducts.find(p => p.id === item.productId);
-            
-            if (!serverProduct) {
-                // Product no longer exists, remove from cart
-                cart.splice(i, 1);
-                cartChanged = true;
-                i--;
-                continue;
-            }
-            
-            // Check if cart quantity exceeds server stock
-            if (item.quantity > serverProduct.stock) {
-                // Adjust cart quantity to match available stock
-                const oldQuantity = item.quantity;
-                item.quantity = serverProduct.stock;
-                cartChanged = true;
-                console.log(`Adjusted ${item.name} quantity from ${oldQuantity} to ${serverProduct.stock} due to stock change`);
-            }
-        }
-        
-        if (cartChanged) {
-            updateCartUI();
-            showMessage("Cart synced with current inventory", false);
-        }
-    } catch (error) {
-        console.error("Error syncing cart:", error);
-    }
-}
 
-// Call this after loading cart
-// Add this line after loadCart() in initialization:
-// syncCartWithServer();
         function sendContactMessage() {
             const name = document.getElementById('contact-name').value.trim();
             const email = document.getElementById('contact-email').value.trim();
@@ -1054,13 +1021,121 @@ async function syncCartWithServer() {
             filterProducts();
         }
 
-        // ============ CART FUNCTIONS ============
+        // ============ CART FUNCTIONS (FIXED) ============
         
         function toggleCart() {
             document.getElementById('cart-view').classList.toggle('open');
         }
 
-        // Add to cart function (used from cart drawer and product page)
+        function showMessage(message, isError = false) {
+            const existingMsg = document.querySelector('.cart-message');
+            if (existingMsg) existingMsg.remove();
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'cart-message';
+            msgDiv.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${isError ? '#dc3545' : '#27ae60'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            msgDiv.textContent = message;
+            document.body.appendChild(msgDiv);
+            setTimeout(() => msgDiv.remove(), 3000);
+        }
+
+        // FIXED: Remove from cart with proper stock restoration
+        async function removeFromCart(index) {
+            const item = cart[index];
+            if (!item) return;
+            
+            const requestId = `${item.productId}_${Date.now()}_${Math.random()}`;
+            
+            const removeBtn = event?.target;
+            if (removeBtn) {
+                removeBtn.textContent = '...';
+                removeBtn.disabled = true;
+            }
+            
+            try {
+                const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        amount: item.quantity,
+                        requestId: requestId
+                    })
+                });
+                
+                if (!stockUpdateResponse.ok) {
+                    throw new Error('Failed to restore stock');
+                }
+                
+                // Refresh products to update stock display
+                await loadProducts();
+                
+                cart.splice(index, 1);
+                updateCartUI();
+                showMessage(`✓ Removed ${item.quantity} × ${item.name} from cart. Stock restored.`);
+                
+                if (cart.length === 0) {
+                    document.getElementById('cart-view').classList.remove('open');
+                }
+                
+            } catch (error) {
+                console.error("Error removing from cart:", error);
+                showMessage('Failed to remove item. Please try again.', true);
+            } finally {
+                if (removeBtn) {
+                    removeBtn.textContent = '✕ Remove';
+                    removeBtn.disabled = false;
+                }
+            }
+        }
+
+        // Sync cart with server stock - prevents stale cart data
+        async function syncCartWithServer() {
+            if (cart.length === 0) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const serverProducts = await response.json();
+                
+                let cartChanged = false;
+                
+                for (let i = 0; i < cart.length; i++) {
+                    const item = cart[i];
+                    const serverProduct = serverProducts.find(p => p.id === item.productId);
+                    
+                    if (!serverProduct) {
+                        cart.splice(i, 1);
+                        cartChanged = true;
+                        i--;
+                        continue;
+                    }
+                    
+                    if (item.quantity > serverProduct.stock && serverProduct.stock >= 0) {
+                        item.quantity = serverProduct.stock;
+                        cartChanged = true;
+                    }
+                }
+                
+                if (cartChanged) {
+                    updateCartUI();
+                    showMessage("Cart synced with current inventory", false);
+                }
+            } catch (error) {
+                console.error("Error syncing cart:", error);
+            }
+        }
+
+        // Add to cart function
         async function addToCart(id, name, price, quantity = 1) {
             const isValid = await validateUserSession();
             if (!isValid) {
@@ -1087,6 +1162,22 @@ async function syncCartWithServer() {
                 return false;
             }
 
+            // First, reduce stock on server
+            const requestId = `${id}_add_${Date.now()}_${Math.random()}`;
+            const stockUpdateResponse = await fetch(`${API_BASE}/products/${id}/stock`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    amount: -quantity,
+                    requestId: requestId
+                })
+            });
+            
+            if (!stockUpdateResponse.ok) {
+                alert("Failed to update stock. Please try again.");
+                return false;
+            }
+
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
@@ -1094,23 +1185,17 @@ async function syncCartWithServer() {
             }
             
             updateCartUI();
+            await loadProducts(); // Refresh product stock display
+            showMessage(`✓ ${quantity} × ${name} added to cart!`);
             return true;
-        }
-
-        function syncCartDisplay() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            localStorage.setItem('cartCount', totalItems);
-            
-            const cartCountSpan = document.getElementById('cart-count');
-            if (cartCountSpan) {
-                cartCountSpan.textContent = totalItems;
-            }
         }
 
         function updateCartUI() {
             const list = document.getElementById('cart-items');
             const countSpan = document.getElementById('cart-count');
             const totalDisplay = document.getElementById('cart-total-display');
+            
+            if (!list) return;
             
             list.innerHTML = '';
             let totalItems = 0, totalPrice = 0;
@@ -1119,78 +1204,47 @@ async function syncCartWithServer() {
                 const itemTotal = item.price * item.quantity;
                 totalPrice += itemTotal;
                 totalItems += item.quantity;
-                list.innerHTML += `<li class="cart-item"><div><strong>${item.name}</strong><br>₹${item.price} x ${item.quantity}</div><div>₹${itemTotal} <button class="remove-btn" onclick="removeFromCart(${index})">x</button></div></li>`;
+                list.innerHTML += `<li class="cart-item">
+                    <div>
+                        <strong>${escapeHtml(item.name)}</strong><br>
+                        ₹${item.price} x ${item.quantity}
+                    </div>
+                    <div>
+                        ₹${itemTotal} 
+                        <button class="remove-btn" onclick="removeFromCart(${index})">✕ Remove</button>
+                    </div>
+                </li>`;
             });
 
-            countSpan.innerText = totalItems;
+            if (countSpan) countSpan.innerText = totalItems;
             localStorage.setItem('cart', JSON.stringify(cart));
             localStorage.setItem('cartCount', totalItems);
             
             if (cart.length > 0) {
                 totalDisplay.innerHTML = `<h4 style="text-align:right;">Total: ₹${totalPrice}</h4>`;
             } else {
-                list.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
-                totalDisplay.innerHTML = '';
+                if (list) list.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
+                if (totalDisplay) totalDisplay.innerHTML = '';
             }
         }
 
-// FIXED: Remove from cart with unique request ID to prevent duplicate stock restoration
-async function removeFromCart(index) {
-    const item = cart[index];
-    if (!item) return;
-    
-    // Generate unique request ID for this operation
-    const requestId = `${item.productId}_${Date.now()}_${Math.random()}`;
-    
-    // Disable button to prevent double click
-    const removeBtn = event?.target;
-    if (removeBtn) {
-        removeBtn.textContent = '...';
-        removeBtn.disabled = true;
-    }
-    
-    try {
-        // Restore stock on server with unique request ID
-        const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                amount: item.quantity,
-                requestId: requestId  // Add unique ID to prevent duplicate
-            })
-        });
-        
-        const stockResult = await stockUpdateResponse.json();
-        
-        // If already processed, don't proceed with cart removal? Actually still remove from cart
-        if (stockResult.alreadyProcessed) {
-            console.log("Stock already restored for this item, removing from cart only");
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
-        
-        // Update local product stock if on product page
-        if (currentProduct && currentProduct.id === item.productId) {
-            // Refresh product data from server
-            const productsResponse = await fetch(`${API_BASE}/products`);
-            const products = await productsResponse.json();
-            currentProduct = products.find(p => p.id === item.productId);
-            if (currentProduct) updateStockDisplay();
+
+        // Load cart from localStorage on page load
+        function loadCart() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCartUI();
+                // Sync cart with server after loading
+                setTimeout(() => syncCartWithServer(), 500);
+            }
         }
-        
-        // Remove from cart array
-        cart.splice(index, 1);
-        updateCartUI();
-        showMessage(`✓ Removed ${item.quantity} × ${item.name} from cart.`);
-        
-    } catch (error) {
-        console.error("Error removing from cart:", error);
-        showMessage('Failed to remove item. Please try again.', true);
-    } finally {
-        if (removeBtn) {
-            removeBtn.textContent = 'x';
-            removeBtn.disabled = false;
-        }
-    }
-}
 
         // ============ MODAL FUNCTIONS ============
 
@@ -1327,15 +1381,6 @@ async function removeFromCart(index) {
                 updateCartUI();
                 await loadProducts();
                 toggleOrderHistoryView();
-            }
-        }
-
-        // Load cart from localStorage on page load
-        function loadCart() {
-            const savedCart = localStorage.getItem('cart');
-            if (savedCart) {
-                cart = JSON.parse(savedCart);
-                updateCartUI();
             }
         }
 
