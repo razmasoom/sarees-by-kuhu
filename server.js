@@ -12,6 +12,30 @@ app.use(express.static(__dirname));
 const DATA_FILE = './data.json';
 const ORDERS_FILE = './orders.json';
 
+// Track processed operations to prevent duplicates
+const processedOperations = new Map(); // Store with timestamps
+
+function isOperationProcessed(key, ttl = 10000) {
+    if (processedOperations.has(key)) {
+        const timestamp = processedOperations.get(key);
+        if (Date.now() - timestamp < ttl) {
+            return true;
+        }
+        processedOperations.delete(key);
+    }
+    return false;
+}
+
+function markOperationProcessed(key) {
+    processedOperations.set(key, Date.now());
+    // Auto cleanup after TTL
+    setTimeout(() => {
+        if (processedOperations.get(key) === Date.now() - 10000) {
+            processedOperations.delete(key);
+        }
+    }, 10000);
+}
+
 // ============ RAZORPAY INITIALIZATION ============
 const RAZORPAY_KEY_ID = 'rzp_test_SqTRTOBs6qninO';
 const RAZORPAY_KEY_SECRET = 'TOqeBfLRRuZ2qrG6YrgnKByK';
@@ -189,6 +213,7 @@ app.post('/products', (req, res) => {
     res.status(201).json(newProduct);
 });
 
+// FIXED: Stock update with validation to prevent double updates
 app.patch('/products/:id/stock', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let products = data.products || [];
@@ -200,6 +225,14 @@ app.patch('/products/:id/stock', (req, res) => {
     }
     
     const changeAmount = Number(req.body.amount);
+    const operationKey = `stock_${productId}_${changeAmount}_${req.body.requestId || Date.now()}`;
+    
+    // Prevent duplicate stock updates
+    if (isOperationProcessed(operationKey)) {
+        console.log(`Duplicate stock update prevented for product ${productId}`);
+        return res.json({ success: true, product: products[productIndex], alreadyProcessed: true });
+    }
+    
     const newStock = products[productIndex].stock + changeAmount;
     
     if (newStock < 0) {
@@ -209,6 +242,9 @@ app.patch('/products/:id/stock', (req, res) => {
     products[productIndex].stock = newStock;
     data.products = products;
     writeJSON(DATA_FILE, data);
+    markOperationProcessed(operationKey);
+    
+    console.log(`Stock updated: Product ${products[productIndex].name} changed by ${changeAmount}, new stock: ${newStock}`);
     res.json({ success: true, product: products[productIndex] });
 });
 
@@ -280,12 +316,6 @@ app.post('/order', (req, res) => {
         return res.status(404).json({ message: "Product not found" });
     }
     
-    // IMPORTANT: Only verify stock is not negative (don't reduce again)
-    // Stock was already reduced when adding to cart
-    if (product.stock < 0) {
-        return res.status(400).json({ message: "Stock inconsistency. Please contact support." });
-    }
-    
     // Create order WITHOUT reducing stock again
     const newOrder = {
         orderId: Date.now(),
@@ -307,7 +337,6 @@ app.post('/order', (req, res) => {
     
     orders.push(newOrder);
     writeJSON(ORDERS_FILE, orders);
-    // DO NOT modify product stock here! Stock already reduced in cart.
     
     console.log(`✅ Order created for ${username}: ${product.name} x ${quantity}`);
     res.status(201).json(newOrder);
@@ -328,9 +357,7 @@ app.patch('/history/:id', (req, res) => {
     }
 });
 
-// Cancel order - restores stock (with duplicate prevention)
-const processedCancellations = new Set();
-
+// FIXED: Cancel order - restores stock with duplicate prevention
 app.patch('/orders/:id/cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -351,33 +378,27 @@ app.patch('/orders/:id/cancel', (req, res) => {
         return res.status(400).json({ message: "Cannot cancel delivered order" });
     }
     
-    // Check if this order was already processed for cancellation
-    const cancelKey = `cancel_${orderId}`;
-    if (processedCancellations.has(cancelKey)) {
-        return res.status(400).json({ message: "Order cancellation already processed" });
+    // Prevent duplicate cancellation
+    const cancelKey = `cancel_order_${orderId}`;
+    if (isOperationProcessed(cancelKey)) {
+        return res.status(400).json({ message: "Order cancellation already in progress" });
     }
-    processedCancellations.add(cancelKey);
     
-    // Restore stock (but only if not already restored)
+    // Restore stock
     const products = data.products || [];
     const product = products.find(p => p.id === order.productId);
     
     if (product) {
-        // Make sure we're not double-adding stock by checking if order was already cancelled
-        if (order.status !== 'Cancelled') {
-            product.stock += order.quantity;
-            data.products = products;
-            writeJSON(DATA_FILE, data);
-            console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
-        }
+        product.stock += order.quantity;
+        data.products = products;
+        writeJSON(DATA_FILE, data);
+        console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
     }
     
     order.status = 'Cancelled';
     orders[orderIndex] = order;
     writeJSON(ORDERS_FILE, orders);
-    
-    // Clean up after 5 seconds
-    setTimeout(() => processedCancellations.delete(cancelKey), 5000);
+    markOperationProcessed(cancelKey);
     
     res.json({ 
         success: true, 
@@ -386,7 +407,8 @@ app.patch('/orders/:id/cancel', (req, res) => {
         productId: order.productId
     });
 });
-// Delete single order (admin) - restore stock (with duplicate prevention)
+
+// FIXED: Delete single order with duplicate prevention
 app.delete('/orders/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -398,12 +420,11 @@ app.delete('/orders/:id', (req, res) => {
     }
     
     const order = orders[orderIndex];
-    const deleteKey = `delete_${orderId}`;
+    const deleteKey = `delete_order_${orderId}`;
     
-    if (processedCancellations.has(deleteKey)) {
-        return res.status(400).json({ message: "Order deletion already processed" });
+    if (isOperationProcessed(deleteKey)) {
+        return res.status(400).json({ message: "Order deletion already in progress" });
     }
-    processedCancellations.add(deleteKey);
     
     // Restore stock when admin deletes order (if not already cancelled)
     if (order.status !== 'Cancelled') {
@@ -419,11 +440,11 @@ app.delete('/orders/:id', (req, res) => {
     
     orders = orders.filter(o => o.orderId !== orderId);
     writeJSON(ORDERS_FILE, orders);
-    
-    setTimeout(() => processedCancellations.delete(deleteKey), 5000);
+    markOperationProcessed(deleteKey);
     
     res.json({ success: true, message: "Order deleted and stock restored" });
 });
+
 // ============ PAYMENT ROUTES ============
 
 app.post('/create-order', async (req, res) => {
@@ -511,14 +532,13 @@ app.listen(PORT, () => {
     console.log(`📁 Orders file: ${ORDERS_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
     console.log(`\n✅ FIXES APPLIED:`);
+    console.log(`   - Duplicate stock update prevention using request IDs`);
+    console.log(`   - Duplicate order cancellation prevention`);
     console.log(`   - Stock deducted ONLY when adding to cart`);
     console.log(`   - Order placement does NOT deduct stock again`);
-    console.log(`   - No more "Insufficient stock" error on checkout`);
-    console.log(`   - Cancel/Delete order restores stock properly`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
     console.log(`   - Login: http://localhost:${PORT}/auth.html`);
-    console.log(`   - Product Page: http://localhost:${PORT}/product.html?id=1`);
     console.log(`\n✅ ========================================\n`);
 });
