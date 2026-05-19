@@ -1375,7 +1375,7 @@ function displayProducts(productsToDisplay) {
                 <p style="color:#B12704; font-weight:bold;">₹${product.price}</p>
                 ${shortDescription ? `<p style="font-size:11px; color:#666; margin:5px 0;">${shortDescription}</p>` : ''}
                 <p style="font-size:12px; color:${isOutOfStock ? 'red' : '#28a745'};">${isOutOfStock ? 'Out of Stock' : 'Stock: ' + product.stock}</p>
-                <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
+                <button onclick="(${product.id}, '${product.name}', ${product.price})" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'Sold Out' : 'Add to Cart'}</button>
             </div>
         `;
     });
@@ -1438,7 +1438,37 @@ function displayProducts(productsToDisplay) {
             updateCartUI();
             document.getElementById('cart-view').classList.add('open');
         }
+function syncCartDisplay() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    localStorage.setItem('cartCount', totalItems);
+    
+    // Update cart count in header if exists
+    const cartCountSpan = document.getElementById('cart-count');
+    if (cartCountSpan) {
+        cartCountSpan.textContent = totalItems;
+    }
+}
 
+// Call this when page loads and when cart changes
+// Add event listener for storage changes (for cross-tab sync)
+window.addEventListener('storage', (e) => {
+    if (e.key === 'cart') {
+        syncCartDisplay();
+        // Also reload cart UI if cart drawer is open
+        if (typeof updateCartUI === 'function') {
+            updateCartUI();
+        }
+    }
+});
+
+// Also listen for custom event
+window.addEventListener('cartUpdated', () => {
+    syncCartDisplay();
+    if (typeof updateCartUI === 'function') {
+        updateCartUI();
+    }
+});
         function updateCartUI() {
             const list = document.getElementById('cart-items');
             const countSpan = document.getElementById('cart-count');
