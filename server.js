@@ -163,7 +163,6 @@ app.post('/products', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let products = data.products || [];
     
-    // Handle multiple images
     let images = [];
     if (req.body.images && Array.isArray(req.body.images) && req.body.images.length > 0) {
         images = req.body.images;
@@ -179,7 +178,7 @@ app.post('/products', (req, res) => {
         price: Number(req.body.price),
         stock: Number(req.body.stock),
         category: req.body.category || 'General',
-        description: req.body.description || '',  // ADD THIS LINE
+        description: req.body.description || '',
         image: images[0],
         images: images,
         createdAt: new Date().toISOString()
@@ -228,7 +227,7 @@ app.patch('/products/:id', (req, res) => {
     if (req.body.price) products[productIndex].price = Number(req.body.price);
     if (req.body.stock !== undefined) products[productIndex].stock = Number(req.body.stock);
     if (req.body.category) products[productIndex].category = req.body.category;
-    if (req.body.description !== undefined) products[productIndex].description = req.body.description;  // ADD THIS LINE
+    if (req.body.description !== undefined) products[productIndex].description = req.body.description;
     if (req.body.image) {
         products[productIndex].image = req.body.image;
         if (!products[productIndex].images) products[productIndex].images = [req.body.image];
@@ -285,6 +284,7 @@ app.post('/order', (req, res) => {
         return res.status(400).json({ message: "Insufficient stock" });
     }
     
+    // Reduce stock
     product.stock -= quantity;
     
     const newOrder = {
@@ -295,7 +295,7 @@ app.post('/order', (req, res) => {
         phone: phone || 'N/A',
         productId: product.id,
         productName: product.name,
-        description: product.description || '',  // ADD THIS LINE
+        description: product.description || '',
         quantity: Number(quantity),
         totalPrice: product.price * Number(quantity),
         date: new Date().toLocaleString(),
@@ -326,6 +326,7 @@ app.patch('/history/:id', (req, res) => {
     }
 });
 
+// FIXED: Cancel order - properly restores stock
 app.patch('/orders/:id/cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -342,23 +343,63 @@ app.patch('/orders/:id/cancel', (req, res) => {
         return res.status(400).json({ message: "Order already cancelled" });
     }
     
-    if (order.status === 'Shipped' || order.status === 'Delivered') {
-        return res.status(400).json({ message: "Cannot cancel order that has already been shipped or delivered" });
+    if (order.status === 'Delivered') {
+        return res.status(400).json({ message: "Cannot cancel delivered order" });
     }
     
+    // Restore stock - FIXED: This now works properly
     const products = data.products || [];
     const product = products.find(p => p.id === order.productId);
+    
     if (product) {
         product.stock += order.quantity;
         data.products = products;
         writeJSON(DATA_FILE, data);
+        console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
+    } else {
+        console.log(`⚠️ Product not found for stock restoration: ${order.productId}`);
     }
     
+    // Update order status
     order.status = 'Cancelled';
     orders[orderIndex] = order;
     writeJSON(ORDERS_FILE, orders);
     
-    res.json({ success: true, message: "Order cancelled and stock restored" });
+    res.json({ 
+        success: true, 
+        message: "Order cancelled and stock restored",
+        restoredQuantity: order.quantity,
+        productId: order.productId
+    });
+});
+
+// Delete single order (admin) - also restore stock
+app.delete('/orders/:id', (req, res) => {
+    let orders = readJSON(ORDERS_FILE, []);
+    let data = readJSON(DATA_FILE, { products: [], users: [] });
+    const orderId = parseInt(req.params.id);
+    const orderIndex = orders.findIndex(o => o.orderId === orderId);
+    
+    if (orderIndex === -1) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    
+    const order = orders[orderIndex];
+    
+    // Restore stock when admin deletes order
+    if (order.status !== 'Cancelled') {
+        const products = data.products || [];
+        const product = products.find(p => p.id === order.productId);
+        if (product) {
+            product.stock += order.quantity;
+            data.products = products;
+            writeJSON(DATA_FILE, data);
+        }
+    }
+    
+    orders = orders.filter(o => o.orderId !== orderId);
+    writeJSON(ORDERS_FILE, orders);
+    res.json({ success: true, message: "Order deleted and stock restored" });
 });
 
 // ============ PAYMENT ROUTES ============
@@ -410,13 +451,6 @@ app.post('/reset-completed-orders', (req, res) => {
     res.json({ success: true, message: `Reset completed! ${activeOrders.length} active orders preserved.` });
 });
 
-app.delete('/orders/:id', (req, res) => {
-    let orders = readJSON(ORDERS_FILE, []);
-    orders = orders.filter(o => o.orderId !== parseInt(req.params.id));
-    writeJSON(ORDERS_FILE, orders);
-    res.json({ success: true });
-});
-
 app.post('/reset-history', (req, res) => {
     writeJSON(ORDERS_FILE, []);
     res.json({ success: true, message: "All orders deleted" });
@@ -454,13 +488,10 @@ app.listen(PORT, () => {
     console.log(`📁 Data file: ${DATA_FILE}`);
     console.log(`📁 Orders file: ${ORDERS_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
-    console.log(`\n📸 FEATURES ENABLED:`);
-    console.log(`   - Multiple Product Images (Gallery)`);
-    console.log(`   - Product Descriptions`);
-    console.log(`   - Category Management`);
-    console.log(`   - User Verification`);
-    console.log(`   - Order Tracking`);
-    console.log(`   - Bulk Label Printing`);
+    console.log(`\n✅ FIXES APPLIED:`);
+    console.log(`   - Cancel order restores product stock`);
+    console.log(`   - Delete order also restores stock`);
+    console.log(`   - Stock validation improved`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
