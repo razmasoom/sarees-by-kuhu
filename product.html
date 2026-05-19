@@ -198,6 +198,24 @@
             display: inline-block;
         }
         
+        /* Cart Drawer - Same as index.html */
+        .cart-drawer { 
+            position: fixed; top: 0; right: -400px; 
+            width: 350px; height: 100%; background: white; 
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3); 
+            transition: 0.3s ease-in-out; padding: 20px; z-index: 2000;
+            overflow-y: auto;
+        }
+        .cart-drawer.open { right: 0; }
+        .close-btn { cursor: pointer; float: right; font-size: 28px; font-weight: bold; color: #888; }
+        
+        #cart-items { list-style: none; padding: 0; margin-top: 40px; }
+        .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; }
+        
+        .checkout-btn { background: #28a745; color: white; width: 100%; border: none; padding: 12px; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; }
+        
+        /* Cart Message */
         .cart-message {
             position: fixed;
             bottom: 20px;
@@ -313,6 +331,29 @@
             border-radius: 20px;
         }
         
+        /* Modal for shipping */
+        .modal {
+            display: none; 
+            position: fixed; z-index: 3000; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background-color: white; margin: 10% auto; padding: 25px;
+            width: 85%; max-width: 450px; border-radius: 10px; text-align: left;
+            position: relative; animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        
+        .shipping-form input, .shipping-form textarea {
+            width: 100%; padding: 10px; margin: 8px 0 15px 0;
+            box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+            font-family: inherit;
+        }
+        .shipping-form textarea { resize: vertical; height: 80px; }
+        .form-submit-btn { background: #28a745; color: white; border: none; width: 100%; padding: 12px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        .form-submit-btn:hover { background: #218838; }
+        
         @media (max-width: 768px) {
             .product-detail-container {
                 grid-template-columns: 1fr;
@@ -327,6 +368,10 @@
                 font-size: 30px;
                 width: 40px;
                 height: 40px;
+            }
+            .cart-drawer {
+                width: 85%;
+                right: -85%;
             }
         }
         
@@ -347,9 +392,22 @@
         }
         .footer-section { flex: 1; min-width: 200px; text-align: left; }
         .footer-section h3 { color: #f0c14b; margin-bottom: 15px; }
-        .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; }
+        .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; }
         .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #37475a; font-size: 12px; }
+        
+        /* Cart header clickable */
+        .cart-header {
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .cart-header:hover {
+            color: #f0c14b;
+        }
     </style>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -361,10 +419,39 @@
         <div class="logo-container" onclick="window.location.href='index.html'">
             <img src="logo.png" alt="Sarees By Kuhu" class="store-logo" onerror="this.src='https://via.placeholder.com/150x50?text=Sarees+By+Kuhu'">
         </div>
-        <div onclick="window.location.href='index.html'" style="cursor:pointer; font-weight: bold;">
-            ← Back to Store
+        <div class="cart-header" onclick="toggleCart()">
+            🛒 Cart (<span id="cart-count">0</span>)
         </div>
     </header>
+
+    <!-- Cart Drawer -->
+    <div class="cart-drawer" id="cart-view">
+        <span class="close-btn" onclick="toggleCart()">&times;</span>
+        <h3>Your Shopping Cart</h3>
+        <ul id="cart-items"></ul>
+        <div id="cart-total-display"></div>
+        <button class="checkout-btn" onclick="openShippingModal()">Place Order</button>
+    </div>
+
+    <!-- Shipping Modal -->
+    <div id="shippingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeShippingModal()">&times;</span>
+            <h2 style="margin-top: 0; text-align: center; color: #232f3e;">Shipping Details</h2>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            <div class="shipping-form">
+                <label for="ship-email"><strong>Email Address</strong></label>
+                <input type="email" id="ship-email" placeholder="E.g., john@example.com" required>
+                <label for="ship-name"><strong>Receiver's Full Name</strong></label>
+                <input type="text" id="ship-name" placeholder="E.g., John Doe" required>
+                <label for="ship-phone"><strong>Contact Phone Number</strong></label>
+                <input type="text" id="ship-phone" placeholder="E.g., 9876543210" required>
+                <label for="ship-address"><strong>Complete Address</strong></label>
+                <textarea id="ship-address" placeholder="House/Office No., Locality, Landmark, City, State, PIN" required></textarea>
+                <button class="form-submit-btn" onclick="checkout()">Confirm & Submit Order</button>
+            </div>
+        </div>
+    </div>
 
     <div id="product-detail" class="product-detail-container">
         <div class="product-gallery">
@@ -415,10 +502,202 @@
         let currentImages = [];
         let currentImageIndex = 0;
         let isZoomed = false;
+        let cart = [];
         
         // Get product ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
+        
+        // ============ CART FUNCTIONS (Same as index.html) ============
+        
+        function loadCart() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            } else {
+                cart = [];
+            }
+            updateCartUI();
+        }
+        
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            localStorage.setItem('cartCount', totalItems);
+            
+            // Dispatch event for other tabs
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
+            window.dispatchEvent(new StorageEvent('storage', { key: 'cart', newValue: JSON.stringify(cart) }));
+        }
+        
+        function updateCartUI() {
+            const list = document.getElementById('cart-items');
+            const countSpan = document.getElementById('cart-count');
+            const totalDisplay = document.getElementById('cart-total-display');
+            
+            if (!list) return;
+            
+            list.innerHTML = '';
+            let totalItems = 0, totalPrice = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+                totalItems += item.quantity;
+                list.innerHTML += `<li class="cart-item"><div><strong>${item.name}</strong><br>₹${item.price} x ${item.quantity}</div><div>₹${itemTotal} <button class="remove-btn" onclick="removeFromCart(${index})">x</button></div></li>`;
+            });
+
+            if (countSpan) countSpan.innerText = totalItems;
+            
+            if (cart.length > 0) {
+                totalDisplay.innerHTML = `<h4 style="text-align:right;">Total: ₹${totalPrice}</h4>`;
+            } else {
+                list.innerHTML = '<p style="text-align:center;">Your cart is empty.</p>';
+                totalDisplay.innerHTML = '';
+            }
+            
+            saveCart();
+        }
+        
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+            showMessage('Item removed from cart');
+        }
+        
+        function toggleCart() {
+            const cartDrawer = document.getElementById('cart-view');
+            cartDrawer.classList.toggle('open');
+        }
+        
+        function showMessage(message, isError = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'cart-message';
+            msgDiv.style.background = isError ? '#dc3545' : '#27ae60';
+            msgDiv.textContent = message;
+            document.body.appendChild(msgDiv);
+            setTimeout(() => msgDiv.remove(), 3000);
+        }
+        
+        // Update stock display on page
+        function updateStockDisplay() {
+            const stockElement = document.getElementById('productStock');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const quantityInput = document.getElementById('quantity');
+            
+            if (currentProduct && currentProduct.stock !== undefined) {
+                if (currentProduct.stock > 0) {
+                    stockElement.innerHTML = `✅ In Stock (${currentProduct.stock} available)`;
+                    stockElement.className = 'product-stock in-stock';
+                    addToCartBtn.disabled = false;
+                    if (quantityInput) quantityInput.max = currentProduct.stock;
+                } else {
+                    stockElement.innerHTML = '❌ Out of Stock';
+                    stockElement.className = 'product-stock out-of-stock';
+                    addToCartBtn.disabled = true;
+                }
+            }
+        }
+        
+        // Refresh product stock from server
+        async function refreshProductStock() {
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const products = await response.json();
+                const updatedProduct = products.find(p => p.id == productId);
+                if (updatedProduct) {
+                    currentProduct.stock = updatedProduct.stock;
+                    updateStockDisplay();
+                }
+            } catch (error) {
+                console.error("Error refreshing stock:", error);
+            }
+        }
+        
+        // Add to cart function with stock validation
+        async function addToCart() {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            if (isNaN(quantity) || quantity < 1) {
+                showMessage('Please enter a valid quantity', true);
+                return;
+            }
+            
+            if (!currentProduct) {
+                showMessage('Product not found', true);
+                return;
+            }
+            
+            // Check if user is logged in
+            const loggedInUser = localStorage.getItem('user');
+            if (!loggedInUser) {
+                showMessage('Please login first!', true);
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 1500);
+                return;
+            }
+            
+            // Refresh stock before adding to ensure it's up to date
+            await refreshProductStock();
+            
+            if (quantity > currentProduct.stock) {
+                showMessage(`Only ${currentProduct.stock} items available in stock!`, true);
+                return;
+            }
+            
+            // Check if product already in cart
+            const existingIndex = cart.findIndex(item => item.productId === currentProduct.id);
+            
+            if (existingIndex !== -1) {
+                const newQuantity = cart[existingIndex].quantity + quantity;
+                if (newQuantity > currentProduct.stock) {
+                    showMessage(`Cannot add more. Only ${currentProduct.stock - cart[existingIndex].quantity} more available!`, true);
+                    return;
+                }
+                cart[existingIndex].quantity = newQuantity;
+            } else {
+                cart.push({
+                    productId: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    quantity: quantity,
+                    image: currentImages[0]
+                });
+            }
+            
+            // Update the stock on server
+            try {
+                const stockUpdateResponse = await fetch(`${API_BASE}/products/${currentProduct.id}/stock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: -quantity })
+                });
+                
+                if (stockUpdateResponse.ok) {
+                    // Stock updated successfully on server
+                    currentProduct.stock -= quantity;
+                    updateStockDisplay();
+                    
+                    // Save cart to localStorage
+                    saveCart();
+                    updateCartUI();
+                    
+                    showMessage(`✓ ${quantity} × ${currentProduct.name} added to cart!`);
+                    
+                    // Dispatch event for other pages
+                    window.dispatchEvent(new CustomEvent('cartUpdated'));
+                    
+                    // Open cart drawer to show items
+                    toggleCart();
+                } else {
+                    showMessage('Failed to update stock. Please try again.', true);
+                }
+            } catch (error) {
+                console.error("Error updating stock:", error);
+                showMessage('Error adding to cart. Please try again.', true);
+            }
+        }
         
         // ============ FULLSCREEN GALLERY FUNCTIONS ============
         
@@ -448,7 +727,6 @@
             const thumbContainer = modal.querySelector('#galleryThumbnails');
             const counter = modal.querySelector('#imageCounter');
             
-            // Create thumbnails
             currentImages.forEach((img, idx) => {
                 const thumb = document.createElement('img');
                 thumb.src = img;
@@ -468,13 +746,11 @@
                 thumbContainer.appendChild(thumb);
             });
             
-            // Close button
             modal.querySelector('.gallery-close').onclick = () => {
                 modal.remove();
                 document.body.style.overflow = 'auto';
             };
             
-            // Previous button
             modal.querySelector('.gallery-prev').onclick = (e) => {
                 e.stopPropagation();
                 currentIdx = (currentIdx - 1 + currentImages.length) % currentImages.length;
@@ -490,7 +766,6 @@
                 }
             };
             
-            // Next button
             modal.querySelector('.gallery-next').onclick = (e) => {
                 e.stopPropagation();
                 currentIdx = (currentIdx + 1) % currentImages.length;
@@ -506,7 +781,6 @@
                 }
             };
             
-            // Zoom on click
             mainImg.onclick = (e) => {
                 e.stopPropagation();
                 if (zoomed) {
@@ -518,7 +792,6 @@
                 }
             };
             
-            // Close on background click
             modal.onclick = (e) => {
                 if (e.target === modal) {
                     modal.remove();
@@ -545,10 +818,8 @@
                     return;
                 }
                 
-                // Update page title
                 document.title = `${currentProduct.name} | Sarees By Kuhu`;
                 
-                // Set images array
                 if (currentProduct.images && currentProduct.images.length > 0) {
                     currentImages = currentProduct.images;
                 } else if (currentProduct.image) {
@@ -557,34 +828,18 @@
                     currentImages = ['https://via.placeholder.com/400x400?text=No+Image'];
                 }
                 
-                // Set product details
                 document.getElementById('productName').textContent = currentProduct.name;
                 document.getElementById('productCategory').textContent = currentProduct.category || 'General';
                 document.getElementById('productPrice').innerHTML = `₹${currentProduct.price}`;
-                
-                // Set main image
                 document.getElementById('mainImage').src = currentImages[0];
                 
-                // Stock status
-                const stockElement = document.getElementById('productStock');
-                if (currentProduct.stock > 0) {
-                    stockElement.innerHTML = `✅ In Stock (${currentProduct.stock} available)`;
-                    stockElement.className = 'product-stock in-stock';
-                    document.getElementById('addToCartBtn').disabled = false;
-                    document.getElementById('quantity').max = currentProduct.stock;
-                } else {
-                    stockElement.innerHTML = '❌ Out of Stock';
-                    stockElement.className = 'product-stock out-of-stock';
-                    document.getElementById('addToCartBtn').disabled = true;
-                }
+                updateStockDisplay();
                 
-                // Description
                 const descriptionHtml = currentProduct.description ? 
                     `<h3>📝 Product Description</h3><p>${currentProduct.description.replace(/\n/g, '<br>')}</p>` : 
                     '<h3>📝 Product Description</h3><p>No description available.</p>';
                 document.getElementById('productDescription').innerHTML = descriptionHtml;
                 
-                // Thumbnails
                 const thumbnailList = document.getElementById('thumbnailList');
                 thumbnailList.innerHTML = '';
                 currentImages.forEach((img, idx) => {
@@ -600,100 +855,10 @@
                     thumbnailList.appendChild(thumb);
                 });
                 
-                // Update cart count display
-                updateCartCountDisplay();
-                
             } catch (error) {
                 console.error('Error loading product:', error);
                 window.location.href = 'index.html';
             }
-        }
-        
-        // ============ CART FUNCTIONS (Same as index.html) ============
-        
-        function updateCartCountDisplay() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            localStorage.setItem('cartCount', totalItems);
-            
-            // Update header cart count if exists
-            const cartCountSpan = document.getElementById('cart-count-header');
-            if (cartCountSpan) {
-                cartCountSpan.textContent = totalItems;
-            }
-        }
-        
-        function showMessage(message, isError = false) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'cart-message';
-            msgDiv.style.background = isError ? '#dc3545' : '#27ae60';
-            msgDiv.textContent = message;
-            document.body.appendChild(msgDiv);
-            setTimeout(() => msgDiv.remove(), 3000);
-        }
-        
-        function addToCart() {
-            const quantity = parseInt(document.getElementById('quantity').value);
-            
-            // Validation
-            if (isNaN(quantity) || quantity < 1) {
-                showMessage('Please enter a valid quantity', true);
-                return;
-            }
-            
-            if (!currentProduct) {
-                showMessage('Product not found', true);
-                return;
-            }
-            
-            if (quantity > currentProduct.stock) {
-                showMessage(`Only ${currentProduct.stock} items available in stock!`, true);
-                return;
-            }
-            
-            // Check if user is logged in
-            const loggedInUser = localStorage.getItem('user');
-            if (!loggedInUser) {
-                showMessage('Please login first!', true);
-                setTimeout(() => {
-                    window.location.href = 'auth.html';
-                }, 1500);
-                return;
-            }
-            
-            // Get existing cart from localStorage
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            
-            // Check if product already in cart
-            const existingIndex = cart.findIndex(item => item.productId === currentProduct.id);
-            
-            if (existingIndex !== -1) {
-                const newQuantity = cart[existingIndex].quantity + quantity;
-                if (newQuantity > currentProduct.stock) {
-                    showMessage(`Cannot add more. Only ${currentProduct.stock - cart[existingIndex].quantity} more available!`, true);
-                    return;
-                }
-                cart[existingIndex].quantity = newQuantity;
-            } else {
-                cart.push({
-                    productId: currentProduct.id,
-                    name: currentProduct.name,
-                    price: currentProduct.price,
-                    quantity: quantity,
-                    image: currentImages[0]
-                });
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('cart', JSON.stringify(cart));
-            
-            // Update cart count
-            updateCartCountDisplay();
-            
-            showMessage(`✓ ${quantity} × ${currentProduct.name} added to cart!`);
-            
-            // Optional: Dispatch event for other pages
-            window.dispatchEvent(new CustomEvent('cartUpdated'));
         }
         
         // ============ AUTH FUNCTIONS ============
@@ -704,7 +869,7 @@
             const cartCount = localStorage.getItem('cartCount') || '0';
             
             if (loggedInUser) {
-                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | 🛒 Cart (<span id="cart-count-header">${cartCount}</span>) | <a href="#" onclick="logout()">Logout</a> | <a href="index.html">🏠 Shop</a>`;
+                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | <a href="#" onclick="logout()">Logout</a> | <a href="index.html">🏠 Shop</a>`;
             } else {
                 userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register</a> | <a href="index.html">🏠 Shop</a>`;
             }
@@ -712,8 +877,142 @@
         
         function logout() {
             localStorage.removeItem('user');
-            // Don't clear cart on logout
             window.location.href = 'index.html';
+        }
+        
+        // ============ SHIPPING & CHECKOUT ============
+        
+        function openShippingModal() {
+            if (cart.length === 0) {
+                showMessage("Add items to cart first!", true);
+                return;
+            }
+            if (!localStorage.getItem('user')) {
+                showMessage("Please login first!", true);
+                setTimeout(() => {
+                    window.location.href = "auth.html";
+                }, 1500);
+                return;
+            }
+            toggleCart();
+            document.getElementById('shippingModal').style.display = "block";
+        }
+        
+        function closeShippingModal() {
+            document.getElementById('shippingModal').style.display = "none";
+        }
+        
+        async function placeOrder(orderData, paymentId) {
+            const username = localStorage.getItem('user');
+            for (let item of orderData.cartItems) {
+                const response = await fetch(`${API_BASE}/order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        username: username,
+                        customerName: orderData.customerName,
+                        phone: orderData.phone,
+                        address: orderData.address
+                    })
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert(`Error: ${error.message}`);
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        async function checkout() {
+            const customerName = document.getElementById('ship-name').value.trim();
+            const phone = document.getElementById('ship-phone').value.trim();
+            const address = document.getElementById('ship-address').value.trim();
+            const email = document.getElementById('ship-email')?.value.trim() || '';
+
+            if (!customerName || !phone || !address) {
+                alert("Please fill all shipping fields");
+                return;
+            }
+
+            let totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const orderData = {
+                totalAmount: totalAmount,
+                customerName: customerName,
+                customerEmail: email,
+                phone: phone,
+                address: address,
+                cartItems: [...cart],
+                productNames: cart.map(item => item.name)
+            };
+            
+            closeShippingModal();
+            
+            const paymentMethod = confirm("Choose Payment:\n\n• Click OK for Card/NetBanking (Razorpay Test)\n• Click Cancel for Test Mode (No Real Payment)");
+            
+            if (paymentMethod) {
+                try {
+                    const createOrderResponse = await fetch(`${API_BASE}/create-order`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: totalAmount, currency: 'INR' })
+                    });
+                    
+                    const orderResult = await createOrderResponse.json();
+                    if (!orderResult.success) throw new Error('Failed to create order');
+                    
+                    const keyResponse = await fetch(`${API_BASE}/get-razorpay-key`);
+                    const { key } = await keyResponse.json();
+                    
+                    const options = {
+                        key: key,
+                        amount: orderResult.amount,
+                        currency: orderResult.currency,
+                        name: 'Sarees By Kuhu',
+                        description: `Payment for ${orderData.productNames.join(', ')}`,
+                        order_id: orderResult.order_id,
+                        prefill: { name: customerName, email: email, contact: phone },
+                        theme: { color: '#27ae60' },
+                        handler: async function(response) {
+                            const verifyRes = await fetch(`${API_BASE}/verify-payment`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+                            const verifyResult = await verifyRes.json();
+                            if (verifyResult.success) {
+                                await placeOrder(orderData, response.razorpay_payment_id);
+                                alert('Payment Successful! Order placed.');
+                                cart = [];
+                                saveCart();
+                                updateCartUI();
+                                window.location.href = 'index.html';
+                            } else {
+                                alert('Payment verification failed!');
+                            }
+                        }
+                    };
+                    const razorpayInstance = new Razorpay(options);
+                    razorpayInstance.open();
+                } catch (error) {
+                    console.error(error);
+                    alert('Payment failed. Please try again or use Test Mode.');
+                }
+            } else {
+                await placeOrder(orderData, "test_payment");
+                alert('[TEST MODE] Order placed successfully without real payment!');
+                cart = [];
+                saveCart();
+                updateCartUI();
+                window.location.href = 'index.html';
+            }
         }
         
         // ============ INITIALIZATION ============
@@ -721,11 +1020,27 @@
         document.getElementById('addToCartBtn').onclick = addToCart;
         checkAuth();
         loadProduct();
+        loadCart();
         
         // Listen for cart updates from other tabs
         window.addEventListener('storage', (e) => {
             if (e.key === 'cart') {
-                updateCartCountDisplay();
+                loadCart();
+            }
+        });
+        
+        window.addEventListener('cartUpdated', () => {
+            loadCart();
+        });
+        
+        // Close cart drawer when clicking outside (optional)
+        document.addEventListener('click', function(event) {
+            const cartDrawer = document.getElementById('cart-view');
+            const cartHeader = document.querySelector('.cart-header');
+            if (cartDrawer.classList.contains('open')) {
+                if (!cartDrawer.contains(event.target) && !cartHeader.contains(event.target)) {
+                    cartDrawer.classList.remove('open');
+                }
             }
         });
     </script>
