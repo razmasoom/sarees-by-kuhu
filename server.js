@@ -661,6 +661,8 @@ app.listen(PORT, () => {
     console.log(`   - Cancellation request workflow (buyer requests, seller approves/rejects)`);
     console.log(`   - Duplicate operation prevention`);
     console.log(`   - Stock management with request IDs`);
+    console.log(`   - Profile saving for users (localStorage based)`);
+    console.log(`   - Order success popup modal`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
