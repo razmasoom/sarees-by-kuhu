@@ -1091,25 +1091,62 @@
             }
         }
 
+// FIXED: Remove from cart with unique request ID to prevent duplicate stock restoration
 async function removeFromCart(index) {
     const item = cart[index];
+    if (!item) return;
     
-    // Restore stock on server BEFORE removing from cart
-    await fetch(`${API_BASE}/products/${item.productId}/stock`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: item.quantity })  // Add stock back
-    });
+    // Generate unique request ID for this operation
+    const requestId = `${item.productId}_${Date.now()}_${Math.random()}`;
     
-    // Update current product display if it's the same product
-    if (currentProduct && currentProduct.id === item.productId) {
-        currentProduct.stock += item.quantity;
-        updateStockDisplay();
+    // Disable button to prevent double click
+    const removeBtn = event?.target;
+    if (removeBtn) {
+        removeBtn.textContent = '...';
+        removeBtn.disabled = true;
     }
     
-    // Then remove from cart
-    cart.splice(index, 1);
-    updateCartUI();
+    try {
+        // Restore stock on server with unique request ID
+        const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                amount: item.quantity,
+                requestId: requestId  // Add unique ID to prevent duplicate
+            })
+        });
+        
+        const stockResult = await stockUpdateResponse.json();
+        
+        // If already processed, don't proceed with cart removal? Actually still remove from cart
+        if (stockResult.alreadyProcessed) {
+            console.log("Stock already restored for this item, removing from cart only");
+        }
+        
+        // Update local product stock if on product page
+        if (currentProduct && currentProduct.id === item.productId) {
+            // Refresh product data from server
+            const productsResponse = await fetch(`${API_BASE}/products`);
+            const products = await productsResponse.json();
+            currentProduct = products.find(p => p.id === item.productId);
+            if (currentProduct) updateStockDisplay();
+        }
+        
+        // Remove from cart array
+        cart.splice(index, 1);
+        updateCartUI();
+        showMessage(`✓ Removed ${item.quantity} × ${item.name} from cart.`);
+        
+    } catch (error) {
+        console.error("Error removing from cart:", error);
+        showMessage('Failed to remove item. Please try again.', true);
+    } finally {
+        if (removeBtn) {
+            removeBtn.textContent = 'x';
+            removeBtn.disabled = false;
+        }
+    }
 }
 
         // ============ MODAL FUNCTIONS ============
