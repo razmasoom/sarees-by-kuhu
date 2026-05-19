@@ -148,8 +148,8 @@
         .btn-reset { background: #c0392b; color: white; width: 100%; margin-top: 20px; }
         .btn-print { background: #27ae60; color: white; }
         .btn-bulk-print { background: #8e44ad; color: white; margin-bottom: 15px; }
-        .btn-approve { background: #27ae60; color: white; }
-        .btn-reject { background: #e74c3c; color: white; }
+        .btn-approve-cancel { background: #27ae60; color: white; }
+        .btn-reject-cancel { background: #e74c3c; color: white; }
         
         .sidebar-link { 
             padding: 12px 15px; 
@@ -173,7 +173,16 @@
         .status-verified { background: #d4edda; color: #155724; }
         .status-pending { background: #fff3cd; color: #856404; }
         .status-cancelled { background: #f8d7da; color: #721c24; }
-        .status-warning { background: #fff3cd; color: #856404; }
+        .cancel-request-badge {
+            background: #ffc107;
+            color: #856404;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
         
         .stock-control { display: flex; gap: 8px; align-items: center; }
         .stock-control input { width: 80px; margin: 0; }
@@ -269,11 +278,6 @@
             font-size: 10px;
             margin-left: 8px;
             animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
         }
         
         /* Category Input Group Styles */
@@ -719,7 +723,6 @@
             <div class="sidebar-link active" onclick="showSection('orders', this)">📋 Order Log</div>
             <div class="sidebar-link" onclick="showSection('inventory', this)">📦 Inventory Matrix</div>
             <div class="sidebar-link" onclick="showSection('users', this)" id="users-tab-link">👥 User Verification</div>
-            <div class="sidebar-link" onclick="showSection('cancellations', this)" id="cancellations-tab-link">❌ Cancel Requests</div>
             <hr style="opacity: 0.1; margin: 15px 0;">
             <button class="btn btn-reset" onclick="showResetConfirmation()">🗑️ Reset Orders</button>
             <button class="btn btn-delete" style="width: 100%; margin-top: 10px;" onclick="adminLogout()">🚪 Logout</button>
@@ -749,7 +752,7 @@
                 <div class="mobile-stat-card"><h4>Users</h4><p id="mobile-user-count">0</p></div>
             </div>
 
-            <!-- ORDER LOG SECTION -->
+            <!-- ORDER LOG SECTION (with integrated cancellation requests) -->
             <div id="section-orders" class="section-content">
                 <h2>📋 Order Log</h2>
                 <div class="bulk-actions-bar">
@@ -762,7 +765,7 @@
                     <button class="btn btn-verify" onclick="clearSelection()">Clear</button>
                 </div>
                 
-                <!-- DESKTOP TABLE VIEW - Orders Table -->
+                <!-- DESKTOP TABLE VIEW - Orders Table with Cancellation Requests Column -->
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -775,6 +778,7 @@
                             <th>Total</th>
                             <th>Status</th>
                             <th>Tracking ID</th>
+                            <th>Cancellation Request</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -865,31 +869,6 @@
                 <!-- MOBILE CARD VIEW -->
                 <div id="users-mobile-container"></div>
             </div>
-
-            <!-- CANCELLATION REQUESTS SECTION -->
-            <div id="section-cancellations" class="section-content" style="display: none;">
-                <h2>❌ Cancellation Requests</h2>
-                <p style="margin-bottom: 15px; color: #666; font-size: 13px;">Review and manage customer cancellation requests. Approve to cancel order and restore stock. Reject if order is already shipped or processed.</p>
-                
-                <!-- DESKTOP TABLE VIEW -->
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Qty</th>
-                            <th>Requested At</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cancellation-table-body"></tbody>
-                </table>
-                
-                <!-- MOBILE CARD VIEW -->
-                <div id="cancellation-mobile-container"></div>
-            </div>
         </div>
     </div>
 
@@ -912,7 +891,6 @@
         <button class="mobile-nav-item active" onclick="mobileNavigate('orders')"><span>📋</span><div>Orders</div></button>
         <button class="mobile-nav-item" onclick="mobileNavigate('inventory')"><span>📦</span><div>Inventory</div></button>
         <button class="mobile-nav-item" onclick="mobileNavigate('users')"><span>👥</span><div>Users</div></button>
-        <button class="mobile-nav-item" onclick="mobileNavigate('cancellations')"><span>❌</span><div>Cancel Req</div></button>
     </div>
 
     <div id="shipping-label-printout" style="display: none;"></div>
@@ -926,6 +904,7 @@
         let lastUserCount = 0;
         let notificationCheckInterval = null;
         let previousUsers = [];
+        let cancellationRequests = [];
 
         // ============ RESET CONFIRMATION FUNCTIONS ============
         function showResetConfirmation() {
@@ -1047,7 +1026,7 @@
             showSection(section, null);
         }
 
-        function startAdminFunctions() { testConnection(); startUserMonitoring(); loadAll(); loadCategories(); loadCancellationRequests(); }
+        function startAdminFunctions() { testConnection(); startUserMonitoring(); loadAll(); loadCategories(); }
 
         function showServerStatus(message, type) {
             const statusDiv = document.getElementById('server-status');
@@ -1109,81 +1088,18 @@
             notificationCheckInterval = setInterval(checkForNewUsers, 10000);
         }
 
-        // ============ CANCELLATION REQUEST FUNCTIONS ============
+        // ============ CANCELLATION REQUEST HANDLING ============
         
         async function loadCancellationRequests() {
             try {
                 const response = await fetch(`${API_BASE}/cancellation-requests`);
-                const requests = await response.json();
-                
-                // Desktop table view
-                const tableBody = document.getElementById('cancellation-table-body');
-                if (tableBody) {
-                    tableBody.innerHTML = '';
-                    if (requests && requests.length > 0) {
-                        [...requests].reverse().forEach(req => {
-                            const statusClass = req.status === 'pending' ? 'status-pending' : (req.status === 'approved' ? 'status-verified' : 'status-cancelled');
-                            const statusText = req.status === 'pending' ? '⏳ Pending' : (req.status === 'approved' ? '✅ Approved' : '❌ Rejected');
-                            
-                            tableBody.innerHTML += `
-                                <tr>
-                                    <td>#${req.orderId}</td>
-                                    <td>${escapeHtml(req.username || 'N/A')}</td>
-                                    <td>${escapeHtml(req.productName || 'N/A')}</td>
-                                    <td>${req.quantity || 0}</td>
-                                    <td>${new Date(req.requestedAt).toLocaleString()}</td>
-                                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                                    <td>
-                                        ${req.status === 'pending' ? `
-                                            <button class="btn btn-approve" onclick="approveCancellation(${req.id})" style="background:#27ae60; margin-right:5px;">✅ Approve</button>
-                                            <button class="btn btn-reject" onclick="rejectCancellation(${req.id})" style="background:#e74c3c;">❌ Reject</button>
-                                        ` : `
-                                            <span style="font-size:11px; color:#666;">Processed on ${req.processedAt ? new Date(req.processedAt).toLocaleDateString() : ''}</span>
-                                        `}
-                                      </td>
-                                 `
-                        });
-                    } else {
-                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No cancellation requests</td></tr>';
-                    }
-                }
-                
-                // Mobile view
-                const mobileContainer = document.getElementById('cancellation-mobile-container');
-                if (mobileContainer) {
-                    mobileContainer.innerHTML = '';
-                    if (requests && requests.length > 0) {
-                        [...requests].reverse().forEach(req => {
-                            const statusClass = req.status === 'pending' ? 'status-pending' : (req.status === 'approved' ? 'status-verified' : 'status-cancelled');
-                            const statusText = req.status === 'pending' ? '⏳ Pending' : (req.status === 'approved' ? '✅ Approved' : '❌ Rejected');
-                            
-                            mobileContainer.innerHTML += `
-                                <div class="order-mobile-card">
-                                    <div><strong>Order #${req.orderId}</strong></div>
-                                    <div>Customer: ${escapeHtml(req.username)}</div>
-                                    <div>Product: ${escapeHtml(req.productName)} (x${req.quantity})</div>
-                                    <div>Requested: ${new Date(req.requestedAt).toLocaleString()}</div>
-                                    <div><span class="status-badge ${statusClass}">${statusText}</span></div>
-                                    ${req.rejectedReason ? `<div style="margin-top: 8px; font-size: 11px; color: #e74c3c;">Reason: ${escapeHtml(req.rejectedReason)}</div>` : ''}
-                                    ${req.status === 'pending' ? `
-                                        <div style="margin-top: 10px; display: flex; gap: 8px;">
-                                            <button class="btn btn-approve" onclick="approveCancellation(${req.id})" style="background:#27ae60;">✅ Approve</button>
-                                            <button class="btn btn-reject" onclick="rejectCancellation(${req.id})" style="background:#e74c3c;">❌ Reject</button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        });
-                    } else {
-                        mobileContainer.innerHTML = '<div class="order-mobile-card" style="text-align:center;">No cancellation requests</div>';
-                    }
-                }
+                cancellationRequests = await response.json();
             } catch (error) {
-                console.error("Error loading cancellation requests:", error);
+                cancellationRequests = [];
             }
         }
 
-        async function approveCancellation(requestId) {
+        async function approveCancellation(requestId, orderId) {
             if (!confirm("⚠️ Confirm: Approve cancellation and restore stock?\n\nThis will cancel the order and restore the product quantity back to inventory.")) return;
             
             try {
@@ -1196,15 +1112,14 @@
                 
                 if (result.success) {
                     alert("✅ Cancellation approved! Stock restored successfully.");
-                    loadAll();
-                    loadCancellationRequests();
+                    await loadAll();
                 } else {
                     if (result.alreadyShipped) {
                         alert("❌ Cannot approve - Order has already been shipped!\n\nPlease check the order status before approving.");
                     } else {
                         alert("Error: " + (result.message || "Failed to approve"));
                     }
-                    loadCancellationRequests();
+                    await loadAll();
                 }
             } catch (error) {
                 alert("Error: " + error.message);
@@ -1227,8 +1142,7 @@
                 
                 if (result.success) {
                     alert("❌ Cancellation request rejected.\n\n" + (result.reason ? `Reason: ${result.reason}` : ''));
-                    loadAll();
-                    loadCancellationRequests();
+                    await loadAll();
                 } else {
                     alert("Error: " + (result.message || "Failed to reject"));
                 }
@@ -1239,6 +1153,9 @@
 
         async function loadAll() {
             try {
+                // Load cancellation requests first
+                await loadCancellationRequests();
+                
                 const [orders, products, users] = await Promise.all([
                     fetch(`${API_BASE}/history`).then(r => r.json()),
                     fetch(`${API_BASE}/products`).then(r => r.json()),
@@ -1248,6 +1165,7 @@
                 console.log("Products loaded:", products);
                 console.log("Users loaded:", users);
                 console.log("Orders loaded:", orders);
+                console.log("Cancellation requests:", cancellationRequests);
 
                 let rev = 0;
                 const activeOrders = orders.filter(o => o.status !== 'Cancelled');
@@ -1270,6 +1188,26 @@
                     ordersTableBody.innerHTML = '';
                     [...orders].reverse().forEach(o => {
                         const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                        
+                        // Check if this order has a pending cancellation request
+                        const pendingRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'pending');
+                        const rejectedRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'rejected');
+                        
+                        let cancelRequestHtml = '';
+                        if (pendingRequest) {
+                            cancelRequestHtml = `
+                                <div style="margin-bottom: 8px;">
+                                    <span class="status-badge cancel-request-badge" style="display: inline-block; margin-bottom: 5px;">⏳ Cancel Request Pending</span>
+                                    <div style="display: flex; gap: 5px; margin-top: 5px;">
+                                        <button class="btn btn-approve-cancel" onclick="approveCancellation(${pendingRequest.id}, ${o.orderId})" style="background:#27ae60;">✅ Approve</button>
+                                        <button class="btn btn-reject-cancel" onclick="rejectCancellation(${pendingRequest.id})" style="background:#e74c3c;">❌ Reject</button>
+                                    </div>
+                                </div>
+                            `;
+                        } else if (rejectedRequest) {
+                            cancelRequestHtml = `<div><span class="status-badge status-cancelled">❌ Rejected: ${rejectedRequest.rejectedReason || 'N/A'}</span></div>`;
+                        }
+                        
                         ordersTableBody.innerHTML += `
                             <tr>
                                 <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
@@ -1281,6 +1219,7 @@
                                 <td>₹${o.totalPrice || 0}</td>
                                 <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
                                 <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
+                                <td style="min-width: 140px;">${cancelRequestHtml || '<span style="color:#888; font-size:11px;">No request</span>'}</td>
                                 <td>
                                     <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
                                     <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
@@ -1296,6 +1235,25 @@
                     ordersMobileContainer.innerHTML = '';
                     [...orders].reverse().forEach(o => {
                         const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                        
+                        const pendingRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'pending');
+                        const rejectedRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'rejected');
+                        
+                        let cancelRequestHtml = '';
+                        if (pendingRequest) {
+                            cancelRequestHtml = `
+                                <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 8px;">
+                                    <div style="color: #856404; margin-bottom: 8px;">⏳ Cancellation Request Pending</div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-approve-cancel" onclick="approveCancellation(${pendingRequest.id}, ${o.orderId})" style="background:#27ae60;">✅ Approve</button>
+                                        <button class="btn btn-reject-cancel" onclick="rejectCancellation(${pendingRequest.id})" style="background:#e74c3c;">❌ Reject</button>
+                                    </div>
+                                </div>
+                            `;
+                        } else if (rejectedRequest) {
+                            cancelRequestHtml = `<div style="margin-top: 8px; color: #721c24; background: #f8d7da; padding: 6px 10px; border-radius: 6px;">❌ Rejected: ${rejectedRequest.rejectedReason || 'N/A'}</div>`;
+                        }
+                        
                         ordersMobileContainer.innerHTML += `
                             <div class="order-mobile-card">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
@@ -1305,10 +1263,10 @@
                                     </div>
                                     <span style="background:${statusColor}; color:white; padding:2px 8px; border-radius:12px; font-size:11px;">${o.status}</span>
                                 </div>
-                                <div><strong>Customer:</strong> ${o.customerName}</div>
-                                <div><strong>Product:</strong> ${o.productName} (x${o.quantity})</div>
+                                <div><strong>Customer:</strong> ${escapeHtml(o.customerName)}</div>
+                                <div><strong>Product:</strong> ${escapeHtml(o.productName)} (x${o.quantity})</div>
                                 <div><strong>Total:</strong> ₹${o.totalPrice}</div>
-                                <div><strong>User:</strong> ${o.username}</div>
+                                <div><strong>User:</strong> ${escapeHtml(o.username)}</div>
                                 <div style="margin-top: 10px;">
                                     <input type="text" id="tracking-mob-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;">
                                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -1317,6 +1275,7 @@
                                         <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
                                     </div>
                                 </div>
+                                ${cancelRequestHtml}
                             </div>
                         `;
                     });
@@ -1398,7 +1357,7 @@
                                  `
                         });
                     } else {
-                        usersTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users found.</td></tr>';
+                        usersTableBody.innerHTML = '<td><td colspan="7" style="text-align:center;">No users found.</td></tr>';
                     }
                 }
 
@@ -1429,7 +1388,6 @@
                 }
                 
                 loadCategories();
-                loadCancellationRequests();
                 showServerStatus('✅ Data loaded!', 'success');
             } catch (e) { 
                 console.error("Load failed", e); 
@@ -1476,9 +1434,6 @@
             if (id === 'users') {
                 const indicator = document.getElementById('users-tab-link')?.querySelector('.new-user-indicator');
                 if (indicator) indicator.remove();
-            }
-            if (id === 'cancellations') {
-                loadCancellationRequests();
             }
         }
 
@@ -1545,9 +1500,9 @@
                             <div class="label-order-id">ORDER #${order.orderId}</div>
                             <div class="label-buyer-section">
                                 <div class="label-section-title">BUYER DETAILS:</div>
-                                <div class="label-line">${order.customerName || 'N/A'}</div>
-                                <div class="label-line">${order.address || 'No Address'}</div>
-                                <div class="label-line">Phone: ${order.phone || 'N/A'}</div>
+                                <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
+                                <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
+                                <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
                             </div>
                             <div class="label-seller-section">
                                 <div class="label-section-title">SENDER DETAILS:</div>
@@ -1582,9 +1537,9 @@
                     <div class="label-order-id">ORDER #${order.orderId}</div>
                     <div class="label-buyer-section">
                         <div class="label-section-title">BUYER DETAILS:</div>
-                        <div class="label-line">${order.customerName || 'N/A'}</div>
-                        <div class="label-line">${order.address || 'No Address'}</div>
-                        <div class="label-line">Phone: ${order.phone || 'N/A'}</div>
+                        <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
+                        <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
+                        <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
                     </div>
                     <div class="label-seller-section">
                         <div class="label-section-title">SENDER DETAILS:</div>
