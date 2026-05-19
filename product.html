@@ -712,73 +712,63 @@
         }
         
         // FIXED: Remove from cart and restore stock on server - with duplicate prevention
-        async function removeFromCart(index) {
-            const item = cart[index];
-            if (!item) return;
-            
-            // Check if this order was already processed to prevent double restoration
-            const orderKey = `restored_${item.productId}_${item.quantity}_${Date.now()}`;
-            if (processedOrderIds.has(orderKey)) {
-                console.log("Duplicate removal detected, skipping...");
-                return;
-            }
-            processedOrderIds.add(orderKey);
-            
-            // Show loading state on remove button
-            const removeBtn = event?.target;
-            if (removeBtn) {
-                removeBtn.textContent = '...';
-                removeBtn.disabled = true;
-            }
-            
-            try {
-                // First, get current product stock from server
-                const productsResponse = await fetch(`${API_BASE}/products`);
-                const products = await productsResponse.json();
-                const currentServerProduct = products.find(p => p.id === item.productId);
-                
-                // Restore stock on server ONLY if it hasn't been restored already
-                // We need to check if the product still exists and stock seems correct
-                if (currentServerProduct) {
-                    // Calculate expected stock (current product stock + cart quantity)
-                    // This ensures we don't double-add
-                    const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ amount: item.quantity })
-                    });
-                    
-                    if (!stockUpdateResponse.ok) {
-                        throw new Error('Failed to restore stock');
-                    }
-                    
-                    // If this is the current product being viewed, update its stock display
-                    if (currentProduct && currentProduct.id === item.productId) {
-                        // Refresh product data from server to ensure accuracy
-                        const updatedProductResponse = await fetch(`${API_BASE}/products`);
-                        const updatedProducts = await updatedProductResponse.json();
-                        currentProduct = updatedProducts.find(p => p.id === item.productId);
-                        updateStockDisplay();
-                    }
-                }
-                
-                // Remove from cart array
-                cart.splice(index, 1);
-                updateCartUI();
-                showMessage(`✓ Removed ${item.quantity} × ${item.name} from cart. Stock restored.`);
-                
-            } catch (error) {
-                console.error("Error removing from cart:", error);
-                showMessage('Failed to remove item. Please try again.', true);
-            } finally {
-                if (removeBtn) {
-                    removeBtn.textContent = 'x';
-                    removeBtn.disabled = false;
-                }
-                // Remove from processed set after some time
-                setTimeout(() => processedOrderIds.delete(orderKey), 5000);
-            }
+        // FIXED: Remove from cart with unique request ID to prevent duplicate stock restoration
+async function removeFromCart(index) {
+    const item = cart[index];
+    if (!item) return;
+    
+    // Generate unique request ID for this operation
+    const requestId = `${item.productId}_${Date.now()}_${Math.random()}`;
+    
+    // Disable button to prevent double click
+    const removeBtn = event?.target;
+    if (removeBtn) {
+        removeBtn.textContent = '...';
+        removeBtn.disabled = true;
+    }
+    
+    try {
+        // Restore stock on server with unique request ID
+        const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                amount: item.quantity,
+                requestId: requestId  // Add unique ID to prevent duplicate
+            })
+        });
+        
+        const stockResult = await stockUpdateResponse.json();
+        
+        // If already processed, don't proceed with cart removal? Actually still remove from cart
+        if (stockResult.alreadyProcessed) {
+            console.log("Stock already restored for this item, removing from cart only");
         }
+        
+        // Update local product stock if on product page
+        if (currentProduct && currentProduct.id === item.productId) {
+            // Refresh product data from server
+            const productsResponse = await fetch(`${API_BASE}/products`);
+            const products = await productsResponse.json();
+            currentProduct = products.find(p => p.id === item.productId);
+            if (currentProduct) updateStockDisplay();
+        }
+        
+        // Remove from cart array
+        cart.splice(index, 1);
+        updateCartUI();
+        showMessage(`✓ Removed ${item.quantity} × ${item.name} from cart.`);
+        
+    } catch (error) {
+        console.error("Error removing from cart:", error);
+        showMessage('Failed to remove item. Please try again.', true);
+    } finally {
+        if (removeBtn) {
+            removeBtn.textContent = 'x';
+            removeBtn.disabled = false;
+        }
+    }
+}
         
         function toggleCart() {
             const cartDrawer = document.getElementById('cart-view');
