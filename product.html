@@ -1043,7 +1043,50 @@ async function removeFromCart(index) {
                 console.error("Error loading related products:", error);
             }
         }
+       // Sync cart with server stock - prevents stale cart data
+async function syncCartWithServer() {
+    if (cart.length === 0) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/products`);
+        const serverProducts = await response.json();
         
+        let cartChanged = false;
+        
+        for (let i = 0; i < cart.length; i++) {
+            const item = cart[i];
+            const serverProduct = serverProducts.find(p => p.id === item.productId);
+            
+            if (!serverProduct) {
+                // Product no longer exists, remove from cart
+                cart.splice(i, 1);
+                cartChanged = true;
+                i--;
+                continue;
+            }
+            
+            // Check if cart quantity exceeds server stock
+            if (item.quantity > serverProduct.stock) {
+                // Adjust cart quantity to match available stock
+                const oldQuantity = item.quantity;
+                item.quantity = serverProduct.stock;
+                cartChanged = true;
+                console.log(`Adjusted ${item.name} quantity from ${oldQuantity} to ${serverProduct.stock} due to stock change`);
+            }
+        }
+        
+        if (cartChanged) {
+            updateCartUI();
+            showMessage("Cart synced with current inventory", false);
+        }
+    } catch (error) {
+        console.error("Error syncing cart:", error);
+    }
+}
+
+// Call this after loading cart
+// Add this line after loadCart() in initialization:
+// syncCartWithServer(); 
         // ============ LOAD PRODUCT ============
         
         async function loadProduct() {
