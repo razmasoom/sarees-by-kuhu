@@ -176,6 +176,7 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
+            transition: 0.2s;
         }
         
         .add-to-cart-btn:hover {
@@ -187,18 +188,7 @@
             cursor: not-allowed;
         }
         
-        .back-btn {
-            background: #37475a;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        
-        /* Cart Drawer - Same as index.html */
+        /* Cart Drawer */
         .cart-drawer { 
             position: fixed; top: 0; right: -400px; 
             width: 350px; height: 100%; background: white; 
@@ -354,6 +344,14 @@
         .form-submit-btn { background: #28a745; color: white; border: none; width: 100%; padding: 12px; font-size: 16px; border-radius: 5px; cursor: pointer; }
         .form-submit-btn:hover { background: #218838; }
         
+        /* Loading indicator */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+        
         @media (max-width: 768px) {
             .product-detail-container {
                 grid-template-columns: 1fr;
@@ -395,7 +393,6 @@
         .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; }
         .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #37475a; font-size: 12px; }
         
-        /* Cart header clickable */
         .cart-header {
             cursor: pointer;
             font-weight: bold;
@@ -500,15 +497,13 @@
         const API_BASE = window.location.origin;
         let currentProduct = null;
         let currentImages = [];
-        let currentImageIndex = 0;
-        let isZoomed = false;
         let cart = [];
         
         // Get product ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
         
-        // ============ CART FUNCTIONS (Same as index.html) ============
+        // ============ CART FUNCTIONS ============
         
         function loadCart() {
             const savedCart = localStorage.getItem('cart');
@@ -524,10 +519,7 @@
             localStorage.setItem('cart', JSON.stringify(cart));
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             localStorage.setItem('cartCount', totalItems);
-            
-            // Dispatch event for other tabs
             window.dispatchEvent(new CustomEvent('cartUpdated'));
-            window.dispatchEvent(new StorageEvent('storage', { key: 'cart', newValue: JSON.stringify(cart) }));
         }
         
         function updateCartUI() {
@@ -579,7 +571,6 @@
             setTimeout(() => msgDiv.remove(), 3000);
         }
         
-        // Update stock display on page
         function updateStockDisplay() {
             const stockElement = document.getElementById('productStock');
             const addToCartBtn = document.getElementById('addToCartBtn');
@@ -599,22 +590,7 @@
             }
         }
         
-        // Refresh product stock from server
-        async function refreshProductStock() {
-            try {
-                const response = await fetch(`${API_BASE}/products`);
-                const products = await response.json();
-                const updatedProduct = products.find(p => p.id == productId);
-                if (updatedProduct) {
-                    currentProduct.stock = updatedProduct.stock;
-                    updateStockDisplay();
-                }
-            } catch (error) {
-                console.error("Error refreshing stock:", error);
-            }
-        }
-        
-        // Add to cart function with stock validation
+        // FIXED: Simplified add to cart - no double stock update
         async function addToCart() {
             const quantity = parseInt(document.getElementById('quantity').value);
             
@@ -638,64 +614,61 @@
                 return;
             }
             
-            // Refresh stock before adding to ensure it's up to date
-            await refreshProductStock();
-            
             if (quantity > currentProduct.stock) {
                 showMessage(`Only ${currentProduct.stock} items available in stock!`, true);
                 return;
             }
             
-            // Check if product already in cart
-            const existingIndex = cart.findIndex(item => item.productId === currentProduct.id);
+            // Disable button to prevent double click
+            const addBtn = document.getElementById('addToCartBtn');
+            addBtn.disabled = true;
+            addBtn.textContent = 'Adding...';
             
-            if (existingIndex !== -1) {
-                const newQuantity = cart[existingIndex].quantity + quantity;
-                if (newQuantity > currentProduct.stock) {
-                    showMessage(`Cannot add more. Only ${currentProduct.stock - cart[existingIndex].quantity} more available!`, true);
-                    return;
-                }
-                cart[existingIndex].quantity = newQuantity;
-            } else {
-                cart.push({
-                    productId: currentProduct.id,
-                    name: currentProduct.name,
-                    price: currentProduct.price,
-                    quantity: quantity,
-                    image: currentImages[0]
-                });
-            }
-            
-            // Update the stock on server
             try {
+                // First update stock on server
                 const stockUpdateResponse = await fetch(`${API_BASE}/products/${currentProduct.id}/stock`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount: -quantity })
                 });
                 
-                if (stockUpdateResponse.ok) {
-                    // Stock updated successfully on server
-                    currentProduct.stock -= quantity;
-                    updateStockDisplay();
-                    
-                    // Save cart to localStorage
-                    saveCart();
-                    updateCartUI();
-                    
-                    showMessage(`✓ ${quantity} × ${currentProduct.name} added to cart!`);
-                    
-                    // Dispatch event for other pages
-                    window.dispatchEvent(new CustomEvent('cartUpdated'));
-                    
-                    // Open cart drawer to show items
-                    toggleCart();
-                } else {
-                    showMessage('Failed to update stock. Please try again.', true);
+                if (!stockUpdateResponse.ok) {
+                    const error = await stockUpdateResponse.json();
+                    throw new Error(error.message || 'Failed to update stock');
                 }
+                
+                // Update local product stock
+                currentProduct.stock -= quantity;
+                updateStockDisplay();
+                
+                // Update cart
+                const existingIndex = cart.findIndex(item => item.productId === currentProduct.id);
+                
+                if (existingIndex !== -1) {
+                    cart[existingIndex].quantity += quantity;
+                } else {
+                    cart.push({
+                        productId: currentProduct.id,
+                        name: currentProduct.name,
+                        price: currentProduct.price,
+                        quantity: quantity,
+                        image: currentImages[0]
+                    });
+                }
+                
+                updateCartUI();
+                showMessage(`✓ ${quantity} × ${currentProduct.name} added to cart!`);
+                
+                // Open cart drawer
+                toggleCart();
+                
             } catch (error) {
-                console.error("Error updating stock:", error);
-                showMessage('Error adding to cart. Please try again.', true);
+                console.error("Error adding to cart:", error);
+                showMessage(error.message || 'Error adding to cart. Please try again.', true);
+            } finally {
+                // Re-enable button
+                addBtn.disabled = false;
+                addBtn.textContent = '🛒 Add to Cart';
             }
         }
         
@@ -866,7 +839,6 @@
         function checkAuth() {
             const userBar = document.getElementById('user-bar');
             const loggedInUser = localStorage.getItem('user');
-            const cartCount = localStorage.getItem('cartCount') || '0';
             
             if (loggedInUser) {
                 userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | <a href="#" onclick="logout()">Logout</a> | <a href="index.html">🏠 Shop</a>`;
@@ -1033,11 +1005,11 @@
             loadCart();
         });
         
-        // Close cart drawer when clicking outside (optional)
+        // Close cart drawer when clicking outside
         document.addEventListener('click', function(event) {
             const cartDrawer = document.getElementById('cart-view');
             const cartHeader = document.querySelector('.cart-header');
-            if (cartDrawer.classList.contains('open')) {
+            if (cartDrawer && cartDrawer.classList && cartDrawer.classList.contains('open')) {
                 if (!cartDrawer.contains(event.target) && !cartHeader.contains(event.target)) {
                     cartDrawer.classList.remove('open');
                 }
