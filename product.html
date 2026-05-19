@@ -441,56 +441,81 @@
             setTimeout(() => msgDiv.remove(), 3000);
         }
         
-        function addToCart() {
-            const quantity = parseInt(document.getElementById('quantity').value);
-            
-            if (!currentProduct) return;
-            if (quantity > currentProduct.stock) {
-                showMessage(`Only ${currentProduct.stock} items available in stock!`);
-                return;
-            }
-            
-            // Get existing cart
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            
-            // Check if product already in cart
-            const existingItem = cart.find(item => item.productId === currentProduct.id);
-            if (existingItem) {
-                if (existingItem.quantity + quantity > currentProduct.stock) {
-                    showMessage(`Cannot add more. Only ${currentProduct.stock - existingItem.quantity} more available!`);
-                    return;
-                }
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    productId: currentProduct.id,
-                    name: currentProduct.name,
-                    price: currentProduct.price,
-                    quantity: quantity,
-                    image: currentProduct.image
-                });
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            showMessage(`✓ ${currentProduct.name} added to cart!`);
-            
-            // Update cart count display
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const event = new CustomEvent('cartUpdated', { detail: { count: totalItems } });
-            window.dispatchEvent(event);
+        // Replace the addToCart function in product.html with this:
+function addToCart() {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    
+    if (!currentProduct) return;
+    if (quantity > currentProduct.stock) {
+        showMessage(`Only ${currentProduct.stock} items available in stock!`);
+        return;
+    }
+    
+    // Check if user is logged in
+    const loggedInUser = localStorage.getItem('user');
+    if (!loggedInUser) {
+        showMessage('Please login first!');
+        setTimeout(() => {
+            window.location.href = 'auth.html';
+        }, 1500);
+        return;
+    }
+    
+    // Get existing cart from localStorage (used across the site)
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    // Check if product already in cart
+    const existingItem = cart.find(item => item.productId === currentProduct.id);
+    if (existingItem) {
+        if (existingItem.quantity + quantity > currentProduct.stock) {
+            showMessage(`Cannot add more. Only ${currentProduct.stock - existingItem.quantity} more available!`);
+            return;
         }
+        existingItem.quantity += quantity;
+    } else {
+        cart.push({
+            productId: currentProduct.id,
+            name: currentProduct.name,
+            price: currentProduct.price,
+            quantity: quantity,
+            image: currentProduct.images && currentProduct.images[0] ? currentProduct.images[0] : (currentProduct.image || 'https://via.placeholder.com/150')
+        });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    showMessage(`✓ ${currentProduct.name} added to cart!`);
+    
+    // Update cart count in localStorage for main page
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    localStorage.setItem('cartCount', totalItems);
+}
         
         // Check login status for user bar
-        function checkAuth() {
-            const userBar = document.getElementById('user-bar');
-            const loggedInUser = localStorage.getItem('user');
-            if (loggedInUser) {
-                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | <a href="index.html">🛒 Shop</a> | <a href="#" onclick="logout()">Logout</a>`;
-            } else {
-                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register</a>`;
-            }
-        }
+function checkAuth() {
+    const userBar = document.getElementById('user-bar');
+    const loggedInUser = localStorage.getItem('user');
+    const cartCount = localStorage.getItem('cartCount') || '0';
+    
+    if (loggedInUser) {
+        userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | 🛒 Cart (<span id="cart-count-header">${cartCount}</span>) | <a href="#" onclick="logout()">Logout</a>`;
+    } else {
+        userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register</a>`;
+    }
+    
+    // Update cart count display
+    const cartCountSpan = document.getElementById('cart-count-header');
+    if (cartCountSpan) {
+        const updateCount = () => {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountSpan.textContent = total;
+        };
+        updateCount();
         
+        // Listen for storage changes
+        window.addEventListener('storage', updateCount);
+    }
+}        
         function logout() {
             localStorage.removeItem('user');
             window.location.href = 'index.html';
