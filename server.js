@@ -358,6 +358,7 @@ app.patch('/history/:id', (req, res) => {
 });
 
 // FIXED: Cancel order - restores stock with duplicate prevention
+// FIXED: Cancel order - Different rules based on order status
 app.patch('/orders/:id/cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -370,12 +371,24 @@ app.patch('/orders/:id/cancel', (req, res) => {
     
     const order = orders[orderIndex];
     
+    // Check if order is already cancelled
     if (order.status === 'Cancelled') {
         return res.status(400).json({ message: "Order already cancelled" });
     }
     
+    // PREVENT CANCELLATION IF ORDER IS SHIPPED OR DELIVERED
+    if (order.status === 'Shipped') {
+        return res.status(400).json({ 
+            message: "Cannot cancel shipped order. Your order has already been dispatched. Please contact customer support for returns after delivery.",
+            alreadyShipped: true
+        });
+    }
+    
     if (order.status === 'Delivered') {
-        return res.status(400).json({ message: "Cannot cancel delivered order" });
+        return res.status(400).json({ 
+            message: "Order already delivered. Please use return policy for refunds.",
+            alreadyDelivered: true
+        });
     }
     
     // Prevent duplicate cancellation
@@ -384,15 +397,20 @@ app.patch('/orders/:id/cancel', (req, res) => {
         return res.status(400).json({ message: "Order cancellation already in progress" });
     }
     
-    // Restore stock
-    const products = data.products || [];
-    const product = products.find(p => p.id === order.productId);
-    
-    if (product) {
-        product.stock += order.quantity;
-        data.products = products;
-        writeJSON(DATA_FILE, data);
-        console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
+    // ONLY RESTORE STOCK IF ORDER IS PENDING (not shipped)
+    // If seller forgot to update status, the user cannot cancel anyway
+    if (order.status === 'Pending') {
+        const products = data.products || [];
+        const product = products.find(p => p.id === order.productId);
+        
+        if (product) {
+            product.stock += order.quantity;
+            data.products = products;
+            writeJSON(DATA_FILE, data);
+            console.log(`✅ Stock restored for cancelled PENDING order: ${product.name} +${order.quantity} (new stock: ${product.stock})`);
+        }
+    } else {
+        console.log(`⚠️ Order ${orderId} is ${order.status} - No stock restoration on cancellation`);
     }
     
     order.status = 'Cancelled';
@@ -402,12 +420,12 @@ app.patch('/orders/:id/cancel', (req, res) => {
     
     res.json({ 
         success: true, 
-        message: "Order cancelled and stock restored",
-        restoredQuantity: order.quantity,
-        productId: order.productId
+        message: order.status === 'Pending' ? "Order cancelled and stock restored" : "Order cancelled (no stock restoration as order was already processed)",
+        restoredQuantity: order.status === 'Pending' ? order.quantity : 0,
+        productId: order.productId,
+        orderStatus: order.status
     });
 });
-
 // FIXED: Delete single order with duplicate prevention
 app.delete('/orders/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
