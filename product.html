@@ -71,6 +71,11 @@
             border-radius: 12px;
             cursor: pointer;
             border: 1px solid #eee;
+            transition: transform 0.3s ease;
+        }
+        
+        .main-image:hover {
+            transform: scale(1.02);
         }
         
         .thumbnail-list {
@@ -210,6 +215,104 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
+        /* Fullscreen Gallery Modal */
+        .gallery-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .gallery-main-image {
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
+            cursor: zoom-in;
+        }
+        
+        .gallery-main-image.zoomed {
+            transform: scale(2);
+            cursor: zoom-out;
+        }
+        
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            overflow-x: auto;
+            padding: 10px;
+            max-width: 90%;
+        }
+        
+        .gallery-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .gallery-thumb:hover, .gallery-thumb.active {
+            border-color: #27ae60;
+        }
+        
+        .gallery-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+        
+        .gallery-prev, .gallery-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 50px;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .gallery-prev { left: 20px; }
+        .gallery-next { right: 20px; }
+        
+        .image-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        
         @media (max-width: 768px) {
             .product-detail-container {
                 grid-template-columns: 1fr;
@@ -220,6 +323,11 @@
             .product-price { font-size: 24px; }
             .thumbnail { width: 60px; height: 60px; }
             .user-bar { padding: 8px 15px; font-size: 12px; }
+            .gallery-prev, .gallery-next {
+                font-size: 30px;
+                width: 40px;
+                height: 40px;
+            }
         }
         
         .footer {
@@ -251,7 +359,7 @@
 
     <header>
         <div class="logo-container" onclick="window.location.href='index.html'">
-            <img src="logo.png" alt="Sarees By Kuhu" class="store-logo">
+            <img src="logo.png" alt="Sarees By Kuhu" class="store-logo" onerror="this.src='https://via.placeholder.com/150x50?text=Sarees+By+Kuhu'">
         </div>
         <div onclick="window.location.href='index.html'" style="cursor:pointer; font-weight: bold;">
             ← Back to Store
@@ -260,7 +368,7 @@
 
     <div id="product-detail" class="product-detail-container">
         <div class="product-gallery">
-            <img id="mainImage" class="main-image" src="" alt="">
+            <img id="mainImage" class="main-image" src="" alt="" onclick="openFullscreenGallery()">
             <div id="thumbnailList" class="thumbnail-list"></div>
         </div>
         <div class="product-info">
@@ -304,10 +412,122 @@
     <script>
         const API_BASE = window.location.origin;
         let currentProduct = null;
+        let currentImages = [];
+        let currentImageIndex = 0;
+        let isZoomed = false;
         
         // Get product ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
+        
+        // ============ FULLSCREEN GALLERY FUNCTIONS ============
+        
+        function openFullscreenGallery() {
+            if (!currentImages || currentImages.length === 0) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'gallery-modal';
+            
+            modal.innerHTML = `
+                <div class="gallery-container">
+                    <span class="gallery-close">&times;</span>
+                    <div class="gallery-prev">❮</div>
+                    <div class="gallery-next">❯</div>
+                    <img id="galleryMainImage" class="gallery-main-image" src="${currentImages[0]}" alt="">
+                    <div id="galleryThumbnails" class="gallery-thumbnails"></div>
+                    <div id="imageCounter" class="image-counter">1 / ${currentImages.length}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            let currentIdx = 0;
+            let zoomed = false;
+            const mainImg = modal.querySelector('#galleryMainImage');
+            const thumbContainer = modal.querySelector('#galleryThumbnails');
+            const counter = modal.querySelector('#imageCounter');
+            
+            // Create thumbnails
+            currentImages.forEach((img, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = img;
+                thumb.className = 'gallery-thumb';
+                if (idx === 0) thumb.classList.add('active');
+                thumb.onclick = () => {
+                    currentIdx = idx;
+                    mainImg.src = currentImages[currentIdx];
+                    counter.textContent = `${currentIdx + 1} / ${currentImages.length}`;
+                    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                    if (zoomed) {
+                        mainImg.classList.remove('zoomed');
+                        zoomed = false;
+                    }
+                };
+                thumbContainer.appendChild(thumb);
+            });
+            
+            // Close button
+            modal.querySelector('.gallery-close').onclick = () => {
+                modal.remove();
+                document.body.style.overflow = 'auto';
+            };
+            
+            // Previous button
+            modal.querySelector('.gallery-prev').onclick = (e) => {
+                e.stopPropagation();
+                currentIdx = (currentIdx - 1 + currentImages.length) % currentImages.length;
+                mainImg.src = currentImages[currentIdx];
+                counter.textContent = `${currentIdx + 1} / ${currentImages.length}`;
+                document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+                    if (i === currentIdx) t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+                if (zoomed) {
+                    mainImg.classList.remove('zoomed');
+                    zoomed = false;
+                }
+            };
+            
+            // Next button
+            modal.querySelector('.gallery-next').onclick = (e) => {
+                e.stopPropagation();
+                currentIdx = (currentIdx + 1) % currentImages.length;
+                mainImg.src = currentImages[currentIdx];
+                counter.textContent = `${currentIdx + 1} / ${currentImages.length}`;
+                document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+                    if (i === currentIdx) t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+                if (zoomed) {
+                    mainImg.classList.remove('zoomed');
+                    zoomed = false;
+                }
+            };
+            
+            // Zoom on click
+            mainImg.onclick = (e) => {
+                e.stopPropagation();
+                if (zoomed) {
+                    mainImg.classList.remove('zoomed');
+                    zoomed = false;
+                } else {
+                    mainImg.classList.add('zoomed');
+                    zoomed = true;
+                }
+            };
+            
+            // Close on background click
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                    document.body.style.overflow = 'auto';
+                }
+            };
+        }
+        
+        // ============ LOAD PRODUCT ============
         
         async function loadProduct() {
             if (!productId) {
@@ -328,10 +548,22 @@
                 // Update page title
                 document.title = `${currentProduct.name} | Sarees By Kuhu`;
                 
+                // Set images array
+                if (currentProduct.images && currentProduct.images.length > 0) {
+                    currentImages = currentProduct.images;
+                } else if (currentProduct.image) {
+                    currentImages = [currentProduct.image];
+                } else {
+                    currentImages = ['https://via.placeholder.com/400x400?text=No+Image'];
+                }
+                
                 // Set product details
                 document.getElementById('productName').textContent = currentProduct.name;
                 document.getElementById('productCategory').textContent = currentProduct.category || 'General';
                 document.getElementById('productPrice').innerHTML = `₹${currentProduct.price}`;
+                
+                // Set main image
+                document.getElementById('mainImage').src = currentImages[0];
                 
                 // Stock status
                 const stockElement = document.getElementById('productStock');
@@ -339,6 +571,7 @@
                     stockElement.innerHTML = `✅ In Stock (${currentProduct.stock} available)`;
                     stockElement.className = 'product-stock in-stock';
                     document.getElementById('addToCartBtn').disabled = false;
+                    document.getElementById('quantity').max = currentProduct.stock;
                 } else {
                     stockElement.innerHTML = '❌ Out of Stock';
                     stockElement.className = 'product-stock out-of-stock';
@@ -351,32 +584,24 @@
                     '<h3>📝 Product Description</h3><p>No description available.</p>';
                 document.getElementById('productDescription').innerHTML = descriptionHtml;
                 
-                // Images gallery
-                const images = currentProduct.images && currentProduct.images.length > 0 ? 
-                    currentProduct.images : [currentProduct.image || 'https://via.placeholder.com/150'];
-                
-                const mainImage = document.getElementById('mainImage');
-                mainImage.src = images[0];
-                mainImage.onclick = () => openFullscreenGallery(images, 0);
-                
                 // Thumbnails
                 const thumbnailList = document.getElementById('thumbnailList');
                 thumbnailList.innerHTML = '';
-                images.forEach((img, idx) => {
+                currentImages.forEach((img, idx) => {
                     const thumb = document.createElement('img');
                     thumb.src = img;
                     thumb.className = 'thumbnail';
                     if (idx === 0) thumb.classList.add('active');
                     thumb.onclick = () => {
-                        mainImage.src = img;
+                        document.getElementById('mainImage').src = img;
                         document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
                         thumb.classList.add('active');
                     };
                     thumbnailList.appendChild(thumb);
                 });
                 
-                // Set max quantity
-                document.getElementById('quantity').max = currentProduct.stock;
+                // Update cart count display
+                updateCartCountDisplay();
                 
             } catch (error) {
                 console.error('Error loading product:', error);
@@ -384,146 +609,125 @@
             }
         }
         
-        function openFullscreenGallery(images, startIndex) {
-            // Simple fullscreen gallery
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer;';
-            let currentIndex = startIndex;
+        // ============ CART FUNCTIONS (Same as index.html) ============
+        
+        function updateCartCountDisplay() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            localStorage.setItem('cartCount', totalItems);
             
-            const img = document.createElement('img');
-            img.src = images[currentIndex];
-            img.style.cssText = 'max-width:90%; max-height:80vh; object-fit:contain;';
-            
-            const counter = document.createElement('div');
-            counter.style.cssText = 'color:white; margin-top:15px;';
-            counter.textContent = `${currentIndex + 1} / ${images.length}`;
-            
-            const prevBtn = document.createElement('button');
-            prevBtn.innerHTML = '❮';
-            prevBtn.style.cssText = 'position:absolute; left:20px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); color:white; border:none; font-size:40px; cursor:pointer; padding:10px 20px; border-radius:50%;';
-            prevBtn.onclick = (e) => {
-                e.stopPropagation();
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
-                img.src = images[currentIndex];
-                counter.textContent = `${currentIndex + 1} / ${images.length}`;
-            };
-            
-            const nextBtn = document.createElement('button');
-            nextBtn.innerHTML = '❯';
-            nextBtn.style.cssText = 'position:absolute; right:20px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); color:white; border:none; font-size:40px; cursor:pointer; padding:10px 20px; border-radius:50%;';
-            nextBtn.onclick = (e) => {
-                e.stopPropagation();
-                currentIndex = (currentIndex + 1) % images.length;
-                img.src = images[currentIndex];
-                counter.textContent = `${currentIndex + 1} / ${images.length}`;
-            };
-            
-            const closeBtn = document.createElement('div');
-            closeBtn.innerHTML = '✕';
-            closeBtn.style.cssText = 'position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;';
-            closeBtn.onclick = () => modal.remove();
-            
-            modal.appendChild(img);
-            modal.appendChild(counter);
-            modal.appendChild(prevBtn);
-            modal.appendChild(nextBtn);
-            modal.appendChild(closeBtn);
-            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-            
-            document.body.appendChild(modal);
+            // Update header cart count if exists
+            const cartCountSpan = document.getElementById('cart-count-header');
+            if (cartCountSpan) {
+                cartCountSpan.textContent = totalItems;
+            }
         }
         
-        function showMessage(message) {
+        function showMessage(message, isError = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'cart-message';
+            msgDiv.style.background = isError ? '#dc3545' : '#27ae60';
             msgDiv.textContent = message;
             document.body.appendChild(msgDiv);
             setTimeout(() => msgDiv.remove(), 3000);
         }
         
-        // Replace the addToCart function in product.html with this:
-function addToCart() {
-    const quantity = parseInt(document.getElementById('quantity').value);
-    
-    if (!currentProduct) return;
-    if (quantity > currentProduct.stock) {
-        showMessage(`Only ${currentProduct.stock} items available in stock!`);
-        return;
-    }
-    
-    // Check if user is logged in
-    const loggedInUser = localStorage.getItem('user');
-    if (!loggedInUser) {
-        showMessage('Please login first!');
-        setTimeout(() => {
-            window.location.href = 'auth.html';
-        }, 1500);
-        return;
-    }
-    
-    // Get existing cart from localStorage (used across the site)
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Check if product already in cart
-    const existingItem = cart.find(item => item.productId === currentProduct.id);
-    if (existingItem) {
-        if (existingItem.quantity + quantity > currentProduct.stock) {
-            showMessage(`Cannot add more. Only ${currentProduct.stock - existingItem.quantity} more available!`);
-            return;
+        function addToCart() {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            // Validation
+            if (isNaN(quantity) || quantity < 1) {
+                showMessage('Please enter a valid quantity', true);
+                return;
+            }
+            
+            if (!currentProduct) {
+                showMessage('Product not found', true);
+                return;
+            }
+            
+            if (quantity > currentProduct.stock) {
+                showMessage(`Only ${currentProduct.stock} items available in stock!`, true);
+                return;
+            }
+            
+            // Check if user is logged in
+            const loggedInUser = localStorage.getItem('user');
+            if (!loggedInUser) {
+                showMessage('Please login first!', true);
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 1500);
+                return;
+            }
+            
+            // Get existing cart from localStorage
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            
+            // Check if product already in cart
+            const existingIndex = cart.findIndex(item => item.productId === currentProduct.id);
+            
+            if (existingIndex !== -1) {
+                const newQuantity = cart[existingIndex].quantity + quantity;
+                if (newQuantity > currentProduct.stock) {
+                    showMessage(`Cannot add more. Only ${currentProduct.stock - cart[existingIndex].quantity} more available!`, true);
+                    return;
+                }
+                cart[existingIndex].quantity = newQuantity;
+            } else {
+                cart.push({
+                    productId: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    quantity: quantity,
+                    image: currentImages[0]
+                });
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart count
+            updateCartCountDisplay();
+            
+            showMessage(`✓ ${quantity} × ${currentProduct.name} added to cart!`);
+            
+            // Optional: Dispatch event for other pages
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
         }
-        existingItem.quantity += quantity;
-    } else {
-        cart.push({
-            productId: currentProduct.id,
-            name: currentProduct.name,
-            price: currentProduct.price,
-            quantity: quantity,
-            image: currentProduct.images && currentProduct.images[0] ? currentProduct.images[0] : (currentProduct.image || 'https://via.placeholder.com/150')
-        });
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    showMessage(`✓ ${currentProduct.name} added to cart!`);
-    
-    // Update cart count in localStorage for main page
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    localStorage.setItem('cartCount', totalItems);
-}
         
-        // Check login status for user bar
-function checkAuth() {
-    const userBar = document.getElementById('user-bar');
-    const loggedInUser = localStorage.getItem('user');
-    const cartCount = localStorage.getItem('cartCount') || '0';
-    
-    if (loggedInUser) {
-        userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | 🛒 Cart (<span id="cart-count-header">${cartCount}</span>) | <a href="#" onclick="logout()">Logout</a>`;
-    } else {
-        userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register</a>`;
-    }
-    
-    // Update cart count display
-    const cartCountSpan = document.getElementById('cart-count-header');
-    if (cartCountSpan) {
-        const updateCount = () => {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCountSpan.textContent = total;
-        };
-        updateCount();
+        // ============ AUTH FUNCTIONS ============
         
-        // Listen for storage changes
-        window.addEventListener('storage', updateCount);
-    }
-}        
+        function checkAuth() {
+            const userBar = document.getElementById('user-bar');
+            const loggedInUser = localStorage.getItem('user');
+            const cartCount = localStorage.getItem('cartCount') || '0';
+            
+            if (loggedInUser) {
+                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${loggedInUser}</b> | 🛒 Cart (<span id="cart-count-header">${cartCount}</span>) | <a href="#" onclick="logout()">Logout</a> | <a href="index.html">🏠 Shop</a>`;
+            } else {
+                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register</a> | <a href="index.html">🏠 Shop</a>`;
+            }
+        }
+        
         function logout() {
             localStorage.removeItem('user');
+            // Don't clear cart on logout
             window.location.href = 'index.html';
         }
+        
+        // ============ INITIALIZATION ============
         
         document.getElementById('addToCartBtn').onclick = addToCart;
         checkAuth();
         loadProduct();
+        
+        // Listen for cart updates from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'cart') {
+                updateCartCountDisplay();
+            }
+        });
     </script>
 </body>
 </html>
