@@ -539,7 +539,200 @@ app.get('/user/:username', (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ id: user.id, username: user.username, status: user.status, phone: user.phone });
 });
+// ============ CANCELLATION REQUEST ROUTES ============
 
+// Store cancellation requests
+const CANCELLATION_REQUESTS_FILE = './cancellation_requests.json';
+
+function initCancellationRequestsFile() {
+    if (!fs.existsSync(CANCELLATION_REQUESTS_FILE)) {
+        writeJSON(CANCELLATION_REQUESTS_FILE, []);
+    }
+}
+initCancellationRequestsFile();
+
+// Buyer requests cancellation
+app.post('/orders/:id/request-cancel', (req, res) => {
+    let orders = readJSON(ORDERS_FILE, []);
+    let cancellationRequests = readJSON(CANCELLATION_REQUESTS_FILE, []);
+    const orderId = parseInt(req.params.id);
+    const orderIndex = orders.findIndex(o => o.orderId === orderId);
+    
+    if (orderIndex === -1) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    
+    const order = orders[orderIndex];
+    
+    // Check if order is already cancelled
+    if (order.status === 'Cancelled') {
+        return res.status(400).json({ message: "Order already cancelled" });
+    }
+    
+    // Check if order is delivered
+    if (order.status === 'Delivered') {
+        return res.status(400).json({ message: "Delivered orders cannot be cancelled" });
+    }
+    
+    // Check if already requested
+    const existingRequest = cancellationRequests.find(r => r.orderId === orderId);
+    if (existingRequest && existingRequest.status === 'pending') {
+        return res.status(400).json({ message: "Cancellation already requested, waiting for approval" });
+    }
+    if (existingRequest && existingRequest.status === 'approved') {
+        return res.status(400).json({ message: "Order already cancelled" });
+    }
+    if (existingRequest && existingRequest.status === 'rejected') {
+        return res.status(400).json({ message: "Previous cancellation request was rejected by seller" });
+    }
+    
+    // Create cancellation request
+    const request = {
+        id: Date.now(),
+        orderId: orderId,
+        productName: order.productName,
+        username: order.username,
+        quantity: order.quantity,
+        status: 'pending', // pending, approved, rejected
+        requestedAt: new Date().toISOString(),
+        orderDetails: order
+    };
+    
+    cancellationRequests.push(request);
+    writeJSON(CANCELLATION_REQUESTS_FILE, cancellationRequests);
+    
+    console.log(`📋 Cancellation requested for order #${orderId} by ${order.username}`);
+    res.json({ 
+        success: true, 
+        message: "Cancellation request submitted. Waiting for seller approval.",
+        request: request
+    });
+});
+
+// Get all cancellation requests (for admin)
+app.get('/cancellation-requests', (req, res) => {
+    const requests = readJSON(CANCELLATION_REQUESTS_FILE, []);
+    res.json(requests);
+});
+
+// Seller approves cancellation
+app.post('/cancellation-requests/:requestId/approve', (req, res) => {
+    let orders = readJSON(ORDERS_FILE, []);
+    let data = readJSON(DATA_FILE, { products: [], users: [] });
+    let cancellationRequests = readJSON(CANCELLATION_REQUESTS_FILE, []);
+    
+    const requestId = parseInt(req.params.requestId);
+    const requestIndex = cancellationRequests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex === -1) {
+        return res.status(404).json({ message: "Request not found" });
+    }
+    
+    const request = cancellationRequests[requestIndex];
+    
+    if (request.status !== 'pending') {
+        return res.status(400).json({ message: `Request already ${request.status}` });
+    }
+    
+    const orderId = request.orderId;
+    const orderIndex = orders.findIndex(o => o.orderId === orderId);
+    
+    if (orderIndex === -1) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    
+    const order = orders[orderIndex];
+    
+    // CRITICAL: Check if order is already shipped
+    if (order.status === 'Shipped') {
+        request.status = 'rejected';
+        request.rejectedReason = 'Order has already been shipped';
+        request.processedAt = new Date().toISOString();
+        cancellationRequests[requestIndex] = request;
+        writeJSON(CANCELLATION_REQUESTS_FILE, cancellationRequests);
+        
+        return res.status(400).json({ 
+            success: false, 
+            message: "Cannot cancel - order has already been shipped!",
+            alreadyShipped: true
+        });
+    }
+    
+    // Check if order is already cancelled
+    if (order.status === 'Cancelled') {
+        request.status = 'rejected';
+        request.rejectedReason = 'Order already cancelled';
+        cancellationRequests[requestIndex] = request;
+        writeJSON(CANCELLATION_REQUESTS_FILE, cancellationRequests);
+        
+        return res.status(400).json({ message: "Order already cancelled" });
+    }
+    
+    // Prevent duplicate approval
+    const approveKey = `approve_cancel_${orderId}`;
+    if (isOperationProcessed(approveKey)) {
+        return res.status(400).json({ message: "Approval already in progress" });
+    }
+    
+    // Restore stock
+    const products = data.products || [];
+    const product = products.find(p => p.id === order.productId);
+    if (product) {
+        product.stock += order.quantity;
+        data.products = products;
+        writeJSON(DATA_FILE, data);
+        console.log(`✅ Stock restored for approved cancellation: ${product.name} +${order.quantity}`);
+    }
+    
+    // Update order status
+    order.status = 'Cancelled';
+    orders[orderIndex] = order;
+    writeJSON(ORDERS_FILE, orders);
+    
+    // Update request
+    request.status = 'approved';
+    request.processedAt = new Date().toISOString();
+    cancellationRequests[requestIndex] = request;
+    writeJSON(CANCELLATION_REQUESTS_FILE, cancellationRequests);
+    
+    markOperationProcessed(approveKey);
+    
+    res.json({ 
+        success: true, 
+        message: "Cancellation approved and stock restored",
+        restoredQuantity: order.quantity
+    });
+});
+
+// Seller rejects cancellation
+app.post('/cancellation-requests/:requestId/reject', (req, res) => {
+    let cancellationRequests = readJSON(CANCELLATION_REQUESTS_FILE, []);
+    
+    const requestId = parseInt(req.params.requestId);
+    const requestIndex = cancellationRequests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex === -1) {
+        return res.status(404).json({ message: "Request not found" });
+    }
+    
+    const request = cancellationRequests[requestIndex];
+    
+    if (request.status !== 'pending') {
+        return res.status(400).json({ message: `Request already ${request.status}` });
+    }
+    
+    request.status = 'rejected';
+    request.rejectedReason = req.body.reason || 'Cancellation rejected by seller';
+    request.processedAt = new Date().toISOString();
+    cancellationRequests[requestIndex] = request;
+    writeJSON(CANCELLATION_REQUESTS_FILE, cancellationRequests);
+    
+    res.json({ 
+        success: true, 
+        message: "Cancellation request rejected",
+        reason: request.rejectedReason
+    });
+});
 // ============ START SERVER ============
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
