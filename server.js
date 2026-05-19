@@ -151,7 +151,6 @@ app.get('/products', (req, res) => {
     res.json(data.products || []);
 });
 
-// Get all unique categories
 app.get('/categories', (req, res) => {
     const data = readJSON(DATA_FILE, { products: [], users: [] });
     const products = data.products || [];
@@ -258,6 +257,7 @@ app.get('/history', (req, res) => {
     res.json(orders);
 });
 
+// FIXED: Order placement - NO stock reduction here (already reduced in cart)
 app.post('/order', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let orders = readJSON(ORDERS_FILE, []);
@@ -280,13 +280,13 @@ app.post('/order', (req, res) => {
         return res.status(404).json({ message: "Product not found" });
     }
     
-    if (product.stock < quantity) {
-        return res.status(400).json({ message: "Insufficient stock" });
+    // IMPORTANT FIX: Check if stock is sufficient (but don't reduce again)
+    // Stock was already reduced when adding to cart, just verify it's not negative
+    if (product.stock < 0) {
+        return res.status(400).json({ message: "Stock inconsistency. Please contact support." });
     }
     
-    // Reduce stock
-    product.stock -= quantity;
-    
+    // Create order WITHOUT reducing stock again
     const newOrder = {
         orderId: Date.now(),
         username: username || 'Guest',
@@ -307,7 +307,9 @@ app.post('/order', (req, res) => {
     
     orders.push(newOrder);
     writeJSON(ORDERS_FILE, orders);
-    writeJSON(DATA_FILE, data);
+    // IMPORTANT: Do NOT modify product stock here again! Stock already reduced in cart.
+    
+    console.log(`✅ Order created for ${username}: ${product.name} x ${quantity} (Stock already reserved in cart)`);
     res.status(201).json(newOrder);
 });
 
@@ -326,7 +328,7 @@ app.patch('/history/:id', (req, res) => {
     }
 });
 
-// FIXED: Cancel order - properly restores stock
+// Cancel order - restores stock
 app.patch('/orders/:id/cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -347,7 +349,7 @@ app.patch('/orders/:id/cancel', (req, res) => {
         return res.status(400).json({ message: "Cannot cancel delivered order" });
     }
     
-    // Restore stock - FIXED: This now works properly
+    // Restore stock
     const products = data.products || [];
     const product = products.find(p => p.id === order.productId);
     
@@ -356,11 +358,8 @@ app.patch('/orders/:id/cancel', (req, res) => {
         data.products = products;
         writeJSON(DATA_FILE, data);
         console.log(`✅ Stock restored for product ${product.name}: +${order.quantity} (new stock: ${product.stock})`);
-    } else {
-        console.log(`⚠️ Product not found for stock restoration: ${order.productId}`);
     }
     
-    // Update order status
     order.status = 'Cancelled';
     orders[orderIndex] = order;
     writeJSON(ORDERS_FILE, orders);
@@ -373,7 +372,7 @@ app.patch('/orders/:id/cancel', (req, res) => {
     });
 });
 
-// Delete single order (admin) - also restore stock
+// Delete single order (admin) - restore stock
 app.delete('/orders/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -386,7 +385,7 @@ app.delete('/orders/:id', (req, res) => {
     
     const order = orders[orderIndex];
     
-    // Restore stock when admin deletes order
+    // Restore stock when admin deletes order (if not already cancelled)
     if (order.status !== 'Cancelled') {
         const products = data.products || [];
         const product = products.find(p => p.id === order.productId);
@@ -394,6 +393,7 @@ app.delete('/orders/:id', (req, res) => {
             product.stock += order.quantity;
             data.products = products;
             writeJSON(DATA_FILE, data);
+            console.log(`✅ Stock restored for deleted order: ${product.name} +${order.quantity}`);
         }
     }
     
@@ -489,9 +489,9 @@ app.listen(PORT, () => {
     console.log(`📁 Orders file: ${ORDERS_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
     console.log(`\n✅ FIXES APPLIED:`);
-    console.log(`   - Cancel order restores product stock`);
-    console.log(`   - Delete order also restores stock`);
-    console.log(`   - Stock validation improved`);
+    console.log(`   - Stock deducted ONLY when adding to cart`);
+    console.log(`   - Order placement does NOT deduct stock again`);
+    console.log(`   - Cancel/Delete order restores stock properly`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
