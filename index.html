@@ -34,15 +34,77 @@
             padding: 8px 50px;
             text-align: right;
             font-size: 14px;
+            position: relative;
+            z-index: 1002;
         }
         .user-bar b { color: white; }
-        .user-bar a { color: #f0c14b; text-decoration: none; margin-left: 15px; cursor: pointer; font-weight: bold; }
+        .user-bar a { 
+            color: #f0c14b; 
+            text-decoration: none; 
+            margin-left: 15px; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
         .user-bar a:hover { text-decoration: underline; }
         .store-name-header {
             float: left;
             font-weight: bold;
             color: #f0c14b;
             font-size: 16px;
+        }
+
+        /* User Dropdown - FIXED */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+            z-index: 1001;
+        }
+
+        .user-name {
+            cursor: pointer;
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .user-name:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            z-index: 10001;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .user-dropdown a {
+            color: #333;
+            padding: 12px 18px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .user-dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .user-dropdown a:hover {
+            background: #f8f9fa;
+            color: #27ae60;
         }
 
         /* Header & Navigation */
@@ -225,7 +287,7 @@
             position: fixed; top: 0; right: -400px; 
             width: 350px; height: 100%; background: white; 
             box-shadow: -2px 0 10px rgba(0,0,0,0.3); 
-            transition: 0.3s ease-in-out; padding: 20px; z-index: 2000;
+            transition: 0.3s ease-in-out; padding: 20px; z-index: 1000;
             overflow-y: auto;
         }
         .cart-drawer.open { right: 0; }
@@ -403,7 +465,7 @@
             background: #219150;
         }
 
-        /* Success Modal - FIXED */
+        /* Success Modal */
         .success-modal {
             display: none;
             position: fixed;
@@ -467,37 +529,6 @@
         }
         .success-modal-content .view-orders-btn:hover {
             background: #2980b9;
-        }
-
-        /* User Dropdown */
-        .user-menu {
-            position: relative;
-            display: inline-block;
-        }
-        .user-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: white;
-            min-width: 180px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            border-radius: 8px;
-            z-index: 100;
-        }
-        .user-dropdown a {
-            color: #333;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .user-dropdown a:hover {
-            background: #f5f5f5;
-        }
-        .user-name {
-            cursor: pointer;
         }
 
         /* Footer */
@@ -614,6 +645,18 @@
                 display: block;
                 margin-bottom: 5px;
                 font-size: 12px;
+            }
+            
+            .user-name {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+            
+            .user-dropdown {
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                min-width: 180px;
             }
             
             .gallery-thumb {
@@ -763,7 +806,7 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL - FIXED POSITION -->
+    <!-- SUCCESS MODAL -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content">
             <div class="success-icon">✅</div>
@@ -1074,9 +1117,9 @@
                     <div class="user-menu">
                         <span class="user-name" onclick="toggleUserDropdown()">👤 Welcome, <b>${escapeHtml(loggedInUser)}</b> ▼</span>
                         <div id="userDropdown" class="user-dropdown">
-                            <a onclick="openProfileModal()">👤 My Profile</a>
-                            <a onclick="toggleOrderHistoryView()">📋 My Orders</a>
-                            <a onclick="openContactModal()">📞 Contact</a>
+                            <a onclick="openProfileModal(); closeDropdown()">👤 My Profile</a>
+                            <a onclick="toggleOrderHistoryView(); closeDropdown()">📋 My Orders</a>
+                            <a onclick="openContactModal(); closeDropdown()">📞 Contact</a>
                             <a onclick="logout()">🚪 Logout</a>
                         </div>
                     </div>`;
@@ -1089,17 +1132,35 @@
             }
         }
         
+        function closeDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        }
+
         function toggleUserDropdown() {
             const dropdown = document.getElementById('userDropdown');
             if (dropdown) {
                 dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
             }
         }
-        
+
+        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('userDropdown');
-            const userName = document.querySelector('.user-name');
-            if (dropdown && userName && !userName.contains(event.target)) {
+            const userMenu = document.querySelector('.user-menu');
+            if (dropdown && dropdown.style.display === 'block') {
+                if (userMenu && !userMenu.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+
+        // Close dropdown on scroll
+        window.addEventListener('scroll', function() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
                 dropdown.style.display = 'none';
             }
         });
@@ -1698,10 +1759,8 @@
                             const verifyResult = await verifyRes.json();
                             if (verifyResult.success) {
                                 await placeOrder(orderData, response.razorpay_payment_id);
-                                // Clear cart
                                 cart = [];
                                 updateCartUI();
-                                // Show success modal
                                 showSuccessModal();
                             } else {
                                 alert('Payment verification failed!');
@@ -1716,10 +1775,8 @@
                 }
             } else {
                 await placeOrder(orderData, "test_payment");
-                // Clear cart
                 cart = [];
                 updateCartUI();
-                // Show success modal
                 showSuccessModal();
             }
         }
