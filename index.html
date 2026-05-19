@@ -410,19 +410,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 15000;
+            z-index: 20000;
         }
         .success-modal-content {
             background: white;
-            padding: 30px;
-            border-radius: 16px;
+            padding: 35px;
+            border-radius: 20px;
             text-align: center;
             max-width: 400px;
             animation: bounceIn 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         @keyframes bounceIn {
             0% { transform: scale(0.3); opacity: 0; }
@@ -430,25 +431,39 @@
             100% { transform: scale(1); opacity: 1; }
         }
         .success-icon {
-            font-size: 60px;
+            font-size: 70px;
             color: #27ae60;
             margin-bottom: 15px;
         }
         .success-modal-content h3 {
             color: #27ae60;
             margin-bottom: 10px;
+            font-size: 24px;
         }
         .success-modal-content p {
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 14px;
         }
         .success-modal-content button {
             background: #27ae60;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        .success-modal-content button:hover {
+            background: #219150;
+        }
+        .success-modal-content .view-orders-btn {
+            background: #3498db;
+        }
+        .success-modal-content .view-orders-btn:hover {
+            background: #2980b9;
         }
 
         /* User Dropdown */
@@ -622,6 +637,17 @@
             .footer-section {
                 text-align: center;
             }
+            
+            .success-modal-content {
+                margin: 20px;
+                padding: 25px;
+            }
+            .success-icon {
+                font-size: 50px;
+            }
+            .success-modal-content h3 {
+                font-size: 20px;
+            }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -730,16 +756,6 @@
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="success-modal" style="display: none;">
-        <div class="success-modal-content">
-            <div class="success-icon">✅</div>
-            <h3>Order Placed Successfully!</h3>
-            <p>Your order has been confirmed and will be processed soon.</p>
-            <button onclick="closeSuccessModal()">Continue Shopping</button>
-        </div>
-    </div>
-
     <div id="shop-container"></div>
 
     <div id="orders-history-container" style="display: none; max-width: 800px; margin: auto;">
@@ -777,6 +793,17 @@
         </div>
         <div class="copyright">
             &copy; 2024 Sarees By Kuhu. All rights reserved.
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal" style="display: none;">
+        <div class="success-modal-content">
+            <div class="success-icon">✅</div>
+            <h3>Order Placed Successfully!</h3>
+            <p>Your order has been confirmed and will be processed soon.</p>
+            <button onclick="closeSuccessAndContinue()">Continue Shopping</button>
+            <button class="view-orders-btn" onclick="closeSuccessAndViewOrders()">View My Orders</button>
         </div>
     </div>
 
@@ -853,18 +880,27 @@
             }
         }
 
-        // ============ SUCCESS MODAL ============
+        // ============ SUCCESS MODAL FUNCTIONS ============
         
         function showSuccessModal() {
             const modal = document.getElementById('successModal');
             modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 3000);
         }
         
         function closeSuccessModal() {
             document.getElementById('successModal').style.display = 'none';
+        }
+        
+        function closeSuccessAndContinue() {
+            closeSuccessModal();
+            showStorefront();
+            // Reload products to update stock
+            loadProducts();
+        }
+        
+        function closeSuccessAndViewOrders() {
+            closeSuccessModal();
+            toggleOrderHistoryView();
         }
 
         // ============ IMAGE GALLERY FUNCTIONS ============
@@ -1658,11 +1694,11 @@
                             const verifyResult = await verifyRes.json();
                             if (verifyResult.success) {
                                 await placeOrder(orderData, response.razorpay_payment_id);
-                                showSuccessModal();
+                                // Clear cart
                                 cart = [];
                                 updateCartUI();
-                                await loadProducts();
-                                toggleOrderHistoryView();
+                                // Show success modal
+                                showSuccessModal();
                             } else {
                                 alert('Payment verification failed!');
                             }
@@ -1676,11 +1712,11 @@
                 }
             } else {
                 await placeOrder(orderData, "test_payment");
-                showSuccessModal();
+                // Clear cart
                 cart = [];
                 updateCartUI();
-                await loadProducts();
-                toggleOrderHistoryView();
+                // Show success modal
+                showSuccessModal();
             }
         }
 
