@@ -545,6 +545,57 @@
             font-size: 11px; 
         }
         
+        /* ========== FOOTER STYLES ========== */
+        .footer {
+            background: #232f3e;
+            color: #ccc;
+            padding: 30px 50px;
+            margin-top: 50px;
+            text-align: center;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+        }
+        .footer-section h3 {
+            color: #f0c14b;
+            margin-bottom: 15px;
+        }
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .footer-section a:hover {
+            color: #f0c14b;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .social-links a {
+            display: inline-block;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #37475a;
+            font-size: 12px;
+        }
+        
         /* ========== MOBILE LAYOUT (max-width: 768px) ========== */
         @media screen and (max-width: 768px) {
             .sidebar { display: none; }
@@ -678,6 +729,18 @@
                 width: 90%;
                 margin: 20px;
                 padding: 20px;
+            }
+            
+            .footer {
+                padding: 20px 15px;
+            }
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .footer-section {
+                text-align: center;
             }
         }
         
@@ -869,6 +932,37 @@
                 <!-- MOBILE CARD VIEW -->
                 <div id="users-mobile-container"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer" id="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a onclick="window.location.href='index.html'">Shop Now</a>
+                <a onclick="window.location.href='index.html?showOrders=true'">My Orders</a>
+                <a>Contact Us</a>
+                <a>My Profile</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p>✉️ Kahkashanp7@gmail.com</p>
+                <p>📍 Lalbagh, Purneacity<br>Bihar 854302</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2024 Sarees By Kuhu. All rights reserved.
         </div>
     </div>
 
@@ -1151,9 +1245,15 @@
             }
         }
 
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         async function loadAll() {
             try {
-                // Load cancellation requests first
                 await loadCancellationRequests();
                 
                 const [orders, products, users] = await Promise.all([
@@ -1189,7 +1289,6 @@
                     [...orders].reverse().forEach(o => {
                         const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
                         
-                        // Check if this order has a pending cancellation request
                         const pendingRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'pending');
                         const rejectedRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'rejected');
                         
@@ -1212,9 +1311,9 @@
                             <tr>
                                 <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
                                 <td>${o.orderId || 'N/A'}</td>
-                                <td>${o.username || 'N/A'}</td>
-                                <td>${o.customerName || 'N/A'}</td>
-                                <td>${o.productName || 'N/A'}</td>
+                                <td>${escapeHtml(o.username) || 'N/A'}</td>
+                                <td>${escapeHtml(o.customerName) || 'N/A'}</td>
+                                <td>${escapeHtml(o.productName) || 'N/A'}</td>
                                 <td>${o.quantity || 0}</td>
                                 <td>₹${o.totalPrice || 0}</td>
                                 <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
@@ -1224,7 +1323,7 @@
                                     <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
                                     <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
                                     <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
-                                  </td>
+                                   </td>
                              `
                     });
                 }
@@ -1305,13 +1404,6 @@
                     }
                 }
 
-                function escapeHtml(text) {
-                    if (!text) return '';
-                    const div = document.createElement('div');
-                    div.textContent = text;
-                    return div.innerHTML;
-                }
-
                 // Mobile inventory view
                 const inventoryMobileContainer = document.getElementById('inventory-mobile-container');
                 if (inventoryMobileContainer) {
@@ -1353,11 +1445,11 @@
                                     <td>
                                         <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
                                         <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
-                                      </td>
+                                       </td>
                                  `
                         });
                     } else {
-                        usersTableBody.innerHTML = '<td><td colspan="7" style="text-align:center;">No users found.</td></tr>';
+                        usersTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users found.</td></tr>';
                     }
                 }
 
