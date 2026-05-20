@@ -49,6 +49,19 @@
         }
         .user-dropdown a:hover { background: #f8f9fa; color: #27ae60; }
         
+        /* Login/Register Links - Yellow color */
+        .user-bar a {
+            color: #f0c14b !important;
+            text-decoration: none;
+            margin-left: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .user-bar a:hover {
+            text-decoration: underline;
+            color: #ddb347 !important;
+        }
+        
         /* Header */
         header {
             background: #232f3e;
@@ -116,7 +129,7 @@
             width: 100%;
         }
         
-        /* CART DRAWER - FIXED: Completely hidden when closed */
+        /* CART DRAWER - Completely hidden when closed */
         .cart-drawer {
             display: none !important;
             position: fixed;
@@ -270,8 +283,41 @@
         
         /* ========== MOBILE STYLES ========== */
         @media screen and (max-width: 768px) {
-            .store-logo { height: 35px; max-width: 140px; }
-            #search-bar { width: 90%; }
+            /* Logo and Cart centered */
+            header {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            .logo-container {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .store-logo { 
+                height: 40px; 
+                max-width: 160px; 
+            }
+            
+            #search-bar { 
+                width: 90%; 
+                margin: 0 auto;
+            }
+            
+            /* Cart button centered */
+            header > div:last-child {
+                display: inline-block;
+                background: #f0c14b;
+                color: #111;
+                padding: 8px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+            }
             
             /* 2 columns for products */
             #shop-container {
@@ -295,18 +341,55 @@
             }
             .cat-btn { white-space: nowrap; }
             
-            /* User bar mobile */
-            .user-bar { padding: 8px 12px; text-align: center; font-size: 12px; }
-            .store-name-header { float: none; display: block; margin-bottom: 5px; }
+            /* User bar mobile - centered */
+            .user-bar { 
+                padding: 8px 12px; 
+                text-align: center; 
+                font-size: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+            .store-name-header { 
+                float: none; 
+                display: block; 
+                margin-bottom: 5px;
+            }
+            
+            /* Login/Register links on mobile */
+            .user-bar a {
+                display: inline-block;
+                margin: 0 8px;
+                background: #f0c14b;
+                color: #111 !important;
+                padding: 6px 15px;
+                border-radius: 6px;
+                text-decoration: none;
+            }
+            .user-bar a:hover {
+                background: #ddb347;
+                color: #111 !important;
+            }
             
             /* Footer mobile */
             .footer { padding: 20px 15px; }
             .footer-content { flex-direction: column; text-align: center; gap: 20px; }
+            .footer-section { text-align: center; }
         }
         
         @media screen and (max-width: 480px) {
             .product-card img { height: 100px; }
             .product-card h3 { font-size: 11px; }
+            
+            .store-logo { height: 35px; max-width: 140px; }
+        }
+        
+        /* Tablet landscape */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .product-card {
+                width: calc(33.33% - 14px);
+            }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -444,7 +527,7 @@
                     </div>`;
             } else {
                 userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
-                    <a href="auth.html">🔑 Login / Register</a> | 
+                    <a href="auth.html">🔑 Login / Register</a>
                     <a onclick="openContactModal()">📞 Contact</a>`;
             }
         }
