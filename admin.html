@@ -150,6 +150,7 @@
         .btn-bulk-print { background: #8e44ad; color: white; margin-bottom: 15px; }
         .btn-approve-cancel { background: #27ae60; color: white; }
         .btn-reject-cancel { background: #e74c3c; color: white; }
+        .btn-upload { background: #6c5ce7; color: white; margin-top: 10px; }
         
         .sidebar-link { 
             padding: 12px 15px; 
@@ -314,12 +315,140 @@
             font-size: 12px;
         }
         
-        /* Multi Image Styles */
+        /* ========== NEW: IMAGE UPLOAD SECTION ========== */
+        .image-upload-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .upload-header label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .upload-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-camera, .btn-gallery {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-camera { background: #e84393; color: white; }
+        .btn-gallery { background: #0984e3; color: white; }
+        .btn-camera:hover { background: #d63384; }
+        .btn-gallery:hover { background: #0773c7; }
+        
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .preview-item .remove-preview {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-item .upload-status {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            padding: 2px;
+        }
+        
+        .preview-item .upload-status.success { background: #27ae60; }
+        .preview-item .upload-status.error { background: #e74c3c; }
+        .preview-item .upload-status.uploading { background: #f39c12; }
+        
+        .upload-progress {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #27ae60;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .upload-stats {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        /* Multi Image Styles (legacy keep for compatibility) */
         .multi-image-section {
             margin-bottom: 15px;
             padding: 10px;
             background: #f8f9fa;
             border-radius: 8px;
+            display: none;
         }
         
         .image-row {
@@ -742,6 +871,25 @@
             .footer-section {
                 text-align: center;
             }
+            
+            .image-preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .preview-item img {
+                height: 80px;
+            }
+            
+            .upload-buttons {
+                width: 100%;
+            }
+            
+            .btn-camera, .btn-gallery {
+                flex: 1;
+                justify-content: center;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
         }
         
         /* Desktop: Hide mobile cards */
@@ -875,16 +1023,42 @@
                         <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
                     </div>
                     
-                    <div class="multi-image-section">
-                        <label style="font-size: 13px; font-weight: bold; display: block; margin-bottom: 8px;">📸 Product Images</label>
-                        <div id="image-urls-container">
-                            <div class="image-row">
-                                <input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;">
-                                <button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button>
+                    <!-- NEW: IMAGE UPLOAD SECTION with Camera/Gallery Support -->
+                    <div class="image-upload-section">
+                        <div class="upload-header">
+                            <label>📸 Product Images (Max 6)</label>
+                            <div class="upload-buttons">
+                                <button type="button" class="btn-camera" onclick="captureFromCamera()">
+                                    📷 Camera
+                                </button>
+                                <button type="button" class="btn-gallery" onclick="selectFromGallery()">
+                                    🖼️ Gallery
+                                </button>
                             </div>
                         </div>
-                        <button type="button" class="add-image-btn" onclick="addImageRow()">+ Add Another Image</button>
+                        
+                        <!-- Hidden file inputs for camera and gallery -->
+                        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" multiple>
+                        <input type="file" id="gallery-input" accept="image/*" style="display: none;" multiple>
+                        
+                        <!-- Image preview grid -->
+                        <div id="image-preview-grid" class="image-preview-grid"></div>
+                        
+                        <!-- Upload progress -->
+                        <div id="upload-progress" class="upload-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="upload-stats" id="upload-stats"></div>
+                        </div>
+                        
+                        <button type="button" class="btn-upload" onclick="uploadAllImages()" id="upload-btn" style="display: none;">
+                            📤 Upload to ImgBB
+                        </button>
                     </div>
+                    
+                    <!-- Hidden fields to store uploaded image URLs -->
+                    <input type="hidden" id="uploaded-image-urls" value="[]">
                     
                     <button class="btn btn-add" onclick="addProduct()">Save Product</button>
                 </div>
@@ -1000,6 +1174,302 @@
         let previousUsers = [];
         let cancellationRequests = [];
 
+        // ============ IMAGE UPLOAD VARIABLES ============
+        let pendingImages = [];  // Array of {file, previewUrl, status, uploadedUrl}
+        let isUploading = false;
+        
+        // ImgBB API Key (Free - sign up at https://imgbb.com to get your own key)
+        // You should replace this with your own API key from imgbb.com
+        const IMGBB_API_KEY = "569ed32b65af48dfc24a3cb583ab0cd7";  // <-- GET YOUR FREE API KEY FROM IMGBB.COM
+        
+        // Helper to show notifications
+        function showNotification(title, message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            const icon = type === 'error' ? '❌' : (type === 'warning' ? '⚠️' : '✅');
+            notification.innerHTML = `<div class="notification-icon">${icon}</div><div class="notification-content"><div class="notification-title">${title}</div><div class="notification-message">${message}</div></div><div class="notification-close" onclick="this.parentElement.remove()">✕</div>`;
+            notification.onclick = (e) => { if (e.target.className !== 'notification-close') notification.remove(); };
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        // ============ CAMERA / GALLERY FUNCTIONS ============
+        
+        function captureFromCamera() {
+            const input = document.getElementById('camera-input');
+            // For mobile, capture="environment" uses back camera
+            input.setAttribute('capture', 'environment');
+            input.click();
+        }
+        
+        function selectFromGallery() {
+            const input = document.getElementById('gallery-input');
+            input.removeAttribute('capture');
+            input.click();
+        }
+        
+        // Setup file input handlers
+        function setupFileInputs() {
+            const cameraInput = document.getElementById('camera-input');
+            const galleryInput = document.getElementById('gallery-input');
+            
+            cameraInput.onchange = (e) => handleFiles(e.target.files);
+            galleryInput.onchange = (e) => handleFiles(e.target.files);
+        }
+        
+        function handleFiles(files) {
+            if (!files || files.length === 0) return;
+            
+            const currentCount = pendingImages.length;
+            const availableSlots = 6 - currentCount;
+            
+            if (files.length > availableSlots) {
+                showNotification('Limit Reached', `Maximum 6 images allowed. You can add ${availableSlots} more.`, 'warning');
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Invalid File', `${file.name} is not an image`, 'error');
+                    continue;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('File Too Large', `${file.name} exceeds 5MB limit`, 'error');
+                    continue;
+                }
+                
+                // Create preview URL
+                const previewUrl = URL.createObjectURL(file);
+                
+                pendingImages.push({
+                    file: file,
+                    previewUrl: previewUrl,
+                    status: 'pending',
+                    uploadedUrl: null
+                });
+            }
+            
+            updateImagePreviewGrid();
+            
+            // Show upload button if there are pending images
+            const uploadBtn = document.getElementById('upload-btn');
+            if (pendingImages.length > 0) {
+                uploadBtn.style.display = 'block';
+            }
+            
+            // Clear file inputs
+            document.getElementById('camera-input').value = '';
+            document.getElementById('gallery-input').value = '';
+        }
+        
+        function updateImagePreviewGrid() {
+            const grid = document.getElementById('image-preview-grid');
+            grid.innerHTML = '';
+            
+            pendingImages.forEach((img, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                let statusText = '';
+                let statusClass = '';
+                if (img.status === 'pending') {
+                    statusText = '📌 Pending';
+                    statusClass = '';
+                } else if (img.status === 'uploading') {
+                    statusText = '⏫ Uploading...';
+                    statusClass = 'uploading';
+                } else if (img.status === 'success') {
+                    statusText = '✅ Uploaded';
+                    statusClass = 'success';
+                } else if (img.status === 'error') {
+                    statusText = '❌ Failed';
+                    statusClass = 'error';
+                }
+                
+                previewItem.innerHTML = `
+                    <img src="${img.previewUrl}" alt="Preview ${index + 1}">
+                    <button class="remove-preview" onclick="removePendingImage(${index})">✕</button>
+                    <div class="upload-status ${statusClass}">${statusText}</div>
+                `;
+                grid.appendChild(previewItem);
+            });
+            
+            // Update stats
+            const uploadedCount = pendingImages.filter(i => i.status === 'success').length;
+            const statsEl = document.getElementById('upload-stats');
+            if (statsEl) {
+                statsEl.innerHTML = `${uploadedCount} of ${pendingImages.length} images uploaded`;
+            }
+        }
+        
+        function removePendingImage(index) {
+            if (pendingImages[index] && pendingImages[index].previewUrl) {
+                URL.revokeObjectURL(pendingImages[index].previewUrl);
+            }
+            pendingImages.splice(index, 1);
+            updateImagePreviewGrid();
+            
+            const uploadBtn = document.getElementById('upload-btn');
+            if (pendingImages.length === 0) {
+                uploadBtn.style.display = 'none';
+            }
+            
+            // Update hidden URLs field
+            updateHiddenUrlsField();
+        }
+        
+        async function uploadAllImages() {
+            if (isUploading) {
+                showNotification('Upload in Progress', 'Please wait for current upload to complete', 'warning');
+                return;
+            }
+            
+            const pendingToUpload = pendingImages.filter(i => i.status === 'pending');
+            if (pendingToUpload.length === 0) {
+                showNotification('No Images', 'All images have been uploaded already', 'warning');
+                return;
+            }
+            
+            if (!IMGBB_API_KEY || IMGBB_API_KEY === 'YOUR_IMGBB_API_KEY') {
+                showNotification('API Key Required', 'Please set your ImgBB API key in the script.\nGet free key from https://imgbb.com/signup', 'error');
+                return;
+            }
+            
+            isUploading = true;
+            const uploadBtn = document.getElementById('upload-btn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '📤 Uploading...';
+            
+            // Show progress bar
+            const progressDiv = document.getElementById('upload-progress');
+            progressDiv.style.display = 'block';
+            
+            let successCount = 0;
+            let failCount = 0;
+            
+            for (let i = 0; i < pendingImages.length; i++) {
+                const img = pendingImages[i];
+                if (img.status !== 'pending') continue;
+                
+                // Update status
+                img.status = 'uploading';
+                updateImagePreviewGrid();
+                
+                // Update progress
+                const totalProcessed = pendingImages.filter(p => p.status !== 'pending').length;
+                const percent = (totalProcessed / pendingImages.length) * 100;
+                document.getElementById('progress-fill').style.width = `${percent}%`;
+                
+                try {
+                    const uploadedUrl = await uploadToImgBB(img.file);
+                    img.status = 'success';
+                    img.uploadedUrl = uploadedUrl;
+                    successCount++;
+                    
+                    showNotification('Upload Success', `Image ${i + 1} uploaded successfully`, 'success');
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    img.status = 'error';
+                    failCount++;
+                    showNotification('Upload Failed', `Image ${i + 1} failed: ${error.message}`, 'error');
+                }
+                
+                updateImagePreviewGrid();
+            }
+            
+            // Update hidden URLs field
+            updateHiddenUrlsField();
+            
+            // Hide progress bar after delay
+            setTimeout(() => {
+                document.getElementById('upload-progress').style.display = 'none';
+                document.getElementById('progress-fill').style.width = '0%';
+            }, 2000);
+            
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = '📤 Upload to ImgBB';
+            isUploading = false;
+            
+            if (successCount > 0) {
+                showNotification('Upload Complete', `${successCount} images uploaded successfully!`, 'success');
+            }
+            if (failCount > 0) {
+                showNotification('Upload Partial', `${failCount} images failed to upload`, 'error');
+            }
+            
+            // If all uploaded successfully, hide upload button
+            const allUploaded = pendingImages.every(i => i.status === 'success');
+            if (allUploaded) {
+                uploadBtn.style.display = 'none';
+            }
+        }
+        
+        async function uploadToImgBB(file) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('key', IMGBB_API_KEY);
+                
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://api.imgbb.com/1/upload', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success && response.data && response.data.url) {
+                                resolve(response.data.url);
+                            } else {
+                                reject(new Error(response.error?.message || 'Upload failed'));
+                            }
+                        } catch (e) {
+                            reject(new Error('Invalid response from ImgBB'));
+                        }
+                    } else {
+                        reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+                    }
+                };
+                xhr.onerror = () => reject(new Error('Network error'));
+                xhr.send(formData);
+            });
+        }
+        
+        function updateHiddenUrlsField() {
+            const successUrls = pendingImages
+                .filter(i => i.status === 'success' && i.uploadedUrl)
+                .map(i => i.uploadedUrl);
+            
+            document.getElementById('uploaded-image-urls').value = JSON.stringify(successUrls);
+        }
+        
+        function getUploadedImageUrls() {
+            const urlsJson = document.getElementById('uploaded-image-urls').value;
+            try {
+                const urls = JSON.parse(urlsJson);
+                return urls.length > 0 ? urls : ['https://via.placeholder.com/150'];
+            } catch (e) {
+                return ['https://via.placeholder.com/150'];
+            }
+        }
+        
+        function clearImageUploads() {
+            // Clean up preview URLs
+            pendingImages.forEach(img => {
+                if (img.previewUrl) {
+                    URL.revokeObjectURL(img.previewUrl);
+                }
+            });
+            pendingImages = [];
+            updateImagePreviewGrid();
+            document.getElementById('uploaded-image-urls').value = '[]';
+            document.getElementById('upload-btn').style.display = 'none';
+            document.getElementById('upload-progress').style.display = 'none';
+        }
+
         // ============ RESET CONFIRMATION FUNCTIONS ============
         function showResetConfirmation() {
             document.getElementById('resetConfirmModal').style.display = 'flex';
@@ -1025,7 +1495,7 @@
             }
         }
 
-        // ============ MULTIPLE IMAGES FUNCTIONS ============
+        // ============ MULTIPLE IMAGES FUNCTIONS (legacy - keep for compatibility) ============
         function addImageRow() {
             const container = document.getElementById('image-urls-container');
             if (container.children.length >= 8) { alert("Maximum 8 images allowed"); return; }
@@ -1047,6 +1517,13 @@
         }
         
         function getAllImageUrls() {
+            // First try to get uploaded URLs from the new system
+            const uploadedUrls = getUploadedImageUrls();
+            if (uploadedUrls.length > 0 && uploadedUrls[0] !== 'https://via.placeholder.com/150') {
+                return uploadedUrls;
+            }
+            
+            // Fallback to manual input URLs
             const inputs = document.querySelectorAll('#image-urls-container .image-url');
             const urls = [];
             inputs.forEach(input => { const url = input.value.trim(); if (url) urls.push(url); });
@@ -1120,7 +1597,7 @@
             showSection(section, null);
         }
 
-        function startAdminFunctions() { testConnection(); startUserMonitoring(); loadAll(); loadCategories(); }
+        function startAdminFunctions() { testConnection(); startUserMonitoring(); loadAll(); loadCategories(); setupFileInputs(); }
 
         function showServerStatus(message, type) {
             const statusDiv = document.getElementById('server-status');
@@ -1133,15 +1610,6 @@
             try { const response = await fetch(`${API_BASE}/users`); if (response.ok) { showServerStatus('✅ Connected to server!', 'success'); return true; } } 
             catch (error) { showServerStatus('❌ Cannot connect to server', 'error'); return false; }
             return false;
-        }
-
-        function showNotification(title, message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `<div class="notification-icon">${type === 'user' ? '👤' : '✅'}</div><div class="notification-content"><div class="notification-title">${title}</div><div class="notification-message">${message}</div></div><div class="notification-close" onclick="this.parentElement.remove()">✕</div>`;
-            notification.onclick = (e) => { if (e.target.className !== 'notification-close') { showSection('users', null); notification.remove(); } };
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 8000);
         }
 
         async function checkForNewUsers() {
@@ -1323,7 +1791,7 @@
                                     <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
                                     <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
                                     <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
-                                   </td>
+                                    </td>
                              `
                     });
                 }
@@ -1445,7 +1913,7 @@
                                     <td>
                                         <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
                                         <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
-                                       </td>
+                                        </td>
                                  `
                         });
                     } else {
@@ -1682,7 +2150,9 @@
             const price = document.getElementById('p-price').value;
             const stock = document.getElementById('p-stock').value;
             const description = document.getElementById('p-description').value;
-            const imageUrls = getAllImageUrls();
+            
+            // Get uploaded image URLs
+            const imageUrls = getUploadedImageUrls();
             const mainImage = imageUrls[0];
             
             const select = document.getElementById('p-cat');
@@ -1708,11 +2178,16 @@
                         images: imageUrls 
                     }) 
                 });
+                
+                // Clear form
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-stock').value = '';
                 document.getElementById('p-description').value = '';
-                document.getElementById('image-urls-container').innerHTML = `<div class="image-row"><input type="text" class="image-url" placeholder="Image URL 1 (Main Image)" style="flex: 1;"><button type="button" class="btn btn-delete remove-image-btn" style="display: none; padding: 8px 12px;" onclick="removeImageRow(this)">✕</button></div>`;
+                
+                // Clear image uploads
+                clearImageUploads();
+                
                 const catSelect = document.getElementById('p-cat');
                 const catNewInput = document.getElementById('p-cat-new');
                 const toggleBtn = document.getElementById('toggle-cat-btn');
@@ -1721,6 +2196,7 @@
                 catSelect.value = '';
                 if (toggleBtn) toggleBtn.textContent = '+ New';
                 catNewInput.value = '';
+                
                 loadAll();
                 loadCategories();
                 alert("Product added successfully with " + imageUrls.length + " image(s) and description!");
