@@ -118,7 +118,7 @@
         }
         .cat-btn:hover { background: white; color: #232f3e; }
         
-        /* Product Detail Layout */
+        /* Product Detail Layout - NO STICKY, normal flow */
         .product-detail-container {
             max-width: 1200px;
             margin: 30px auto;
@@ -131,10 +131,11 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         
+        /* Gallery - normal flow, no sticky positioning */
         .product-gallery {
-            position: sticky;
-            top: 100px;
+            width: 100%;
         }
+        
         .main-image {
             width: 100%;
             border-radius: 12px;
@@ -143,6 +144,7 @@
             transition: transform 0.3s ease;
         }
         .main-image:hover { transform: scale(1.02); }
+        
         .thumbnail-list {
             display: flex;
             gap: 10px;
