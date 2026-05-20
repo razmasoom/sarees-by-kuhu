@@ -25,7 +25,7 @@
             }
         }
         
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; margin: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
         
         /* User Profile Bar */
         .user-bar {
@@ -109,9 +109,15 @@
 
         /* Header & Navigation */
         header { 
-            background: #232f3e; color: white; padding: 15px; 
-            position: sticky; top: 0; display: flex; 
-            justify-content: space-around; align-items: center; z-index: 1000; 
+            background: #232f3e; 
+            color: white; 
+            padding: 15px; 
+            position: sticky; 
+            top: 0; 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            z-index: 1000; 
             flex-wrap: wrap;
             gap: 10px;
         }
@@ -128,19 +134,28 @@
         .cat-btn { background: none; border: 1px solid #ffffff55; color: white; padding: 5px 15px; font-size: 14px; cursor: pointer; border-radius: 4px; }
         .cat-btn:hover, .cat-btn.active { background: white; color: #232f3e; }
 
-        /* Product Grid */
-        #shop-container, #orders-history-container { padding: 30px; }
+        /* Product Grid - FIXED for 2 columns on mobile */
         #shop-container { 
             display: flex; 
             flex-wrap: wrap; 
-            justify-content: center; 
+            justify-content: flex-start; 
             gap: 20px; 
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         .product-card { 
-            background: white; border: 1px solid #ddd; padding: 15px; 
-            border-radius: 8px; width: 220px; transition: 0.2s; text-align: center;
+            background: white; 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            border-radius: 8px; 
+            width: calc(25% - 15px);
+            min-width: 200px;
+            transition: 0.2s; 
+            text-align: center;
             position: relative;
             cursor: pointer;
+            box-sizing: border-box;
         }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; }
@@ -289,7 +304,7 @@
         
         .checkout-btn { background: #28a745; color: white; width: 100%; border: none; padding: 12px; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; }
 
-        /* Cart Drawer - FIXED: Ensure it's completely hidden when closed */
+        /* Cart Drawer - FIXED: Completely hidden when closed */
         .cart-drawer { 
             position: fixed; 
             top: 0; 
@@ -607,8 +622,15 @@
         /* ========== MOBILE RESPONSIVE STYLES ========== */
         @media screen and (max-width: 768px) {
             /* Products - 2 columns on mobile */
+            #shop-container {
+                padding: 15px;
+                gap: 12px;
+                justify-content: space-between;
+            }
+            
             .product-card {
-                width: calc(50% - 10px);
+                width: calc(50% - 6px);
+                min-width: auto;
                 padding: 10px;
             }
             
@@ -617,22 +639,17 @@
             }
             
             .product-card h3 {
-                font-size: 13px;
-                margin: 8px 0;
+                font-size: 12px;
+                margin: 6px 0;
             }
             
             .product-card p {
-                font-size: 12px;
+                font-size: 11px;
             }
             
             .view-details-btn {
                 padding: 6px 10px;
                 font-size: 11px;
-            }
-            
-            #shop-container {
-                padding: 15px;
-                gap: 10px;
             }
             
             header {
@@ -652,6 +669,7 @@
                 padding: 8px;
                 overflow-x: auto;
                 justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
             }
             
             .cat-btn {
@@ -699,6 +717,7 @@
                 font-size: 30px;
                 width: 40px;
                 height: 40px;
+                padding: 10px;
             }
             
             .footer {
@@ -733,8 +752,12 @@
         
         /* Small phones (up to 480px) */
         @media screen and (max-width: 480px) {
+            #shop-container {
+                gap: 8px;
+            }
+            
             .product-card {
-                width: calc(50% - 8px);
+                width: calc(50% - 4px);
             }
             
             .product-card img {
@@ -743,6 +766,13 @@
             
             .product-card h3 {
                 font-size: 11px;
+            }
+        }
+        
+        /* Tablet landscape */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .product-card {
+                width: calc(33.33% - 14px);
             }
         }
     </style>
