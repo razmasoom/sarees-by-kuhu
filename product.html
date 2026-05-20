@@ -431,7 +431,6 @@
                 gap: 12px;
                 padding: 12px;
             }
-            /* Cart button style matching index.html (yellow badge) */
             .cart-header {
                 display: inline-block;
                 background: #f0c14b;
@@ -472,7 +471,6 @@
         }
         @media screen and (max-width: 480px) {
             .store-logo { height: 65px; max-width: 200px; }
-            .product-card img { height: 100px; }
         }
         @media screen and (min-width: 769px) and (max-width: 1024px) {
             .store-logo { height: 70px; max-width: 220px; }
@@ -498,6 +496,24 @@
             display: flex;
             align-items: center;
             gap: 5px;
+        }
+        
+        /* Stock sync indicator */
+        .stock-sync-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            z-index: 9999;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -615,6 +631,7 @@
         let currentImages = [];
         let cart = [];
         let allProducts = [];
+        let stockSyncInterval = null;
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
 
@@ -647,6 +664,47 @@
         function logout() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
         document.addEventListener('click', function(e) { let dd = document.getElementById('userDropdown'); if(dd && dd.style.display === 'block' && !e.target.closest('.user-menu')) dd.style.display = 'none'; });
         
+        // Stock Sync - Periodically check for stock updates from server
+        async function syncStockFromServer() {
+            if (!currentProduct || !currentProduct.id) return;
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const products = await response.json();
+                const updatedProduct = products.find(p => p.id === currentProduct.id);
+                if (updatedProduct && updatedProduct.stock !== currentProduct.stock) {
+                    console.log(`Stock sync: ${currentProduct.stock} → ${updatedProduct.stock}`);
+                    currentProduct.stock = updatedProduct.stock;
+                    updateStockDisplay();
+                    // Also update related products if needed
+                    await loadRelatedProducts();
+                    showStockSyncNotification(updatedProduct.stock);
+                }
+            } catch (error) {
+                console.error("Stock sync error:", error);
+            }
+        }
+        
+        function showStockSyncNotification(newStock) {
+            const indicator = document.createElement('div');
+            indicator.className = 'stock-sync-indicator';
+            indicator.innerHTML = `🔄 Stock updated: ${newStock} available`;
+            document.body.appendChild(indicator);
+            setTimeout(() => indicator.remove(), 3000);
+        }
+        
+        function startStockSync() {
+            if (stockSyncInterval) clearInterval(stockSyncInterval);
+            // Sync every 5 seconds to catch cancellation updates
+            stockSyncInterval = setInterval(() => syncStockFromServer(), 5000);
+        }
+        
+        function stopStockSync() {
+            if (stockSyncInterval) {
+                clearInterval(stockSyncInterval);
+                stockSyncInterval = null;
+            }
+        }
+        
         // Cart functions
         function loadCart() { const saved = localStorage.getItem('cart'); if(saved) { try { cart = JSON.parse(saved); } catch(e) { cart = []; } } else cart = []; updateCartUI(); }
         function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); window.dispatchEvent(new CustomEvent('cartUpdated')); }
@@ -659,7 +717,7 @@
             else totalDisplay.innerHTML = '';
             saveCart();
         }
-        async function removeFromCart(index) { const item = cart[index]; if(!item) return; try { await fetch(`${API_BASE}/products/${item.productId}/stock`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: item.quantity, requestId: `remove_${Date.now()}` }) }); cart.splice(index,1); updateCartUI(); showMessage(`✓ Removed ${item.name}`); } catch(e) { showMessage('Error removing', true); } }
+        async function removeFromCart(index) { const item = cart[index]; if(!item) return; try { await fetch(`${API_BASE}/products/${item.productId}/stock`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: item.quantity, requestId: `remove_${Date.now()}` }) }); cart.splice(index,1); updateCartUI(); showMessage(`✓ Removed ${item.name}`); await syncStockFromServer(); } catch(e) { showMessage('Error removing', true); } }
         function toggleCart() { const drawer = document.getElementById('cart-view'); if(drawer.classList.contains('open')) { drawer.classList.remove('open'); drawer.style.display = 'none'; } else { drawer.style.display = 'block'; setTimeout(() => drawer.classList.add('open'), 10); } }
         function showMessage(msg, isErr=false) { let d = document.createElement('div'); d.className = 'cart-message'; d.style.background = isErr ? '#dc3545' : '#27ae60'; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
         
@@ -684,8 +742,19 @@
         
         function updateStockDisplay() {
             const stockEl = document.getElementById('productStock'); const addBtn = document.getElementById('addToCartBtn'); const qtyInput = document.getElementById('quantity');
-            if(currentProduct.stock>0) { stockEl.innerHTML = `✅ In Stock (${currentProduct.stock} available)`; stockEl.className = 'product-stock in-stock'; addBtn.disabled=false; if(qtyInput) qtyInput.max = currentProduct.stock; }
-            else { stockEl.innerHTML = '❌ Out of Stock'; stockEl.className = 'product-stock out-of-stock'; addBtn.disabled=true; }
+            if(currentProduct && currentProduct.stock > 0) { 
+                stockEl.innerHTML = `✅ In Stock (${currentProduct.stock} available)`; 
+                stockEl.className = 'product-stock in-stock'; 
+                addBtn.disabled=false; 
+                if(qtyInput) { 
+                    qtyInput.max = currentProduct.stock; 
+                    if(parseInt(qtyInput.value) > currentProduct.stock) qtyInput.value = currentProduct.stock;
+                } 
+            } else if(currentProduct) { 
+                stockEl.innerHTML = '❌ Out of Stock'; 
+                stockEl.className = 'product-stock out-of-stock'; 
+                addBtn.disabled=true; 
+            }
         }
         
         // Product loading & gallery
@@ -704,6 +773,8 @@
             const thumbContainer = document.getElementById('thumbnailList'); thumbContainer.innerHTML = '';
             currentImages.forEach((img,idx)=>{ let thumb = document.createElement('img'); thumb.src=img; thumb.className='thumbnail'; if(idx===0) thumb.classList.add('active'); thumb.onclick=()=>{ document.getElementById('mainImage').src=img; document.querySelectorAll('.thumbnail').forEach(t=>t.classList.remove('active')); thumb.classList.add('active'); }; thumbContainer.appendChild(thumb); });
             await loadRelatedProducts();
+            // Start stock sync after product is loaded
+            startStockSync();
         }
         
         async function loadRelatedProducts() {
@@ -721,11 +792,11 @@
             document.body.appendChild(modalDiv); document.body.style.overflow='hidden';
             let idx=0, zoomed=false; const mainImg=modalDiv.querySelector('#galleryMainImage'); const thumbContainer=modalDiv.querySelector('#galleryThumbnails'); const counter=modalDiv.querySelector('.image-counter');
             currentImages.forEach((img,i)=>{ let thumb=document.createElement('img'); thumb.src=img; thumb.className='gallery-thumb'; if(i===0) thumb.classList.add('active'); thumb.onclick=(e)=>{ e.stopPropagation(); idx=i; mainImg.src=currentImages[idx]; counter.innerText=`${idx+1}/${currentImages.length}`; document.querySelectorAll('.gallery-thumb').forEach(t=>t.classList.remove('active')); thumb.classList.add('active'); if(zoomed){mainImg.classList.remove('zoomed');zoomed=false;} }; thumbContainer.appendChild(thumb); });
-            modalDiv.querySelector('.gallery-close').onclick=()=>{ modalDiv.remove(); document.body.style.overflow='auto'; };
+            modalDiv.querySelector('.gallery-close').onclick=()=>{ modalDiv.remove(); document.body.style.overflow='auto'; stopStockSync(); };
             modalDiv.querySelector('.gallery-prev').onclick=(e)=>{ e.stopPropagation(); idx=(idx-1+currentImages.length)%currentImages.length; mainImg.src=currentImages[idx]; counter.innerText=`${idx+1}/${currentImages.length}`; document.querySelectorAll('.gallery-thumb').forEach((t,i)=>{ if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); if(zoomed){mainImg.classList.remove('zoomed');zoomed=false;} };
             modalDiv.querySelector('.gallery-next').onclick=(e)=>{ e.stopPropagation(); idx=(idx+1)%currentImages.length; mainImg.src=currentImages[idx]; counter.innerText=`${idx+1}/${currentImages.length}`; document.querySelectorAll('.gallery-thumb').forEach((t,i)=>{ if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); if(zoomed){mainImg.classList.remove('zoomed');zoomed=false;} };
             mainImg.onclick=(e)=>{ e.stopPropagation(); if(zoomed){mainImg.classList.remove('zoomed');zoomed=false;}else{mainImg.classList.add('zoomed');zoomed=true;} };
-            modalDiv.onclick=(e)=>{ if(e.target===modalDiv){modalDiv.remove();document.body.style.overflow='auto';} };
+            modalDiv.onclick=(e)=>{ if(e.target===modalDiv){modalDiv.remove();document.body.style.overflow='auto'; startStockSync();} };
         }
         
         // Checkout & modals
@@ -756,6 +827,10 @@
         // Event listeners & init
         document.getElementById('addToCartBtn').onclick = addToCart;
         window.onclick = function(e){ if(e.target === document.getElementById('shippingModal')) closeShippingModal(); if(e.target === document.getElementById('contactModal')) closeContactModal(); if(e.target === document.getElementById('profileModal')) closeProfileModal(); const cartDrawer = document.getElementById('cart-view'); if(cartDrawer && cartDrawer.classList.contains('open') && !cartDrawer.contains(e.target) && !e.target.closest('.cart-header')) { cartDrawer.classList.remove('open'); cartDrawer.style.display='none'; } };
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() { stopStockSync(); });
+        
         checkAuth(); loadProduct(); loadCart();
         
         async function loadCategories() { try{ const resp = await fetch(`${API_BASE}/products`); const prods = await resp.json(); const cats = ['All', ...new Set(prods.map(p=>p.category).filter(c=>c))]; document.getElementById('category-menu').innerHTML = cats.slice(0,8).map(c=>`<button class="cat-btn" onclick="window.location.href='index.html?category=${encodeURIComponent(c)}'">${c}</button>`).join(''); } catch(e){} }
