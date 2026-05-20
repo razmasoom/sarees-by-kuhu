@@ -34,6 +34,60 @@
             font-size: 16px;
         }
         
+        /* User Dropdown */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+            z-index: 1001;
+        }
+
+        .user-name {
+            cursor: pointer;
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .user-name:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            z-index: 10001;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .user-dropdown a {
+            color: #333;
+            padding: 12px 18px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .user-dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .user-dropdown a:hover {
+            background: #f8f9fa;
+            color: #27ae60;
+        }
+        
         header { 
             background: #232f3e; 
             color: white; 
@@ -556,7 +610,7 @@
             font-weight: bold;
         }
         
-        /* Footer */
+        /* ============ FOOTER STYLES (Same as index.html) ============ */
         .footer {
             background: #232f3e;
             color: #ccc;
@@ -572,11 +626,40 @@
             flex-wrap: wrap;
             gap: 30px;
         }
-        .footer-section { flex: 1; min-width: 200px; text-align: left; }
-        .footer-section h3 { color: #f0c14b; margin-bottom: 15px; }
-        .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; }
-        .footer-section a:hover { color: #f0c14b; }
-        .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #37475a; font-size: 12px; }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+        }
+        .footer-section h3 {
+            color: #f0c14b;
+            margin-bottom: 15px;
+        }
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .footer-section a:hover {
+            color: #f0c14b;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .social-links a {
+            display: inline-block;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #37475a;
+            font-size: 12px;
+        }
         
         /* Loading state */
         .loading {
@@ -619,6 +702,19 @@
             .product-gallery {
                 position: relative;
                 top: 0;
+            }
+            
+            /* Footer Mobile */
+            .footer {
+                padding: 20px 15px;
+            }
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .footer-section {
+                text-align: center;
             }
         }
         
@@ -714,25 +810,82 @@
         <div id="relatedProductsGrid" class="related-products-grid"></div>
     </div>
 
+    <!-- ============ FOOTER (Same as index.html) ============ -->
     <div class="footer">
         <div class="footer-content">
             <div class="footer-section">
                 <h3>About Us</h3>
-                <p>Your trusted online shopping destination for authentic sarees.</p>
+                <p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p>
             </div>
             <div class="footer-section">
                 <h3>Quick Links</h3>
-                <a href="index.html">Shop Now</a>
-                <a href="index.html?showOrders=true">My Orders</a>
+                <a onclick="window.location.href='index.html'">Shop Now</a>
+                <a onclick="window.location.href='index.html?showOrders=true'">My Orders</a>
+                <a onclick="openContactModal()">Contact Us</a>
+                <a onclick="openProfileModal()">My Profile</a>
             </div>
             <div class="footer-section">
                 <h3>Contact Info</h3>
                 <p>✉️ Kahkashanp7@gmail.com</p>
-                <p>📍 Purnea, Bihar 854302</p>
+                <p>📍 Lalbagh, Purneacity<br>Bihar 854302</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+                </div>
             </div>
         </div>
         <div class="copyright">
             &copy; 2024 Sarees By Kuhu. All rights reserved.
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeContactModal()">&times;</span>
+            <h2 style="margin-top: 0; text-align: center; color: #232f3e;">Contact Us</h2>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            <div style="text-align: center;">
+                <p>✉️ <strong>Email:</strong> Kahkashanp7@gmail.com</p>
+                <p>📍 <strong>Address:</strong> PS-Sadar, Purnea<br>Near-Industrial Area, Purneacity<br>Bihar 854302</p>
+                <p>🕐 <strong>Business Hours:</strong> Mon-Sat: 10 AM - 7 PM</p>
+                <hr style="margin: 20px 0;">
+                <h3>Send us a message</h3>
+                <input type="text" id="contact-name" placeholder="Your Name" style="width: 100%; margin-bottom: 10px;">
+                <input type="email" id="contact-email" placeholder="Your Email" style="width: 100%; margin-bottom: 10px;">
+                <textarea id="contact-message" placeholder="Your Message" rows="4" style="width: 100%; margin-bottom: 10px;"></textarea>
+                <button onclick="sendContactMessage()" style="background: #28a745; color: white; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeProfileModal()">&times;</span>
+            <h2 style="margin-top: 0; text-align: center; color: #232f3e;">👤 My Profile</h2>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            <div class="profile-form">
+                <div class="profile-form-group" style="margin-bottom: 15px;">
+                    <label>📧 Email Address</label>
+                    <input type="email" id="profile-email" placeholder="Your email address" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="profile-form-group" style="margin-bottom: 15px;">
+                    <label>👤 Full Name</label>
+                    <input type="text" id="profile-name" placeholder="Your full name" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="profile-form-group" style="margin-bottom: 15px;">
+                    <label>📞 Phone Number</label>
+                    <input type="tel" id="profile-phone" placeholder="Mobile number" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <div class="profile-form-group" style="margin-bottom: 15px;">
+                    <label>📍 Default Shipping Address</label>
+                    <textarea id="profile-address" placeholder="House/Office No., Locality, Landmark, City, State, PIN" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
+                </div>
+                <button class="save-profile-btn" onclick="saveProfile()" style="background: #27ae60; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">💾 Save Profile</button>
+            </div>
         </div>
     </div>
 
@@ -769,6 +922,145 @@
             }
         }
         
+        // ============ CONTACT MODAL FUNCTIONS ============
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = "block";
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = "none";
+            document.getElementById('contact-name').value = '';
+            document.getElementById('contact-email').value = '';
+            document.getElementById('contact-message').value = '';
+        }
+
+        function sendContactMessage() {
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
+            
+            if (!name || !email || !message) {
+                alert("Please fill in all fields");
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                alert("Please enter a valid email address");
+                return;
+            }
+            
+            alert(`Thank you ${name}!\n\nWe have received your message and will get back to you soon.\n\nRegards,\nSarees By Kuhu Team`);
+            closeContactModal();
+        }
+
+        // ============ PROFILE FUNCTIONS ============
+        function openProfileModal() {
+            const username = localStorage.getItem('user');
+            if (!username) {
+                alert("Please login first!");
+                window.location.href = "auth.html";
+                return;
+            }
+            const savedProfile = localStorage.getItem(`profile_${username}`);
+            if (savedProfile) {
+                const profile = JSON.parse(savedProfile);
+                document.getElementById('profile-email').value = profile.email || '';
+                document.getElementById('profile-name').value = profile.name || '';
+                document.getElementById('profile-phone').value = profile.phone || '';
+                document.getElementById('profile-address').value = profile.address || '';
+            } else {
+                document.getElementById('profile-email').value = '';
+                document.getElementById('profile-name').value = '';
+                document.getElementById('profile-phone').value = '';
+                document.getElementById('profile-address').value = '';
+            }
+            document.getElementById('profileModal').style.display = "block";
+        }
+        
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = "none";
+        }
+        
+        function saveProfile() {
+            const username = localStorage.getItem('user');
+            if (!username) {
+                alert("Please login first!");
+                return;
+            }
+            const profile = {
+                email: document.getElementById('profile-email').value.trim(),
+                name: document.getElementById('profile-name').value.trim(),
+                phone: document.getElementById('profile-phone').value.trim(),
+                address: document.getElementById('profile-address').value.trim(),
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem(`profile_${username}`, JSON.stringify(profile));
+            alert("✅ Profile saved successfully!");
+            closeProfileModal();
+        }
+        
+        // ============ AUTH FUNCTIONS ============
+        
+        function checkAuth() {
+            const userBar = document.getElementById('user-bar');
+            const loggedInUser = localStorage.getItem('user');
+            
+            if (userBar) {
+                if (loggedInUser) {
+                    userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
+                        <div class="user-menu">
+                            <span class="user-name" onclick="toggleUserDropdown()">👤 Welcome, <b>${escapeHtml(loggedInUser)}</b> ▼</span>
+                            <div id="userDropdown" class="user-dropdown">
+                                <a onclick="openProfileModal(); closeDropdown()">👤 My Profile</a>
+                                <a onclick="window.location.href='index.html?showOrders=true'; closeDropdown()">📋 My Orders</a>
+                                <a onclick="openContactModal(); closeDropdown()">📞 Contact</a>
+                                <a onclick="logout()">🚪 Logout</a>
+                            </div>
+                        </div>`;
+                } else {
+                    userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
+                        <a href="auth.html">🔑 Login / Register</a> | 
+                        <a onclick="openContactModal()" style="cursor:pointer;">📞 Contact</a>`;
+                }
+            }
+        }
+        
+        function closeDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userMenu = document.querySelector('.user-menu');
+            if (dropdown && dropdown.style.display === 'block') {
+                if (userMenu && !userMenu.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+
+        window.addEventListener('scroll', function() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+        
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
         // ============ CART FUNCTIONS ============
         
         function loadCart() {
@@ -789,7 +1081,6 @@
             localStorage.setItem('cart', JSON.stringify(cart));
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             localStorage.setItem('cartCount', totalItems);
-            // Dispatch event to notify other tabs
             window.dispatchEvent(new CustomEvent('cartUpdated'));
         }
         
@@ -845,7 +1136,6 @@
             }
             
             try {
-                // Restore stock on server
                 const stockUpdateResponse = await fetch(`${API_BASE}/products/${item.productId}/stock`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -855,7 +1145,6 @@
                     })
                 });
                 
-                // Update local product stock if on product page
                 if (currentProduct && currentProduct.id === item.productId) {
                     const productsResponse = await fetch(`${API_BASE}/products`);
                     const products = await productsResponse.json();
@@ -918,7 +1207,6 @@
             }
         }
         
-        // Add to cart function
         async function addToCart() {
             const quantity = parseInt(document.getElementById('quantity').value);
             
@@ -951,7 +1239,6 @@
             addBtn.textContent = 'Adding...';
             
             try {
-                // Update stock on server (reduce by quantity)
                 const stockUpdateResponse = await fetch(`${API_BASE}/products/${currentProduct.id}/stock`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -963,11 +1250,9 @@
                     throw new Error(error.message || 'Failed to update stock');
                 }
                 
-                // Update local product stock
                 currentProduct.stock -= quantity;
                 updateStockDisplay();
                 
-                // Update cart
                 const existingIndex = cart.findIndex(item => item.productId === currentProduct.id);
                 
                 if (existingIndex !== -1) {
@@ -985,13 +1270,11 @@
                 updateCartUI();
                 showMessage(`✓ ${quantity} × ${currentProduct.name} added to cart!`);
                 
-                // Briefly show cart
                 setTimeout(() => {
                     toggleCart();
                     setTimeout(() => {
                         const cartDrawer = document.getElementById('cart-view');
                         if (cartDrawer && cartDrawer.classList.contains('open')) {
-                            // Auto close after 3 seconds
                             setTimeout(() => {
                                 if (cartDrawer.classList.contains('open')) {
                                     cartDrawer.classList.remove('open');
@@ -1234,24 +1517,18 @@
             }
         }
         
-        // ============ AUTH FUNCTIONS ============
-        
-        function checkAuth() {
-            const userBar = document.getElementById('user-bar');
-            const loggedInUser = localStorage.getItem('user');
-            
-            if (userBar) {
-                if (loggedInUser) {
-                    userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>Welcome, <b>${escapeHtml(loggedInUser)}</b> | <a href="#" onclick="logout()">Logout</a> | <a href="index.html">🏠 Shop</a> | <a href="index.html?showOrders=true">📋 Orders</a>`;
-                } else {
-                    userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span><a href="auth.html">Login / Register</a> | <a href="index.html">🏠 Shop</a>`;
+        function loadProfileForShipping() {
+            const username = localStorage.getItem('user');
+            if (username) {
+                const savedProfile = localStorage.getItem(`profile_${username}`);
+                if (savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    if (profile.name) document.getElementById('ship-name').value = profile.name;
+                    if (profile.phone) document.getElementById('ship-phone').value = profile.phone;
+                    if (profile.address) document.getElementById('ship-address').value = profile.address;
+                    if (profile.email) document.getElementById('ship-email').value = profile.email;
                 }
             }
-        }
-        
-        function logout() {
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
         }
         
         // ============ SHIPPING & CHECKOUT ============
@@ -1269,16 +1546,12 @@
                 return;
             }
             toggleCart();
+            loadProfileForShipping();
             document.getElementById('shippingModal').style.display = "block";
         }
         
         function closeShippingModal() {
             document.getElementById('shippingModal').style.display = "none";
-            // Clear form
-            document.getElementById('ship-name').value = '';
-            document.getElementById('ship-phone').value = '';
-            document.getElementById('ship-address').value = '';
-            document.getElementById('ship-email').value = '';
         }
         
         async function placeOrder(orderData, paymentId) {
@@ -1398,17 +1671,23 @@
         
         // ============ INITIALIZATION ============
         
-        // Set up event listeners
         const addBtn = document.getElementById('addToCartBtn');
         if (addBtn) {
             addBtn.onclick = addToCart;
         }
         
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('shippingModal');
             if (event.target === modal) {
                 closeShippingModal();
+            }
+            const contactModal = document.getElementById('contactModal');
+            if (event.target === contactModal) {
+                closeContactModal();
+            }
+            const profileModal = document.getElementById('profileModal');
+            if (event.target === profileModal) {
+                closeProfileModal();
             }
             const cartDrawer = document.getElementById('cart-view');
             const cartHeader = document.querySelector('.cart-header');
@@ -1419,13 +1698,11 @@
             }
         };
         
-        // Initialize everything
         checkAuth();
         loadProduct();
         loadCart();
         loadCategories();
         
-        // Listen for cart updates from other tabs
         window.addEventListener('storage', (e) => {
             if (e.key === 'cart') {
                 loadCart();
