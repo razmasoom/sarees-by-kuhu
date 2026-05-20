@@ -134,7 +134,7 @@
         .cat-btn { background: none; border: 1px solid #ffffff55; color: white; padding: 5px 15px; font-size: 14px; cursor: pointer; border-radius: 4px; }
         .cat-btn:hover, .cat-btn.active { background: white; color: #232f3e; }
 
-        /* Product Grid - FIXED for 2 columns on mobile */
+        /* Product Grid - 2 columns on mobile */
         #shop-container { 
             display: flex; 
             flex-wrap: wrap; 
@@ -308,7 +308,7 @@
         .cart-drawer { 
             position: fixed; 
             top: 0; 
-            right: -100% !important; 
+            right: -100%; 
             width: 350px; 
             height: 100%; 
             background: white; 
@@ -319,7 +319,7 @@
             overflow-y: auto;
         }
         .cart-drawer.open { 
-            right: 0 !important; 
+            right: 0; 
         }
         .close-btn { 
             cursor: pointer; 
@@ -678,9 +678,10 @@
                 white-space: nowrap;
             }
             
+            /* Cart Drawer - Mobile Fix: Completely hidden when closed */
             .cart-drawer {
                 width: 85%;
-                right: -85% !important;
+                right: -85%;
             }
             
             .user-bar {
@@ -796,6 +797,7 @@
 
     <nav class="category-nav" id="category-menu"></nav>
 
+    <!-- Cart Drawer - FIXED: Starts hidden off-screen -->
     <div class="cart-drawer" id="cart-view">
         <span class="close-btn" onclick="toggleCart()">&times;</span>
         <h3>Your Shopping Cart</h3>
