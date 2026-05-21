@@ -315,7 +315,173 @@
             font-size: 12px;
         }
         
-        /* ========== NEW: IMAGE UPLOAD SECTION ========== */
+        /* ========== IMPROVED SHIPPING LABEL STYLES ========== */
+        /* Single Label Style */
+        .shipping-label {
+            width: 600px;
+            min-height: 350px;
+            border: 2px solid #000;
+            padding: 25px 30px;
+            font-family: 'Courier New', monospace;
+            background: white;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        
+        /* Header section - centered */
+        .label-header {
+            text-align: center;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .label-shop-name {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .label-order-id {
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #555;
+        }
+        
+        /* Two column layout for buyer/seller */
+        .label-two-columns {
+            display: flex;
+            gap: 30px;
+            flex: 1;
+            min-height: 200px;
+        }
+        
+        /* Buyer column - RIGHT aligned (visually on right side) */
+        .label-buyer-column {
+            flex: 1;
+            text-align: right;
+            border-right: 1px dashed #ccc;
+            padding-right: 20px;
+        }
+        
+        /* Seller column - LEFT aligned */
+        .label-seller-column {
+            flex: 1;
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        .label-section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-decoration: underline;
+            letter-spacing: 0.5px;
+        }
+        
+        .label-line {
+            margin: 5px 0;
+            font-size: 11px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            white-space: normal;
+            overflow-wrap: break-word;
+        }
+        
+        /* Address container with auto-wrapping */
+        .label-address {
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+        }
+        
+        /* Bulk Label Container */
+        .bulk-label-container { 
+            width: 100%; 
+            background: white; 
+            padding: 20px;
+        }
+        
+        .label-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            page-break-after: always;
+            break-after: page;
+            margin-bottom: 20px;
+        }
+        
+        .print-label-card {
+            border: 2px solid #000;
+            padding: 20px 25px;
+            min-height: 320px;
+            background: white;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        
+        /* Bulk label internal structure */
+        .print-label-header {
+            text-align: center;
+            border-bottom: 1px dashed #aaa;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .print-shop-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .print-order-id {
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 4px;
+            color: #555;
+        }
+        
+        .print-two-columns {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .print-buyer-column {
+            flex: 1;
+            text-align: right;
+            border-right: 1px dashed #aaa;
+            padding-right: 15px;
+        }
+        
+        .print-seller-column {
+            flex: 1;
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        .print-section-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 11px;
+            text-decoration: underline;
+        }
+        
+        .print-line {
+            margin: 4px 0;
+            font-size: 10px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+        
+        /* NEW: Image Upload Section */
         .image-upload-section {
             margin-bottom: 20px;
             padding: 15px;
@@ -442,7 +608,7 @@
             margin-top: 8px;
         }
         
-        /* Multi Image Styles (legacy keep for compatibility) */
+        /* Legacy multi image styles */
         .multi-image-section {
             margin-bottom: 15px;
             padding: 10px;
@@ -594,87 +760,27 @@
             #shipping-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
             #bulk-label-printout, #bulk-label-printout * { visibility: visible; }
             #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
+            
+            .shipping-label {
+                width: 100%;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            .label-two-columns {
+                gap: 20px;
+            }
+            
+            .label-buyer-column {
+                padding-right: 15px;
+            }
+            
+            .label-seller-column {
+                padding-left: 15px;
+            }
         }
         
-        /* Single Label Style */
-        .shipping-label {
-            width: 600px;
-            min-height: 350px;
-            border: 2px solid #000;
-            padding: 30px;
-            font-family: 'Courier New', monospace;
-            position: relative;
-            background: white;
-            margin: 0 auto;
-        }
-        
-        /* Bulk Label Container */
-        .bulk-label-container { 
-            width: 100%; 
-            background: white; 
-            padding: 20px;
-        }
-        
-        .label-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            page-break-after: always;
-            break-after: page;
-            margin-bottom: 20px;
-        }
-        
-        .print-label-card {
-            border: 2px solid #000;
-            padding: 20px;
-            min-height: 350px;
-            position: relative;
-            background: white;
-            width: 100%;
-        }
-        
-        .label-shop-name { 
-            text-align: center; 
-            font-size: 24px; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            text-transform: uppercase; 
-        }
-        
-        .label-order-id { 
-            text-align: center; 
-            font-size: 14px; 
-            font-weight: bold; 
-            margin-bottom: 50px; 
-        }
-        
-        .label-buyer-section { 
-            position: absolute; 
-            top: 130px; 
-            right: 20px; 
-            text-align: right; 
-        }
-        
-        .label-seller-section { 
-            position: absolute; 
-            bottom: 20px; 
-            left: 20px; 
-            text-align: left; 
-        }
-        
-        .label-section-title { 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            font-size: 12px; 
-            text-decoration: underline; 
-        }
-        
-        .label-line { 
-            margin: 4px 0; 
-            font-size: 11px; 
-        }
-        
-        /* ========== FOOTER STYLES ========== */
+        /* Footer Styles */
         .footer {
             background: #232f3e;
             color: #ccc;
@@ -890,6 +996,46 @@
                 font-size: 12px;
                 padding: 8px 12px;
             }
+            
+            .shipping-label {
+                width: 100%;
+                padding: 15px;
+                min-height: auto;
+            }
+            
+            .label-two-columns {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .label-buyer-column {
+                border-right: none;
+                border-bottom: 1px dashed #ccc;
+                padding-right: 0;
+                padding-bottom: 15px;
+                text-align: left;
+            }
+            
+            .label-seller-column {
+                padding-left: 0;
+            }
+            
+            .print-two-columns {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .print-buyer-column {
+                border-right: none;
+                border-bottom: 1px dashed #aaa;
+                padding-right: 0;
+                padding-bottom: 10px;
+                text-align: left;
+            }
+            
+            .print-seller-column {
+                padding-left: 0;
+            }
         }
         
         /* Desktop: Hide mobile cards */
@@ -1023,7 +1169,7 @@
                         <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
                     </div>
                     
-                    <!-- NEW: IMAGE UPLOAD SECTION with Camera/Gallery Support -->
+                    <!-- Image Upload Section with Camera/Gallery Support -->
                     <div class="image-upload-section">
                         <div class="upload-header">
                             <label>📸 Product Images (Max 6)</label>
@@ -1037,14 +1183,11 @@
                             </div>
                         </div>
                         
-                        <!-- Hidden file inputs for camera and gallery -->
                         <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" multiple>
                         <input type="file" id="gallery-input" accept="image/*" style="display: none;" multiple>
                         
-                        <!-- Image preview grid -->
                         <div id="image-preview-grid" class="image-preview-grid"></div>
                         
-                        <!-- Upload progress -->
                         <div id="upload-progress" class="upload-progress">
                             <div class="progress-bar">
                                 <div class="progress-fill" id="progress-fill"></div>
@@ -1057,7 +1200,6 @@
                         </button>
                     </div>
                     
-                    <!-- Hidden fields to store uploaded image URLs -->
                     <input type="hidden" id="uploaded-image-urls" value="[]">
                     
                     <button class="btn btn-add" onclick="addProduct()">Save Product</button>
@@ -1087,7 +1229,6 @@
             <div id="section-users" class="section-content" style="display: none;">
                 <h2>👥 User Verification</h2>
                 
-                <!-- DESKTOP TABLE VIEW -->
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -1103,7 +1244,6 @@
                     <tbody id="users-table-body"></tbody>
                 </table>
                 
-                <!-- MOBILE CARD VIEW -->
                 <div id="users-mobile-container"></div>
             </div>
         </div>
@@ -1174,15 +1314,12 @@
         let previousUsers = [];
         let cancellationRequests = [];
 
-        // ============ IMAGE UPLOAD VARIABLES ============
-        let pendingImages = [];  // Array of {file, previewUrl, status, uploadedUrl}
+        // Image Upload Variables
+        let pendingImages = [];
         let isUploading = false;
         
-        // ImgBB API Key (Free - sign up at https://imgbb.com to get your own key)
-        // You should replace this with your own API key from imgbb.com
-        const IMGBB_API_KEY = "569ed32b65af48dfc24a3cb583ab0cd7";  // <-- GET YOUR FREE API KEY FROM IMGBB.COM
+        const IMGBB_API_KEY = "569ed32b65af48dfc24a3cb583ab0cd7";
         
-        // Helper to show notifications
         function showNotification(title, message, type = 'success') {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -1193,11 +1330,8 @@
             setTimeout(() => notification.remove(), 5000);
         }
 
-        // ============ CAMERA / GALLERY FUNCTIONS ============
-        
         function captureFromCamera() {
             const input = document.getElementById('camera-input');
-            // For mobile, capture="environment" uses back camera
             input.setAttribute('capture', 'environment');
             input.click();
         }
@@ -1208,7 +1342,6 @@
             input.click();
         }
         
-        // Setup file input handlers
         function setupFileInputs() {
             const cameraInput = document.getElementById('camera-input');
             const galleryInput = document.getElementById('gallery-input');
@@ -1231,19 +1364,16 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 
-                // Validate file type
                 if (!file.type.startsWith('image/')) {
                     showNotification('Invalid File', `${file.name} is not an image`, 'error');
                     continue;
                 }
                 
-                // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     showNotification('File Too Large', `${file.name} exceeds 5MB limit`, 'error');
                     continue;
                 }
                 
-                // Create preview URL
                 const previewUrl = URL.createObjectURL(file);
                 
                 pendingImages.push({
@@ -1256,13 +1386,11 @@
             
             updateImagePreviewGrid();
             
-            // Show upload button if there are pending images
             const uploadBtn = document.getElementById('upload-btn');
             if (pendingImages.length > 0) {
                 uploadBtn.style.display = 'block';
             }
             
-            // Clear file inputs
             document.getElementById('camera-input').value = '';
             document.getElementById('gallery-input').value = '';
         }
@@ -1299,7 +1427,6 @@
                 grid.appendChild(previewItem);
             });
             
-            // Update stats
             const uploadedCount = pendingImages.filter(i => i.status === 'success').length;
             const statsEl = document.getElementById('upload-stats');
             if (statsEl) {
@@ -1319,7 +1446,6 @@
                 uploadBtn.style.display = 'none';
             }
             
-            // Update hidden URLs field
             updateHiddenUrlsField();
         }
         
@@ -1345,7 +1471,6 @@
             uploadBtn.disabled = true;
             uploadBtn.textContent = '📤 Uploading...';
             
-            // Show progress bar
             const progressDiv = document.getElementById('upload-progress');
             progressDiv.style.display = 'block';
             
@@ -1356,11 +1481,9 @@
                 const img = pendingImages[i];
                 if (img.status !== 'pending') continue;
                 
-                // Update status
                 img.status = 'uploading';
                 updateImagePreviewGrid();
                 
-                // Update progress
                 const totalProcessed = pendingImages.filter(p => p.status !== 'pending').length;
                 const percent = (totalProcessed / pendingImages.length) * 100;
                 document.getElementById('progress-fill').style.width = `${percent}%`;
@@ -1370,7 +1493,6 @@
                     img.status = 'success';
                     img.uploadedUrl = uploadedUrl;
                     successCount++;
-                    
                     showNotification('Upload Success', `Image ${i + 1} uploaded successfully`, 'success');
                 } catch (error) {
                     console.error('Upload error:', error);
@@ -1382,10 +1504,8 @@
                 updateImagePreviewGrid();
             }
             
-            // Update hidden URLs field
             updateHiddenUrlsField();
             
-            // Hide progress bar after delay
             setTimeout(() => {
                 document.getElementById('upload-progress').style.display = 'none';
                 document.getElementById('progress-fill').style.width = '0%';
@@ -1402,7 +1522,6 @@
                 showNotification('Upload Partial', `${failCount} images failed to upload`, 'error');
             }
             
-            // If all uploaded successfully, hide upload button
             const allUploaded = pendingImages.every(i => i.status === 'success');
             if (allUploaded) {
                 uploadBtn.style.display = 'none';
@@ -1457,7 +1576,6 @@
         }
         
         function clearImageUploads() {
-            // Clean up preview URLs
             pendingImages.forEach(img => {
                 if (img.previewUrl) {
                     URL.revokeObjectURL(img.previewUrl);
@@ -1470,7 +1588,6 @@
             document.getElementById('upload-progress').style.display = 'none';
         }
 
-        // ============ RESET CONFIRMATION FUNCTIONS ============
         function showResetConfirmation() {
             document.getElementById('resetConfirmModal').style.display = 'flex';
         }
@@ -1495,7 +1612,6 @@
             }
         }
 
-        // ============ MULTIPLE IMAGES FUNCTIONS (legacy - keep for compatibility) ============
         function addImageRow() {
             const container = document.getElementById('image-urls-container');
             if (container.children.length >= 8) { alert("Maximum 8 images allowed"); return; }
@@ -1517,13 +1633,11 @@
         }
         
         function getAllImageUrls() {
-            // First try to get uploaded URLs from the new system
             const uploadedUrls = getUploadedImageUrls();
             if (uploadedUrls.length > 0 && uploadedUrls[0] !== 'https://via.placeholder.com/150') {
                 return uploadedUrls;
             }
             
-            // Fallback to manual input URLs
             const inputs = document.querySelectorAll('#image-urls-container .image-url');
             const urls = [];
             inputs.forEach(input => { const url = input.value.trim(); if (url) urls.push(url); });
@@ -1531,7 +1645,6 @@
             return urls;
         }
 
-        // ============ CATEGORY FUNCTIONS ============
         function toggleNewCategory() {
             const select = document.getElementById('p-cat');
             const newInput = document.getElementById('p-cat-new');
@@ -1561,7 +1674,6 @@
             } catch (error) { console.error("Failed to load categories:", error); }
         }
 
-        // ============ ADMIN AUTH ============
         function checkAdminSession() {
             const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
             if (isLoggedIn === 'true') {
@@ -1650,8 +1762,6 @@
             notificationCheckInterval = setInterval(checkForNewUsers, 10000);
         }
 
-        // ============ CANCELLATION REQUEST HANDLING ============
-        
         async function loadCancellationRequests() {
             try {
                 const response = await fetch(`${API_BASE}/cancellation-requests`);
@@ -1720,6 +1830,105 @@
             return div.innerHTML;
         }
 
+        // ============ UPDATED PRINT LABEL FUNCTION ============
+        function printLabel(order) {
+            const buffer = document.getElementById('shipping-label-printout');
+            buffer.innerHTML = `
+                <div class="shipping-label">
+                    <div class="label-header">
+                        <div class="label-shop-name">SAARES BY KUHU</div>
+                        <div class="label-order-id">ORDER #${order.orderId}</div>
+                    </div>
+                    <div class="label-two-columns">
+                        <div class="label-buyer-column">
+                            <div class="label-section-title">BUYER DETAILS:</div>
+                            <div class="label-address">
+                                <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
+                                <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
+                                <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
+                            </div>
+                        </div>
+                        <div class="label-seller-column">
+                            <div class="label-section-title">SENDER DETAILS:</div>
+                            <div class="label-address">
+                                <div class="label-line">Kuhu</div>
+                                <div class="label-line">Lalbagh, Purneacity</div>
+                                <div class="label-line">Near-Industrial Area</div>
+                                <div class="label-line">PS-Sadar, Purnea</div>
+                                <div class="label-line">Bihar - 854302</div>
+                                <div class="label-line">Phone: +91 9304288748</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            buffer.style.display = 'block'; 
+            window.print(); 
+            buffer.style.display = 'none';
+        }
+
+        // ============ UPDATED BULK PRINT FUNCTION ============
+        async function printBulkLabels() {
+            if (selectedOrders.size === 0) { 
+                alert("Please select at least one order to print labels."); 
+                return; 
+            }
+            try {
+                const response = await fetch(`${API_BASE}/history`);
+                const allOrders = await response.json();
+                const ordersToPrint = allOrders.filter(o => selectedOrders.has(o.orderId.toString()));
+                if (ordersToPrint.length === 0) { 
+                    alert("No orders found to print."); 
+                    return; 
+                }
+                
+                let bulkHtml = `<div class="bulk-label-container">`;
+                for (let i = 0; i < ordersToPrint.length; i++) {
+                    const order = ordersToPrint[i];
+                    if (i % 4 === 0) { 
+                        if (i > 0) bulkHtml += `</div>`; 
+                        bulkHtml += `<div class="label-grid">`; 
+                    }
+                    bulkHtml += `
+                        <div class="print-label-card">
+                            <div class="print-label-header">
+                                <div class="print-shop-name">SAARES BY KUHU</div>
+                                <div class="print-order-id">ORDER #${order.orderId}</div>
+                            </div>
+                            <div class="print-two-columns">
+                                <div class="print-buyer-column">
+                                    <div class="print-section-title">BUYER DETAILS:</div>
+                                    <div class="print-line">${escapeHtml(order.customerName) || 'N/A'}</div>
+                                    <div class="print-line">${escapeHtml(order.address) || 'No Address'}</div>
+                                    <div class="print-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
+                                </div>
+                                <div class="print-seller-column">
+                                    <div class="print-section-title">SENDER DETAILS:</div>
+                                    <div class="print-line">Kuhu</div>
+                                    <div class="print-line">Lalbagh, Purneacity</div>
+                                    <div class="print-line">Near-Industrial Area</div>
+                                    <div class="print-line">PS-Sadar, Purnea</div>
+                                    <div class="print-line">Bihar - 854302</div>
+                                    <div class="print-line">Phone: +91 9304288748</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                bulkHtml += `</div></div>`;
+                
+                const printContainer = document.getElementById('bulk-label-printout');
+                printContainer.innerHTML = bulkHtml;
+                printContainer.style.display = 'block';
+                window.print();
+                printContainer.style.display = 'none';
+                alert(`${ordersToPrint.length} label(s) printed successfully!`);
+            } catch (error) { 
+                console.error("Error printing bulk labels:", error);
+                alert("Error printing labels. Please try again."); 
+            }
+        }
+
         async function loadAll() {
             try {
                 await loadCancellationRequests();
@@ -1750,7 +1959,7 @@
                 if (mobileOrders) mobileOrders.innerText = orders.length;
                 if (mobileUsers) mobileUsers.innerText = users.length;
 
-                // ============ RENDER ORDERS - DESKTOP TABLE VIEW ============
+                // Render Orders - Desktop Table View
                 const ordersTableBody = document.getElementById('orders-table-body');
                 if (ordersTableBody) {
                     ordersTableBody.innerHTML = '';
@@ -1796,7 +2005,7 @@
                     });
                 }
 
-                // ============ RENDER ORDERS - MOBILE CARD VIEW ============
+                // Render Orders - Mobile Card View
                 const ordersMobileContainer = document.getElementById('orders-mobile-container');
                 if (ordersMobileContainer) {
                     ordersMobileContainer.innerHTML = '';
@@ -1848,7 +2057,7 @@
                     });
                 }
 
-                // ============ RENDER INVENTORY ============
+                // Render Inventory
                 const inventoryTableBody = document.getElementById('inventory-table-body');
                 if (inventoryTableBody) {
                     inventoryTableBody.innerHTML = '';
@@ -1868,7 +2077,7 @@
                                  `
                         });
                     } else {
-                        inventoryTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No products found. Add some!</td></tr>';
+                        inventoryTableBody.innerHTML = '<td><td colspan="7" style="text-align:center;">No products found. Add some!</td></tr>';
                     }
                 }
 
@@ -1896,7 +2105,7 @@
                     }
                 }
 
-                // ============ RENDER USERS ============
+                // Render Users
                 const usersTableBody = document.getElementById('users-table-body');
                 if (usersTableBody) {
                     usersTableBody.innerHTML = '';
@@ -1955,7 +2164,6 @@
             }
         }
       
-        // Mobile selection functions
         function updateMobileSelectionCount() {
             const checkboxes = document.querySelectorAll('.order-select-mobile:checked');
             selectedOrders.clear();
@@ -1963,7 +2171,6 @@
             document.getElementById('selection-info').innerText = `${selectedOrders.size} order(s) selected`;
         }
 
-        // Mobile tracking update wrapper
         async function updateTrackingMobile(orderId) {
             const trackingId = document.getElementById(`tracking-mob-${orderId}`).value;
             if (!trackingId) { alert("Enter tracking ID"); return; }
@@ -2032,89 +2239,6 @@
             updateSelectionCount();
         }
 
-        // ============ BULK PRINT FUNCTION ============
-        async function printBulkLabels() {
-            if (selectedOrders.size === 0) { 
-                alert("Please select at least one order to print labels."); 
-                return; 
-            }
-            try {
-                const response = await fetch(`${API_BASE}/history`);
-                const allOrders = await response.json();
-                const ordersToPrint = allOrders.filter(o => selectedOrders.has(o.orderId.toString()));
-                if (ordersToPrint.length === 0) { 
-                    alert("No orders found to print."); 
-                    return; 
-                }
-                
-                let bulkHtml = `<div class="bulk-label-container">`;
-                for (let i = 0; i < ordersToPrint.length; i++) {
-                    const order = ordersToPrint[i];
-                    if (i % 4 === 0) { 
-                        if (i > 0) bulkHtml += `</div>`; 
-                        bulkHtml += `<div class="label-grid">`; 
-                    }
-                    bulkHtml += `
-                        <div class="print-label-card">
-                            <div class="label-shop-name">SAARES BY KUHU</div>
-                            <div class="label-order-id">ORDER #${order.orderId}</div>
-                            <div class="label-buyer-section">
-                                <div class="label-section-title">BUYER DETAILS:</div>
-                                <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
-                                <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
-                                <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
-                            </div>
-                            <div class="label-seller-section">
-                                <div class="label-section-title">SENDER DETAILS:</div>
-                                <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                                <div class="label-line">Near-Industrial Area, Purneacity</div>
-                                <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                                <div class="label-line">Phone: +91 9304288748</div>
-                            </div>
-                        </div>
-                    `;
-                }
-                bulkHtml += `</div></div>`;
-                
-                const printContainer = document.getElementById('bulk-label-printout');
-                printContainer.innerHTML = bulkHtml;
-                printContainer.style.display = 'block';
-                window.print();
-                printContainer.style.display = 'none';
-                alert(`${ordersToPrint.length} label(s) printed successfully!`);
-            } catch (error) { 
-                console.error("Error printing bulk labels:", error);
-                alert("Error printing labels. Please try again."); 
-            }
-        }
-
-        // ============ SINGLE PRINT FUNCTION ============
-        function printLabel(order) {
-            const buffer = document.getElementById('shipping-label-printout');
-            buffer.innerHTML = `
-                <div class="shipping-label">
-                    <div class="label-shop-name">SAARES BY KUHU</div>
-                    <div class="label-order-id">ORDER #${order.orderId}</div>
-                    <div class="label-buyer-section">
-                        <div class="label-section-title">BUYER DETAILS:</div>
-                        <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
-                        <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
-                        <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
-                    </div>
-                    <div class="label-seller-section">
-                        <div class="label-section-title">SENDER DETAILS:</div>
-                        <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                        <div class="label-line">Near-Industrial Area, Purneacity</div>
-                        <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                        <div class="label-line">Phone: +91 9304288748</div>
-                    </div>
-                </div>
-            `;
-            buffer.style.display = 'block'; 
-            window.print(); 
-            buffer.style.display = 'none';
-        }
-
         async function deleteSingleOrder(orderId) {
             if(!confirm(`Delete order #${orderId}?`)) return;
             try {
@@ -2151,7 +2275,6 @@
             const stock = document.getElementById('p-stock').value;
             const description = document.getElementById('p-description').value;
             
-            // Get uploaded image URLs
             const imageUrls = getUploadedImageUrls();
             const mainImage = imageUrls[0];
             
@@ -2179,13 +2302,11 @@
                     }) 
                 });
                 
-                // Clear form
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-stock').value = '';
                 document.getElementById('p-description').value = '';
                 
-                // Clear image uploads
                 clearImageUploads();
                 
                 const catSelect = document.getElementById('p-cat');
@@ -2219,7 +2340,6 @@
             } catch (error) { alert("Error updating user"); }
         }
 
-        // Initialize
         checkAdminSession();
     </script>
 </body>
