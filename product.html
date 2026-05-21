@@ -822,19 +822,34 @@
             modalDiv.onclick=(e)=>{ if(e.target===modalDiv){modalDiv.remove();document.body.style.overflow='auto'; startStockSync();} };
         }
         
-        // ============ UPDATED CHECKOUT WITH SUCCESS MODAL ============
+        // ============ UPDATED CHECKOUT WITH WORKING SUCCESS MODAL ============
         function showOrderSuccessModal() {
             const modal = document.getElementById('orderSuccessModal');
             if (!modal) return;
-            modal.classList.add('show');
+            
+            // Remove any existing buttons and recreate with fresh click handlers
             const continueBtn = document.getElementById('continueShoppingBtn');
             const viewOrdersBtn = document.getElementById('viewMyOrdersBtn');
+            
+            // Clone and replace to remove old event listeners
             const newContinue = continueBtn.cloneNode(true);
             const newViewOrders = viewOrdersBtn.cloneNode(true);
             continueBtn.parentNode.replaceChild(newContinue, continueBtn);
             viewOrdersBtn.parentNode.replaceChild(newViewOrders, viewOrdersBtn);
-            newContinue.onclick = () => { modal.classList.remove('show'); window.location.href = 'index.html'; };
-            newViewOrders.onclick = () => { modal.classList.remove('show'); window.location.href = 'index.html?showOrders=true'; };
+            
+            // Set new click handlers
+            newContinue.onclick = function() {
+                modal.classList.remove('show');
+                window.location.href = 'index.html';
+            };
+            
+            newViewOrders.onclick = function() {
+                modal.classList.remove('show');
+                // Direct navigation to index.html with orders view
+                window.location.href = 'index.html?showOrders=true';
+            };
+            
+            modal.classList.add('show');
         }
         
         async function placeOrder(orderData, paymentId) { 
