@@ -596,7 +596,7 @@
             #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
         }
         
-      /* Label Styles - TO centered, FROM left-aligned */
+ /* Label Styles - TO right-aligned from center, FROM left-aligned */
 .shipping-label {
     width: 600px;
     min-height: 350px;
@@ -624,14 +624,14 @@
     margin-bottom: 40px;
 }
 
-/* TO Section - Centered horizontally */
+/* TO Section - Starts from center, aligned to right */
 .label-to-section {
-    text-align: left;
-    width: fit-content;
-    max-width: 45%;
+    text-align: right;
+    width: 50%;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: 0;
     margin-bottom: 35px;
+    padding-right: 10px;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -640,7 +640,8 @@
 .label-from-section {
     text-align: left;
     margin-left: 0;
-    max-width: 100%;
+    margin-right: auto;
+    width: 50%;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -650,6 +651,24 @@
     margin-bottom: 8px;
     font-size: 14px;
     text-decoration: underline;
+}
+
+/* TO section title and text are right-aligned */
+.label-to-section .label-section-title {
+    text-align: right;
+}
+
+.label-to-section .label-line {
+    text-align: right;
+}
+
+/* FROM section title and text are left-aligned */
+.label-from-section .label-section-title {
+    text-align: left;
+}
+
+.label-from-section .label-line {
+    text-align: left;
 }
 
 .label-line {
@@ -702,14 +721,14 @@
     margin-bottom: 30px;
 }
 
-/* TO Section - Centered horizontally for bulk labels */
+/* TO Section - Starts from center, right-aligned for bulk labels */
 .print-label-card .label-to-section {
-    text-align: left;
-    width: fit-content;
-    max-width: 48%;
+    text-align: right;
+    width: 50%;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: 0;
     margin-bottom: 30px;
+    padding-right: 10px;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -718,7 +737,8 @@
 .print-label-card .label-from-section {
     text-align: left;
     margin-left: 0;
-    max-width: 100%;
+    margin-right: auto;
+    width: 50%;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -730,6 +750,22 @@
     text-decoration: underline;
 }
 
+.print-label-card .label-to-section .label-section-title {
+    text-align: right;
+}
+
+.print-label-card .label-to-section .label-line {
+    text-align: right;
+}
+
+.print-label-card .label-from-section .label-section-title {
+    text-align: left;
+}
+
+.print-label-card .label-from-section .label-line {
+    text-align: left;
+}
+
 .print-label-card .label-line {
     margin: 3px 0;
     font-size: 10px;
@@ -737,6 +773,14 @@
     word-wrap: break-word;
     white-space: normal;
     overflow-wrap: break-word;
+}
+
+/* Printing optimization */
+@media print {
+    .shipping-label, .print-label-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
 }
 
         /* ========== FOOTER STYLES ========== */
@@ -2161,7 +2205,7 @@ async function printBulkLabels() {
     }
 }
         // ============ SINGLE PRINT FUNCTION ============
-  function printLabel(order) {
+ function printLabel(order) {
     const buffer = document.getElementById('shipping-label-printout');
     // Handle long addresses with line breaks
     let safeAddress = (order.address || 'No Address');
@@ -2195,15 +2239,6 @@ async function printBulkLabels() {
     window.print();
     buffer.style.display = 'none';
 }
-        async function deleteSingleOrder(orderId) {
-            if(!confirm(`Delete order #${orderId}?`)) return;
-            try {
-                await fetch(`${API_BASE}/orders/${orderId}`, { method: 'DELETE' });
-                alert("Order deleted!");
-                selectedOrders.delete(orderId.toString());
-                loadAll();
-            } catch (error) { alert("Error: " + error.message); }
-        }
 
         async function updateStock(productId) {
             const changeAmount = parseInt(document.getElementById(`stock-change-${productId}`).value);
