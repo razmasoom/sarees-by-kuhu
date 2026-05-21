@@ -767,14 +767,15 @@
             const modal = document.getElementById('successModal');
             if (!modal) return;
             
-            // Get buttons and clone to remove old listeners
+            // Get buttons and set fresh click handlers
             const continueBtn = document.getElementById('continueShoppingBtn');
             const viewOrdersBtn = document.getElementById('viewMyOrdersBtn');
             
+            // Remove any existing listeners by cloning and replacing
             if (continueBtn) {
                 const newContinue = continueBtn.cloneNode(true);
                 continueBtn.parentNode.replaceChild(newContinue, continueBtn);
-                newContinue.onclick = () => {
+                newContinue.onclick = function() {
                     modal.classList.remove('show');
                     showStorefront();
                     loadProducts();
@@ -784,8 +785,9 @@
             if (viewOrdersBtn) {
                 const newViewOrders = viewOrdersBtn.cloneNode(true);
                 viewOrdersBtn.parentNode.replaceChild(newViewOrders, viewOrdersBtn);
-                newViewOrders.onclick = () => {
+                newViewOrders.onclick = function() {
                     modal.classList.remove('show');
+                    // This now correctly calls the existing toggleOrderHistoryView function
                     toggleOrderHistoryView();
                 };
             }
