@@ -429,7 +429,7 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL - Using window.goToOrders global function -->
+    <!-- SUCCESS MODAL - Using direct onclick with window.location -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content">
             <div class="success-icon">✅</div>
@@ -499,9 +499,9 @@
             setTimeout(() => d.remove(), 3000);
         }
 
-        // ============ ORDER VIEW FUNCTION - GLOBAL ============
+        // ============ ORDER VIEW FUNCTION ============
         window.viewOrdersDirect = async function() {
-            console.log("viewOrdersDirect called");
+            console.log("viewOrdersDirect called - showing orders");
             const username = localStorage.getItem('user');
             if (!username) { 
                 alert("Please login first"); 
@@ -509,9 +509,11 @@
                 return; 
             }
             
+            // Hide shop elements
             document.getElementById('shop-container').style.display = 'none';
             document.getElementById('category-menu').style.display = 'none';
             document.getElementById('search-bar').style.display = 'none';
+            // Show orders container
             document.getElementById('orders-history-container').style.display = 'block';
             
             try {
@@ -542,7 +544,7 @@
             }
         };
         
-        // Setup modal buttons after DOM is ready
+        // Setup modal buttons - SIMPLE DIRECT APPROACH
         function setupModalButtons() {
             const continueBtn = document.getElementById('continueShopBtn');
             const viewOrdersBtn = document.getElementById('viewOrdersBtn');
@@ -557,8 +559,9 @@
             
             if (viewOrdersBtn) {
                 viewOrdersBtn.onclick = function() {
-                    console.log("View Orders button clicked");
+                    console.log("View Orders button clicked - closing modal and showing orders");
                     document.getElementById('successModal').classList.remove('show');
+                    // Direct call to view orders
                     viewOrdersDirect();
                 };
             }
@@ -801,10 +804,11 @@
                                 if (orderSuccess) {
                                     cart = [];
                                     updateCartUI();
-                                    // Show success modal and setup buttons again
+                                    // Show success modal
                                     const modal = document.getElementById('successModal');
                                     modal.classList.add('show');
-                                    setupModalButtons();
+                                    // Setup buttons after modal is shown
+                                    setTimeout(setupModalButtons, 100);
                                 } else {
                                     alert("Payment verified but order placement had issues. Please contact support.");
                                 }
@@ -835,7 +839,7 @@
                     updateCartUI();
                     const modal = document.getElementById('successModal');
                     modal.classList.add('show');
-                    setupModalButtons();
+                    setTimeout(setupModalButtons, 100);
                 } else {
                     alert("[TEST MODE] Order placement failed. Please try again.");
                 }
