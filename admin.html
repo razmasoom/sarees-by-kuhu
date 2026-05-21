@@ -596,7 +596,7 @@
             #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
         }
         
-/* Label Styles - TO starts from center line, FROM on left */
+/* Label Styles - TO on right (left-aligned within 50%), FROM below on left */
 .shipping-label {
     width: 600px;
     min-height: 350px;
@@ -606,7 +606,6 @@
     background: white;
     margin: 0 auto;
     box-sizing: border-box;
-    position: relative;
 }
 
 .label-shop-name {
@@ -624,39 +623,25 @@
     margin-bottom: 40px;
 }
 
-/* Container for both sections - creates the center line */
-.label-sections-container {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-}
-
-/* Center line visual (optional - for debugging, remove if not needed) */
-.label-sections-container::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    border-left: 1px dashed #ccc;
-    opacity: 0.3;
-}
-
-/* FROM Section - takes left half (0% to 50%) */
-.label-from-section {
-    text-align: left;
-    width: 48%;
-    margin-right: auto;
-    word-wrap: break-word;
-    white-space: normal;
-}
-
-/* TO Section - takes right half (50% to 100%), starts from center line */
+/* TO Section - Right side (50% width), left-aligned within that 50%, starts from center */
 .label-to-section {
     text-align: left;
-    width: 48%;
+    width: 50%;
     margin-left: auto;
+    margin-right: 0;
+    margin-bottom: 35px;
+    padding-left: 15px;
+    word-wrap: break-word;
+    white-space: normal;
+    box-sizing: border-box;
+}
+
+/* FROM Section - Below TO, on the left side, full width */
+.label-from-section {
+    text-align: left;
+    clear: both;
+    margin-top: 20px;
+    width: 100%;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -668,7 +653,7 @@
     text-decoration: underline;
 }
 
-/* TO section title and text - left aligned within its container */
+/* TO section - left aligned text */
 .label-to-section .label-section-title {
     text-align: left;
 }
@@ -677,7 +662,7 @@
     text-align: left;
 }
 
-/* FROM section title and text - left aligned */
+/* FROM section - left aligned text */
 .label-from-section .label-section-title {
     text-align: left;
 }
@@ -736,23 +721,25 @@
     margin-bottom: 30px;
 }
 
-/* Container for both sections in bulk labels */
-.print-label-card .label-sections-container {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-}
-
-.print-label-card .label-from-section {
-    text-align: left;
-    width: 48%;
-    word-wrap: break-word;
-    white-space: normal;
-}
-
+/* TO Section - Right side for bulk labels */
 .print-label-card .label-to-section {
     text-align: left;
-    width: 48%;
+    width: 50%;
+    margin-left: auto;
+    margin-right: 0;
+    margin-bottom: 25px;
+    padding-left: 15px;
+    word-wrap: break-word;
+    white-space: normal;
+    box-sizing: border-box;
+}
+
+/* FROM Section - Below TO for bulk labels */
+.print-label-card .label-from-section {
+    text-align: left;
+    clear: both;
+    margin-top: 15px;
+    width: 100%;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -794,10 +781,6 @@
     .shipping-label, .print-label-card {
         page-break-inside: avoid;
         break-inside: avoid;
-    }
-    /* Hide the center line when printing */
-    .label-sections-container::before {
-        display: none;
     }
 }
 
@@ -2193,20 +2176,18 @@ async function printBulkLabels() {
                 <div class="print-label-card">
                     <div class="label-shop-name">SAARES BY KUHU</div>
                     <div class="label-order-id">ORDER #${order.orderId}</div>
-                    <div class="label-sections-container">
-                        <div class="label-from-section">
-                            <div class="label-section-title">FROM:</div>
-                            <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                            <div class="label-line">Near-Industrial Area, Purneacity</div>
-                            <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                            <div class="label-line">Phone: +91 9304288748</div>
-                        </div>
-                        <div class="label-to-section">
-                            <div class="label-section-title">TO:</div>
-                            <div class="label-line">${safeName}</div>
-                            <div class="label-line">${safeAddress}</div>
-                            <div class="label-line">Phone: ${safePhone}</div>
-                        </div>
+                    <div class="label-to-section">
+                        <div class="label-section-title">TO:</div>
+                        <div class="label-line">${safeName}</div>
+                        <div class="label-line">${safeAddress}</div>
+                        <div class="label-line">Phone: ${safePhone}</div>
+                    </div>
+                    <div class="label-from-section">
+                        <div class="label-section-title">FROM:</div>
+                        <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                        <div class="label-line">Near-Industrial Area, Purneacity</div>
+                        <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                        <div class="label-line">Phone: +91 9304288748</div>
                     </div>
                 </div>
             `;
@@ -2240,20 +2221,18 @@ async function printBulkLabels() {
         <div class="shipping-label">
             <div class="label-shop-name">SAARES BY KUHU</div>
             <div class="label-order-id">ORDER #${order.orderId}</div>
-            <div class="label-sections-container">
-                <div class="label-from-section">
-                    <div class="label-section-title">FROM:</div>
-                    <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                    <div class="label-line">Near-Industrial Area, Purneacity</div>
-                    <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                    <div class="label-line">Phone: +91 9304288748</div>
-                </div>
-                <div class="label-to-section">
-                    <div class="label-section-title">TO:</div>
-                    <div class="label-line">${safeName}</div>
-                    <div class="label-line">${safeAddress}</div>
-                    <div class="label-line">Phone: ${safePhone}</div>
-                </div>
+            <div class="label-to-section">
+                <div class="label-section-title">TO:</div>
+                <div class="label-line">${safeName}</div>
+                <div class="label-line">${safeAddress}</div>
+                <div class="label-line">Phone: ${safePhone}</div>
+            </div>
+            <div class="label-from-section">
+                <div class="label-section-title">FROM:</div>
+                <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                <div class="label-line">Near-Industrial Area, Purneacity</div>
+                <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                <div class="label-line">Phone: +91 9304288748</div>
             </div>
         </div>
     `;
@@ -2261,26 +2240,6 @@ async function printBulkLabels() {
     window.print();
     buffer.style.display = 'none';
 }
-        async function updateStock(productId) {
-            const changeAmount = parseInt(document.getElementById(`stock-change-${productId}`).value);
-            if (isNaN(changeAmount) || changeAmount === 0) { alert("Enter valid number (+ to add, - to subtract)"); return; }
-            try {
-                await fetch(`${API_BASE}/products/${productId}/stock`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: changeAmount }) });
-                alert(`Stock updated by ${changeAmount}`);
-                loadAll();
-            } catch (error) { alert("Error updating stock"); }
-        }
-
-        async function updateTracking(orderId) {
-            const trackingId = document.getElementById(`tracking-${orderId}`).value;
-            if (!trackingId) { alert("Enter tracking ID"); return; }
-            try {
-                await fetch(`${API_BASE}/history/${orderId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trackingId: trackingId, status: 'Shipped' }) });
-                alert("Tracking Updated!");
-                loadAll();
-            } catch(e) { alert("Error: " + e.message); }
-        }
-
         async function addProduct() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
