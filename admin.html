@@ -315,202 +315,7 @@
             font-size: 12px;
         }
         
-        /* ========== SHIPPING LABEL STYLES - A4 OPTIMIZED ========== */
-        /* A4 Print Settings - 4 labels per page */
-        @media print {
-            @page {
-                size: A4;
-                margin: 0.5cm;
-            }
-            
-            body * {
-                visibility: hidden;
-            }
-            
-            #shipping-label-printout, #shipping-label-printout * {
-                visibility: visible;
-            }
-            
-            #shipping-label-printout {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-                display: block !important;
-            }
-            
-            #bulk-label-printout, #bulk-label-printout * {
-                visibility: visible;
-            }
-            
-            #bulk-label-printout {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-                display: block !important;
-            }
-            
-            .print-label-card {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-        }
-        
-        /* Single Label Style */
-        .shipping-label {
-            width: 100%;
-            max-width: 600px;
-            min-height: 320px;
-            border: 2px solid #000;
-            padding: 20px 25px;
-            font-family: 'Courier New', monospace;
-            background: white;
-            margin: 0 auto;
-            position: relative;
-            box-sizing: border-box;
-        }
-        
-        /* Header - Centered Top */
-        .label-header {
-            text-align: center;
-            border-bottom: 1px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .label-shop-name {
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .label-order-id {
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
-        
-        /* Buyer Section - Top Right */
-        .label-buyer-section {
-            position: absolute;
-            top: 100px;
-            right: 25px;
-            text-align: right;
-            max-width: 48%;
-        }
-        
-        /* Seller Section - Bottom Left */
-        .label-seller-section {
-            position: absolute;
-            bottom: 20px;
-            left: 25px;
-            text-align: left;
-            max-width: 48%;
-        }
-        
-        .label-section-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 12px;
-            text-decoration: underline;
-        }
-        
-        .label-line {
-            margin: 4px 0;
-            font-size: 11px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            white-space: normal;
-            overflow-wrap: break-word;
-        }
-        
-        /* Bulk Label Container - A4 with 4 labels per page */
-        .bulk-label-container { 
-            width: 100%; 
-            background: white; 
-            padding: 0;
-        }
-        
-        .label-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            page-break-after: always;
-            break-after: page;
-            margin-bottom: 15px;
-        }
-        
-        .print-label-card {
-            border: 2px solid #000;
-            padding: 15px 18px;
-            min-height: 310px;
-            background: white;
-            width: 100%;
-            position: relative;
-            box-sizing: border-box;
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-        
-        /* Bulk label internal structure */
-        .print-label-header {
-            text-align: center;
-            border-bottom: 1px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .print-shop-name {
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .print-order-id {
-            font-size: 10px;
-            font-weight: bold;
-            margin-top: 3px;
-        }
-        
-        /* Buyer Section - Right side for bulk labels */
-        .print-buyer-section {
-            position: absolute;
-            top: 85px;
-            right: 18px;
-            text-align: right;
-            max-width: 45%;
-        }
-        
-        /* Seller Section - Left bottom for bulk labels */
-        .print-seller-section {
-            position: absolute;
-            bottom: 15px;
-            left: 18px;
-            text-align: left;
-            max-width: 45%;
-        }
-        
-        .print-section-title {
-            font-weight: bold;
-            margin-bottom: 6px;
-            font-size: 10px;
-            text-decoration: underline;
-        }
-        
-        .print-line {
-            margin: 3px 0;
-            font-size: 9px;
-            line-height: 1.3;
-            word-wrap: break-word;
-            white-space: normal;
-            overflow-wrap: break-word;
-        }
-        
-        /* Image Upload Section */
+        /* ========== NEW: IMAGE UPLOAD SECTION ========== */
         .image-upload-section {
             margin-bottom: 20px;
             padding: 15px;
@@ -637,7 +442,7 @@
             margin-top: 8px;
         }
         
-        /* Legacy styles */
+        /* Multi Image Styles (legacy keep for compatibility) */
         .multi-image-section {
             margin-bottom: 15px;
             padding: 10px;
@@ -681,7 +486,7 @@
             font-size: 14px;
         }
         
-        /* Confirmation Modal */
+        /* Confirmation Modal Styles */
         .confirm-modal {
             position: fixed;
             top: 0;
@@ -728,8 +533,15 @@
             font-weight: bold;
         }
         
-        .confirm-yes { background: #e74c3c; color: white; }
-        .confirm-no { background: #95a5a6; color: white; }
+        .confirm-yes {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .confirm-no {
+            background: #95a5a6;
+            color: white;
+        }
         
         /* Login Overlay */
         .login-overlay {
@@ -775,7 +587,94 @@
         }
         .error-msg { color: #e74c3c; margin-top: 10px; font-size: 14px; }
         
-        /* Footer */
+        /* Print Styles for Labels */
+        @media print {
+            body * { visibility: hidden; }
+            #shipping-label-printout, #shipping-label-printout * { visibility: visible; }
+            #shipping-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
+            #bulk-label-printout, #bulk-label-printout * { visibility: visible; }
+            #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
+        }
+        
+        /* Single Label Style */
+        .shipping-label {
+            width: 600px;
+            min-height: 350px;
+            border: 2px solid #000;
+            padding: 30px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            background: white;
+            margin: 0 auto;
+        }
+        
+        /* Bulk Label Container */
+        .bulk-label-container { 
+            width: 100%; 
+            background: white; 
+            padding: 20px;
+        }
+        
+        .label-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            page-break-after: always;
+            break-after: page;
+            margin-bottom: 20px;
+        }
+        
+        .print-label-card {
+            border: 2px solid #000;
+            padding: 20px;
+            min-height: 350px;
+            position: relative;
+            background: white;
+            width: 100%;
+        }
+        
+        .label-shop-name { 
+            text-align: center; 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+        }
+        
+        .label-order-id { 
+            text-align: center; 
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 50px; 
+        }
+        
+        .label-buyer-section { 
+            position: absolute; 
+            top: 130px; 
+            right: 20px; 
+            text-align: right; 
+        }
+        
+        .label-seller-section { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            text-align: left; 
+        }
+        
+        .label-section-title { 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            font-size: 12px; 
+            text-decoration: underline; 
+        }
+        
+        .label-line { 
+            margin: 4px 0; 
+            font-size: 11px; 
+        }
+        
+        /* ========== FOOTER STYLES ========== */
         .footer {
             background: #232f3e;
             color: #ccc;
@@ -826,7 +725,7 @@
             font-size: 12px;
         }
         
-        /* ========== MOBILE LAYOUT ========== */
+        /* ========== MOBILE LAYOUT (max-width: 768px) ========== */
         @media screen and (max-width: 768px) {
             .sidebar { display: none; }
             
@@ -923,7 +822,10 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             }
             
-            .data-table { display: none; }
+            /* Hide tables on mobile */
+            .data-table {
+                display: none;
+            }
             
             .bulk-actions-bar {
                 flex-direction: column;
@@ -990,11 +892,17 @@
             }
         }
         
+        /* Desktop: Hide mobile cards */
         @media screen and (min-width: 769px) {
-            .order-mobile-card { display: none; }
-            .data-table { display: table; }
+            .order-mobile-card {
+                display: none;
+            }
+            .data-table {
+                display: table;
+            }
         }
         
+        /* Tablet Styles */
         @media screen and (min-width: 769px) and (max-width: 1024px) {
             .sidebar { width: 220px; }
             .main-content { margin-left: 240px; width: calc(100% - 240px); }
@@ -1017,7 +925,7 @@
         </div>
     </div>
 
-    <!-- Main Admin Content -->
+    <!-- Main Admin Content (Hidden until login) -->
     <div id="admin-content" style="display: none;">
         
         <!-- DESKTOP SIDEBAR -->
@@ -1055,7 +963,7 @@
                 <div class="mobile-stat-card"><h4>Users</h4><p id="mobile-user-count">0</p></div>
             </div>
 
-            <!-- ORDER LOG SECTION -->
+            <!-- ORDER LOG SECTION (with integrated cancellation requests) -->
             <div id="section-orders" class="section-content">
                 <h2>📋 Order Log</h2>
                 <div class="bulk-actions-bar">
@@ -1064,11 +972,11 @@
                         <strong>Select All</strong>
                     </label>
                     <div class="selection-info" id="selection-info">0 orders selected</div>
-                    <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected (4 per A4)</button>
+                    <button class="btn btn-bulk-print" onclick="printBulkLabels()">🖨️ Print Selected</button>
                     <button class="btn btn-verify" onclick="clearSelection()">Clear</button>
                 </div>
                 
-                <!-- DESKTOP TABLE VIEW -->
+                <!-- DESKTOP TABLE VIEW - Orders Table with Cancellation Requests Column -->
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -1115,50 +1023,87 @@
                         <button type="button" onclick="toggleNewCategory()" id="toggle-cat-btn">+ New</button>
                     </div>
                     
+                    <!-- NEW: IMAGE UPLOAD SECTION with Camera/Gallery Support -->
                     <div class="image-upload-section">
                         <div class="upload-header">
                             <label>📸 Product Images (Max 6)</label>
                             <div class="upload-buttons">
-                                <button type="button" class="btn-camera" onclick="captureFromCamera()">📷 Camera</button>
-                                <button type="button" class="btn-gallery" onclick="selectFromGallery()">🖼️ Gallery</button>
+                                <button type="button" class="btn-camera" onclick="captureFromCamera()">
+                                    📷 Camera
+                                </button>
+                                <button type="button" class="btn-gallery" onclick="selectFromGallery()">
+                                    🖼️ Gallery
+                                </button>
                             </div>
                         </div>
                         
+                        <!-- Hidden file inputs for camera and gallery -->
                         <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" multiple>
                         <input type="file" id="gallery-input" accept="image/*" style="display: none;" multiple>
                         
+                        <!-- Image preview grid -->
                         <div id="image-preview-grid" class="image-preview-grid"></div>
                         
+                        <!-- Upload progress -->
                         <div id="upload-progress" class="upload-progress">
-                            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
                             <div class="upload-stats" id="upload-stats"></div>
                         </div>
                         
-                        <button type="button" class="btn-upload" onclick="uploadAllImages()" id="upload-btn" style="display: none;">📤 Upload to ImgBB</button>
+                        <button type="button" class="btn-upload" onclick="uploadAllImages()" id="upload-btn" style="display: none;">
+                            📤 Upload to ImgBB
+                        </button>
                     </div>
                     
+                    <!-- Hidden fields to store uploaded image URLs -->
                     <input type="hidden" id="uploaded-image-urls" value="[]">
                     
                     <button class="btn btn-add" onclick="addProduct()">Save Product</button>
                 </div>
                 
+                <!-- DESKTOP TABLE VIEW - Inventory Table -->
                 <table class="data-table">
                     <thead>
-                        <tr><th style="width:20%">Name</th><th style="width:8%">Stock</th><th style="width:10%">Price</th><th style="width:30%">Description</th><th style="width:10%">Images</th><th style="width:12%">Update Stock</th><th style="width:10%">Actions</th></tr>
+                        <tr>
+                            <th style="width:20%">Name</th>
+                            <th style="width:8%">Stock</th>
+                            <th style="width:10%">Price</th>
+                            <th style="width:30%">Description (Full Text)</th>
+                            <th style="width:10%">Images</th>
+                            <th style="width:12%">Update Stock</th>
+                            <th style="width:10%">Actions</th>
+                        </tr>
                     </thead>
                     <tbody id="inventory-table-body"></tbody>
                 </table>
                 
+                <!-- MOBILE CARD VIEW -->
                 <div id="inventory-mobile-container"></div>
             </div>
 
             <!-- USER VERIFICATION SECTION -->
             <div id="section-users" class="section-content" style="display: none;">
                 <h2>👥 User Verification</h2>
+                
+                <!-- DESKTOP TABLE VIEW -->
                 <table class="data-table">
-                    <thead><tr><th>S.No</th><th>ID</th><th>Username</th><th>Phone</th><th>Status</th><th>Registered On</th><th>Actions</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th style="width:60px">S.No</th>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
+                            <th style="width:150px">Actions</th>
+                        </tr>
+                    </thead>
                     <tbody id="users-table-body"></tbody>
                 </table>
+                
+                <!-- MOBILE CARD VIEW -->
                 <div id="users-mobile-container"></div>
             </div>
         </div>
@@ -1167,15 +1112,35 @@
     <!-- FOOTER -->
     <div class="footer" id="footer">
         <div class="footer-content">
-            <div class="footer-section"><h3>About Us</h3><p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p></div>
-            <div class="footer-section"><h3>Quick Links</h3><a onclick="window.location.href='index.html'">Shop Now</a><a onclick="window.location.href='index.html?showOrders=true'">My Orders</a><a>Contact Us</a><a>My Profile</a></div>
-            <div class="footer-section"><h3>Contact Info</h3><p>✉️ Kahkashanp7@gmail.com</p><p>📍 Lalbagh, Purneacity<br>Bihar 854302</p></div>
-            <div class="footer-section"><h3>Follow Us</h3><div class="social-links"><a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a></div></div>
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a onclick="window.location.href='index.html'">Shop Now</a>
+                <a onclick="window.location.href='index.html?showOrders=true'">My Orders</a>
+                <a>Contact Us</a>
+                <a>My Profile</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p>✉️ Kahkashanp7@gmail.com</p>
+                <p>📍 Lalbagh, Purneacity<br>Bihar 854302</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+                </div>
+            </div>
         </div>
-        <div class="copyright">&copy; 2024 Sarees By Kuhu. All rights reserved.</div>
+        <div class="copyright">
+            &copy; 2024 Sarees By Kuhu. All rights reserved.
+        </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Confirmation Modal for Reset Orders -->
     <div id="resetConfirmModal" class="confirm-modal" style="display: none;">
         <div class="confirm-modal-content">
             <h3>⚠️ WARNING: Reset Orders</h3>
@@ -1189,6 +1154,7 @@
         </div>
     </div>
 
+    <!-- MOBILE BOTTOM NAVIGATION -->
     <div class="mobile-bottom-nav">
         <button class="mobile-nav-item active" onclick="mobileNavigate('orders')"><span>📋</span><div>Orders</div></button>
         <button class="mobile-nav-item" onclick="mobileNavigate('inventory')"><span>📦</span><div>Inventory</div></button>
@@ -1207,11 +1173,16 @@
         let notificationCheckInterval = null;
         let previousUsers = [];
         let cancellationRequests = [];
-        let pendingImages = [];
+
+        // ============ IMAGE UPLOAD VARIABLES ============
+        let pendingImages = [];  // Array of {file, previewUrl, status, uploadedUrl}
         let isUploading = false;
         
-        const IMGBB_API_KEY = "569ed32b65af48dfc24a3cb583ab0cd7";
+        // ImgBB API Key (Free - sign up at https://imgbb.com to get your own key)
+        // You should replace this with your own API key from imgbb.com
+        const IMGBB_API_KEY = "569ed32b65af48dfc24a3cb583ab0cd7";  // <-- GET YOUR FREE API KEY FROM IMGBB.COM
         
+        // Helper to show notifications
         function showNotification(title, message, type = 'success') {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -1222,31 +1193,76 @@
             setTimeout(() => notification.remove(), 5000);
         }
 
-        function captureFromCamera() { const input = document.getElementById('camera-input'); input.setAttribute('capture', 'environment'); input.click(); }
-        function selectFromGallery() { const input = document.getElementById('gallery-input'); input.removeAttribute('capture'); input.click(); }
+        // ============ CAMERA / GALLERY FUNCTIONS ============
         
+        function captureFromCamera() {
+            const input = document.getElementById('camera-input');
+            // For mobile, capture="environment" uses back camera
+            input.setAttribute('capture', 'environment');
+            input.click();
+        }
+        
+        function selectFromGallery() {
+            const input = document.getElementById('gallery-input');
+            input.removeAttribute('capture');
+            input.click();
+        }
+        
+        // Setup file input handlers
         function setupFileInputs() {
             const cameraInput = document.getElementById('camera-input');
             const galleryInput = document.getElementById('gallery-input');
+            
             cameraInput.onchange = (e) => handleFiles(e.target.files);
             galleryInput.onchange = (e) => handleFiles(e.target.files);
         }
         
         function handleFiles(files) {
             if (!files || files.length === 0) return;
+            
             const currentCount = pendingImages.length;
             const availableSlots = 6 - currentCount;
-            if (files.length > availableSlots) { showNotification('Limit Reached', `Maximum 6 images allowed. You can add ${availableSlots} more.`, 'warning'); return; }
+            
+            if (files.length > availableSlots) {
+                showNotification('Limit Reached', `Maximum 6 images allowed. You can add ${availableSlots} more.`, 'warning');
+                return;
+            }
+            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                if (!file.type.startsWith('image/')) { showNotification('Invalid File', `${file.name} is not an image`, 'error'); continue; }
-                if (file.size > 5 * 1024 * 1024) { showNotification('File Too Large', `${file.name} exceeds 5MB limit`, 'error'); continue; }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Invalid File', `${file.name} is not an image`, 'error');
+                    continue;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('File Too Large', `${file.name} exceeds 5MB limit`, 'error');
+                    continue;
+                }
+                
+                // Create preview URL
                 const previewUrl = URL.createObjectURL(file);
-                pendingImages.push({ file: file, previewUrl: previewUrl, status: 'pending', uploadedUrl: null });
+                
+                pendingImages.push({
+                    file: file,
+                    previewUrl: previewUrl,
+                    status: 'pending',
+                    uploadedUrl: null
+                });
             }
+            
             updateImagePreviewGrid();
+            
+            // Show upload button if there are pending images
             const uploadBtn = document.getElementById('upload-btn');
-            if (pendingImages.length > 0) uploadBtn.style.display = 'block';
+            if (pendingImages.length > 0) {
+                uploadBtn.style.display = 'block';
+            }
+            
+            // Clear file inputs
             document.getElementById('camera-input').value = '';
             document.getElementById('gallery-input').value = '';
         }
@@ -1254,73 +1270,143 @@
         function updateImagePreviewGrid() {
             const grid = document.getElementById('image-preview-grid');
             grid.innerHTML = '';
+            
             pendingImages.forEach((img, index) => {
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
-                let statusText = '', statusClass = '';
-                if (img.status === 'pending') { statusText = '📌 Pending'; statusClass = ''; }
-                else if (img.status === 'uploading') { statusText = '⏫ Uploading...'; statusClass = 'uploading'; }
-                else if (img.status === 'success') { statusText = '✅ Uploaded'; statusClass = 'success'; }
-                else if (img.status === 'error') { statusText = '❌ Failed'; statusClass = 'error'; }
-                previewItem.innerHTML = `<img src="${img.previewUrl}" alt="Preview ${index + 1}"><button class="remove-preview" onclick="removePendingImage(${index})">✕</button><div class="upload-status ${statusClass}">${statusText}</div>`;
+                
+                let statusText = '';
+                let statusClass = '';
+                if (img.status === 'pending') {
+                    statusText = '📌 Pending';
+                    statusClass = '';
+                } else if (img.status === 'uploading') {
+                    statusText = '⏫ Uploading...';
+                    statusClass = 'uploading';
+                } else if (img.status === 'success') {
+                    statusText = '✅ Uploaded';
+                    statusClass = 'success';
+                } else if (img.status === 'error') {
+                    statusText = '❌ Failed';
+                    statusClass = 'error';
+                }
+                
+                previewItem.innerHTML = `
+                    <img src="${img.previewUrl}" alt="Preview ${index + 1}">
+                    <button class="remove-preview" onclick="removePendingImage(${index})">✕</button>
+                    <div class="upload-status ${statusClass}">${statusText}</div>
+                `;
                 grid.appendChild(previewItem);
             });
+            
+            // Update stats
             const uploadedCount = pendingImages.filter(i => i.status === 'success').length;
             const statsEl = document.getElementById('upload-stats');
-            if (statsEl) statsEl.innerHTML = `${uploadedCount} of ${pendingImages.length} images uploaded`;
+            if (statsEl) {
+                statsEl.innerHTML = `${uploadedCount} of ${pendingImages.length} images uploaded`;
+            }
         }
         
         function removePendingImage(index) {
-            if (pendingImages[index] && pendingImages[index].previewUrl) URL.revokeObjectURL(pendingImages[index].previewUrl);
+            if (pendingImages[index] && pendingImages[index].previewUrl) {
+                URL.revokeObjectURL(pendingImages[index].previewUrl);
+            }
             pendingImages.splice(index, 1);
             updateImagePreviewGrid();
+            
             const uploadBtn = document.getElementById('upload-btn');
-            if (pendingImages.length === 0) uploadBtn.style.display = 'none';
+            if (pendingImages.length === 0) {
+                uploadBtn.style.display = 'none';
+            }
+            
+            // Update hidden URLs field
             updateHiddenUrlsField();
         }
         
         async function uploadAllImages() {
-            if (isUploading) { showNotification('Upload in Progress', 'Please wait for current upload to complete', 'warning'); return; }
+            if (isUploading) {
+                showNotification('Upload in Progress', 'Please wait for current upload to complete', 'warning');
+                return;
+            }
+            
             const pendingToUpload = pendingImages.filter(i => i.status === 'pending');
-            if (pendingToUpload.length === 0) { showNotification('No Images', 'All images have been uploaded already', 'warning'); return; }
-            if (!IMGBB_API_KEY || IMGBB_API_KEY === 'YOUR_IMGBB_API_KEY') { showNotification('API Key Required', 'Please set your ImgBB API key in the script.', 'error'); return; }
+            if (pendingToUpload.length === 0) {
+                showNotification('No Images', 'All images have been uploaded already', 'warning');
+                return;
+            }
+            
+            if (!IMGBB_API_KEY || IMGBB_API_KEY === 'YOUR_IMGBB_API_KEY') {
+                showNotification('API Key Required', 'Please set your ImgBB API key in the script.\nGet free key from https://imgbb.com/signup', 'error');
+                return;
+            }
+            
             isUploading = true;
             const uploadBtn = document.getElementById('upload-btn');
             uploadBtn.disabled = true;
             uploadBtn.textContent = '📤 Uploading...';
+            
+            // Show progress bar
             const progressDiv = document.getElementById('upload-progress');
             progressDiv.style.display = 'block';
-            let successCount = 0, failCount = 0;
+            
+            let successCount = 0;
+            let failCount = 0;
+            
             for (let i = 0; i < pendingImages.length; i++) {
                 const img = pendingImages[i];
                 if (img.status !== 'pending') continue;
+                
+                // Update status
                 img.status = 'uploading';
                 updateImagePreviewGrid();
+                
+                // Update progress
                 const totalProcessed = pendingImages.filter(p => p.status !== 'pending').length;
                 const percent = (totalProcessed / pendingImages.length) * 100;
                 document.getElementById('progress-fill').style.width = `${percent}%`;
+                
                 try {
                     const uploadedUrl = await uploadToImgBB(img.file);
                     img.status = 'success';
                     img.uploadedUrl = uploadedUrl;
                     successCount++;
+                    
                     showNotification('Upload Success', `Image ${i + 1} uploaded successfully`, 'success');
                 } catch (error) {
+                    console.error('Upload error:', error);
                     img.status = 'error';
                     failCount++;
                     showNotification('Upload Failed', `Image ${i + 1} failed: ${error.message}`, 'error');
                 }
+                
                 updateImagePreviewGrid();
             }
+            
+            // Update hidden URLs field
             updateHiddenUrlsField();
-            setTimeout(() => { document.getElementById('upload-progress').style.display = 'none'; document.getElementById('progress-fill').style.width = '0%'; }, 2000);
+            
+            // Hide progress bar after delay
+            setTimeout(() => {
+                document.getElementById('upload-progress').style.display = 'none';
+                document.getElementById('progress-fill').style.width = '0%';
+            }, 2000);
+            
             uploadBtn.disabled = false;
             uploadBtn.textContent = '📤 Upload to ImgBB';
             isUploading = false;
-            if (successCount > 0) showNotification('Upload Complete', `${successCount} images uploaded successfully!`, 'success');
-            if (failCount > 0) showNotification('Upload Partial', `${failCount} images failed to upload`, 'error');
+            
+            if (successCount > 0) {
+                showNotification('Upload Complete', `${successCount} images uploaded successfully!`, 'success');
+            }
+            if (failCount > 0) {
+                showNotification('Upload Partial', `${failCount} images failed to upload`, 'error');
+            }
+            
+            // If all uploaded successfully, hide upload button
             const allUploaded = pendingImages.every(i => i.status === 'success');
-            if (allUploaded) uploadBtn.style.display = 'none';
+            if (allUploaded) {
+                uploadBtn.style.display = 'none';
+            }
         }
         
         async function uploadToImgBB(file) {
@@ -1328,16 +1414,24 @@
                 const formData = new FormData();
                 formData.append('image', file);
                 formData.append('key', IMGBB_API_KEY);
+                
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', 'https://api.imgbb.com/1/upload', true);
                 xhr.onload = function() {
                     if (xhr.status === 200) {
                         try {
                             const response = JSON.parse(xhr.responseText);
-                            if (response.success && response.data && response.data.url) resolve(response.data.url);
-                            else reject(new Error(response.error?.message || 'Upload failed'));
-                        } catch (e) { reject(new Error('Invalid response from ImgBB')); }
-                    } else { reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`)); }
+                            if (response.success && response.data && response.data.url) {
+                                resolve(response.data.url);
+                            } else {
+                                reject(new Error(response.error?.message || 'Upload failed'));
+                            }
+                        } catch (e) {
+                            reject(new Error('Invalid response from ImgBB'));
+                        }
+                    } else {
+                        reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+                    }
                 };
                 xhr.onerror = () => reject(new Error('Network error'));
                 xhr.send(formData);
@@ -1345,18 +1439,30 @@
         }
         
         function updateHiddenUrlsField() {
-            const successUrls = pendingImages.filter(i => i.status === 'success' && i.uploadedUrl).map(i => i.uploadedUrl);
+            const successUrls = pendingImages
+                .filter(i => i.status === 'success' && i.uploadedUrl)
+                .map(i => i.uploadedUrl);
+            
             document.getElementById('uploaded-image-urls').value = JSON.stringify(successUrls);
         }
         
         function getUploadedImageUrls() {
             const urlsJson = document.getElementById('uploaded-image-urls').value;
-            try { const urls = JSON.parse(urlsJson); return urls.length > 0 ? urls : ['https://via.placeholder.com/150']; } 
-            catch (e) { return ['https://via.placeholder.com/150']; }
+            try {
+                const urls = JSON.parse(urlsJson);
+                return urls.length > 0 ? urls : ['https://via.placeholder.com/150'];
+            } catch (e) {
+                return ['https://via.placeholder.com/150'];
+            }
         }
         
         function clearImageUploads() {
-            pendingImages.forEach(img => { if (img.previewUrl) URL.revokeObjectURL(img.previewUrl); });
+            // Clean up preview URLs
+            pendingImages.forEach(img => {
+                if (img.previewUrl) {
+                    URL.revokeObjectURL(img.previewUrl);
+                }
+            });
             pendingImages = [];
             updateImagePreviewGrid();
             document.getElementById('uploaded-image-urls').value = '[]';
@@ -1364,18 +1470,68 @@
             document.getElementById('upload-progress').style.display = 'none';
         }
 
-        function showResetConfirmation() { document.getElementById('resetConfirmModal').style.display = 'flex'; }
-        function closeResetConfirmation() { document.getElementById('resetConfirmModal').style.display = 'none'; }
+        // ============ RESET CONFIRMATION FUNCTIONS ============
+        function showResetConfirmation() {
+            document.getElementById('resetConfirmModal').style.display = 'flex';
+        }
+        
+        function closeResetConfirmation() {
+            document.getElementById('resetConfirmModal').style.display = 'none';
+        }
         
         async function confirmResetHistory() {
             closeResetConfirmation();
             try {
                 const response = await fetch(`${API_BASE}/reset-completed-orders`, { method: 'POST' });
-                if (response.ok) { const result = await response.json(); alert(result.message); loadAll(); }
-                else alert("Failed to reset history");
-            } catch (error) { alert("Error: " + error.message); }
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    loadAll();
+                } else {
+                    alert("Failed to reset history");
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
         }
 
+        // ============ MULTIPLE IMAGES FUNCTIONS (legacy - keep for compatibility) ============
+        function addImageRow() {
+            const container = document.getElementById('image-urls-container');
+            if (container.children.length >= 8) { alert("Maximum 8 images allowed"); return; }
+            const newRow = document.createElement('div');
+            newRow.className = 'image-row';
+            newRow.innerHTML = `<input type="text" class="image-url" placeholder="Image URL ${container.children.length + 1}" style="flex: 1;"><button type="button" class="btn btn-delete remove-image-btn" onclick="removeImageRow(this)" style="padding: 8px 12px;">✕</button>`;
+            container.appendChild(newRow);
+        }
+        
+        function removeImageRow(button) {
+            const container = document.getElementById('image-urls-container');
+            if (container.children.length <= 1) { alert("At least one image required"); return; }
+            button.parentElement.remove();
+            const rows = container.children;
+            for (let i = 0; i < rows.length; i++) {
+                const input = rows[i].querySelector('.image-url');
+                if (input) input.placeholder = `Image URL ${i + 1}${i === 0 ? ' (Main Image)' : ''}`;
+            }
+        }
+        
+        function getAllImageUrls() {
+            // First try to get uploaded URLs from the new system
+            const uploadedUrls = getUploadedImageUrls();
+            if (uploadedUrls.length > 0 && uploadedUrls[0] !== 'https://via.placeholder.com/150') {
+                return uploadedUrls;
+            }
+            
+            // Fallback to manual input URLs
+            const inputs = document.querySelectorAll('#image-urls-container .image-url');
+            const urls = [];
+            inputs.forEach(input => { const url = input.value.trim(); if (url) urls.push(url); });
+            if (urls.length === 0) urls.push('https://via.placeholder.com/150');
+            return urls;
+        }
+
+        // ============ CATEGORY FUNCTIONS ============
         function toggleNewCategory() {
             const select = document.getElementById('p-cat');
             const newInput = document.getElementById('p-cat-new');
@@ -1405,6 +1561,7 @@
             } catch (error) { console.error("Failed to load categories:", error); }
         }
 
+        // ============ ADMIN AUTH ============
         function checkAdminSession() {
             const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
             if (isLoggedIn === 'true') {
@@ -1433,9 +1590,15 @@
         }
 
         function adminLogout() { sessionStorage.removeItem('adminLoggedIn'); window.location.reload(); }
-        function mobileNavigate(section) { document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active')); event.target.closest('.mobile-nav-item').classList.add('active'); showSection(section, null); }
+
+        function mobileNavigate(section) {
+            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.mobile-nav-item').classList.add('active');
+            showSection(section, null);
+        }
+
         function startAdminFunctions() { testConnection(); startUserMonitoring(); loadAll(); loadCategories(); setupFileInputs(); }
-        
+
         function showServerStatus(message, type) {
             const statusDiv = document.getElementById('server-status');
             statusDiv.className = 'server-status ' + type;
@@ -1487,126 +1650,90 @@
             notificationCheckInterval = setInterval(checkForNewUsers, 10000);
         }
 
+        // ============ CANCELLATION REQUEST HANDLING ============
+        
         async function loadCancellationRequests() {
-            try { const response = await fetch(`${API_BASE}/cancellation-requests`); cancellationRequests = await response.json(); } 
-            catch (error) { cancellationRequests = []; }
+            try {
+                const response = await fetch(`${API_BASE}/cancellation-requests`);
+                cancellationRequests = await response.json();
+            } catch (error) {
+                cancellationRequests = [];
+            }
         }
 
         async function approveCancellation(requestId, orderId) {
             if (!confirm("⚠️ Confirm: Approve cancellation and restore stock?\n\nThis will cancel the order and restore the product quantity back to inventory.")) return;
+            
             try {
-                const response = await fetch(`${API_BASE}/cancellation-requests/${requestId}/approve`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const response = await fetch(`${API_BASE}/cancellation-requests/${requestId}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
                 const result = await response.json();
-                if (result.success) { alert("✅ Cancellation approved! Stock restored successfully."); await loadAll(); } 
-                else { if (result.alreadyShipped) alert("❌ Cannot approve - Order has already been shipped!"); else alert("Error: " + (result.message || "Failed to approve")); await loadAll(); }
-            } catch (error) { alert("Error: " + error.message); }
+                
+                if (result.success) {
+                    alert("✅ Cancellation approved! Stock restored successfully.");
+                    await loadAll();
+                } else {
+                    if (result.alreadyShipped) {
+                        alert("❌ Cannot approve - Order has already been shipped!\n\nPlease check the order status before approving.");
+                    } else {
+                        alert("Error: " + (result.message || "Failed to approve"));
+                    }
+                    await loadAll();
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
         }
 
         async function rejectCancellation(requestId) {
             const reason = prompt("Reason for rejecting cancellation (optional):");
+            
             if (!confirm("Confirm rejection of cancellation request?")) return;
+            
             try {
-                const response = await fetch(`${API_BASE}/cancellation-requests/${requestId}/reject`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reason: reason || "Rejected by seller" }) });
+                const response = await fetch(`${API_BASE}/cancellation-requests/${requestId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: reason || "Rejected by seller" })
+                });
+                
                 const result = await response.json();
-                if (result.success) alert("❌ Cancellation request rejected.\n\n" + (result.reason ? `Reason: ${result.reason}` : ''));
-                else alert("Error: " + (result.message || "Failed to reject"));
-                await loadAll();
-            } catch (error) { alert("Error: " + error.message); }
-        }
-
-        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-
-        // ============ UPDATED PRINT LABEL - Buyer Right, Seller Left Bottom ============
-        function printLabel(order) {
-            const buffer = document.getElementById('shipping-label-printout');
-            buffer.innerHTML = `
-                <div class="shipping-label">
-                    <div class="label-header">
-                        <div class="label-shop-name">SAARES BY KUHU</div>
-                        <div class="label-order-id">ORDER #${order.orderId}</div>
-                    </div>
-                    <div class="label-buyer-section">
-                        <div class="label-section-title">BUYER DETAILS:</div>
-                        <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
-                        <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
-                        <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
-                    </div>
-                    <div class="label-seller-section">
-                        <div class="label-section-title">SENDER DETAILS:</div>
-                        <div class="label-line">Kuhu</div>
-                        <div class="label-line">Lalbagh, Purneacity</div>
-                        <div class="label-line">Near-Industrial Area</div>
-                        <div class="label-line">PS-Sadar, Purnea</div>
-                        <div class="label-line">Bihar - 854302</div>
-                        <div class="label-line">Phone: +91 9304288748</div>
-                    </div>
-                </div>
-            `;
-            buffer.style.display = 'block'; 
-            window.print(); 
-            buffer.style.display = 'none';
-        }
-
-        // ============ UPDATED BULK PRINT - 4 labels per A4 page ============
-        async function printBulkLabels() {
-            if (selectedOrders.size === 0) { alert("Please select at least one order to print labels."); return; }
-            try {
-                const response = await fetch(`${API_BASE}/history`);
-                const allOrders = await response.json();
-                const ordersToPrint = allOrders.filter(o => selectedOrders.has(o.orderId.toString()));
-                if (ordersToPrint.length === 0) { alert("No orders found to print."); return; }
                 
-                let bulkHtml = `<div class="bulk-label-container">`;
-                for (let i = 0; i < ordersToPrint.length; i++) {
-                    const order = ordersToPrint[i];
-                    if (i % 4 === 0) { 
-                        if (i > 0) bulkHtml += `</div>`; 
-                        bulkHtml += `<div class="label-grid">`; 
-                    }
-                    bulkHtml += `
-                        <div class="print-label-card">
-                            <div class="print-label-header">
-                                <div class="print-shop-name">SAARES BY KUHU</div>
-                                <div class="print-order-id">ORDER #${order.orderId}</div>
-                            </div>
-                            <div class="print-buyer-section">
-                                <div class="print-section-title">BUYER DETAILS:</div>
-                                <div class="print-line">${escapeHtml(order.customerName) || 'N/A'}</div>
-                                <div class="print-line">${escapeHtml(order.address) || 'No Address'}</div>
-                                <div class="print-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
-                            </div>
-                            <div class="print-seller-section">
-                                <div class="print-section-title">SENDER DETAILS:</div>
-                                <div class="print-line">Kuhu, Lalbagh, Purneacity</div>
-                                <div class="print-line">Near-Industrial Area</div>
-                                <div class="print-line">PS-Sadar, Purnea, Bihar 854302</div>
-                                <div class="print-line">Phone: +91 9304288748</div>
-                            </div>
-                        </div>
-                    `;
+                if (result.success) {
+                    alert("❌ Cancellation request rejected.\n\n" + (result.reason ? `Reason: ${result.reason}` : ''));
+                    await loadAll();
+                } else {
+                    alert("Error: " + (result.message || "Failed to reject"));
                 }
-                bulkHtml += `</div></div>`;
-                
-                const printContainer = document.getElementById('bulk-label-printout');
-                printContainer.innerHTML = bulkHtml;
-                printContainer.style.display = 'block';
-                window.print();
-                printContainer.style.display = 'none';
-                alert(`${ordersToPrint.length} label(s) printed successfully! (4 per A4 page)`);
-            } catch (error) { 
-                console.error("Error printing bulk labels:", error);
-                alert("Error printing labels. Please try again."); 
+            } catch (error) {
+                alert("Error: " + error.message);
             }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         async function loadAll() {
             try {
                 await loadCancellationRequests();
+                
                 const [orders, products, users] = await Promise.all([
                     fetch(`${API_BASE}/history`).then(r => r.json()),
                     fetch(`${API_BASE}/products`).then(r => r.json()),
                     fetch(`${API_BASE}/users`).then(r => r.json())
                 ]);
+
+                console.log("Products loaded:", products);
+                console.log("Users loaded:", users);
+                console.log("Orders loaded:", orders);
+                console.log("Cancellation requests:", cancellationRequests);
 
                 let rev = 0;
                 const activeOrders = orders.filter(o => o.status !== 'Cancelled');
@@ -1623,43 +1750,105 @@
                 if (mobileOrders) mobileOrders.innerText = orders.length;
                 if (mobileUsers) mobileUsers.innerText = users.length;
 
-                // Render Orders Table
+                // ============ RENDER ORDERS - DESKTOP TABLE VIEW ============
                 const ordersTableBody = document.getElementById('orders-table-body');
                 if (ordersTableBody) {
                     ordersTableBody.innerHTML = '';
                     [...orders].reverse().forEach(o => {
                         const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                        
                         const pendingRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'pending');
                         const rejectedRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'rejected');
+                        
                         let cancelRequestHtml = '';
                         if (pendingRequest) {
-                            cancelRequestHtml = `<div style="margin-bottom: 8px;"><span class="status-badge cancel-request-badge" style="display: inline-block; margin-bottom: 5px;">⏳ Cancel Request Pending</span><div style="display: flex; gap: 5px; margin-top: 5px;"><button class="btn btn-approve-cancel" onclick="approveCancellation(${pendingRequest.id}, ${o.orderId})" style="background:#27ae60;">✅ Approve</button><button class="btn btn-reject-cancel" onclick="rejectCancellation(${pendingRequest.id})" style="background:#e74c3c;">❌ Reject</button></div></div>`;
+                            cancelRequestHtml = `
+                                <div style="margin-bottom: 8px;">
+                                    <span class="status-badge cancel-request-badge" style="display: inline-block; margin-bottom: 5px;">⏳ Cancel Request Pending</span>
+                                    <div style="display: flex; gap: 5px; margin-top: 5px;">
+                                        <button class="btn btn-approve-cancel" onclick="approveCancellation(${pendingRequest.id}, ${o.orderId})" style="background:#27ae60;">✅ Approve</button>
+                                        <button class="btn btn-reject-cancel" onclick="rejectCancellation(${pendingRequest.id})" style="background:#e74c3c;">❌ Reject</button>
+                                    </div>
+                                </div>
+                            `;
                         } else if (rejectedRequest) {
                             cancelRequestHtml = `<div><span class="status-badge status-cancelled">❌ Rejected: ${rejectedRequest.rejectedReason || 'N/A'}</span></div>`;
                         }
-                        ordersTableBody.innerHTML += `<tr><td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td><td>${o.orderId || 'N/A'}</td><td>${escapeHtml(o.username) || 'N/A'}</td><td>${escapeHtml(o.customerName) || 'N/A'}</td><td>${escapeHtml(o.productName) || 'N/A'}</td><td>${o.quantity || 0}</td><td>₹${o.totalPrice || 0}</td><td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td><td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td><td style="min-width: 140px;">${cancelRequestHtml || '<span style="color:#888; font-size:11px;">No request</span>'}</td><td><button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button><button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button><button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button></td></tr>`;
+                        
+                        ordersTableBody.innerHTML += `
+                            <tr>
+                                <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
+                                <td>${o.orderId || 'N/A'}</td>
+                                <td>${escapeHtml(o.username) || 'N/A'}</td>
+                                <td>${escapeHtml(o.customerName) || 'N/A'}</td>
+                                <td>${escapeHtml(o.productName) || 'N/A'}</td>
+                                <td>${o.quantity || 0}</td>
+                                <td>₹${o.totalPrice || 0}</td>
+                                <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
+                                <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
+                                <td style="min-width: 140px;">${cancelRequestHtml || '<span style="color:#888; font-size:11px;">No request</span>'}</td>
+                                <td>
+                                    <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
+                                    <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
+                                    <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
+                                    </td>
+                             `
                     });
                 }
 
-                // Mobile Orders
+                // ============ RENDER ORDERS - MOBILE CARD VIEW ============
                 const ordersMobileContainer = document.getElementById('orders-mobile-container');
                 if (ordersMobileContainer) {
                     ordersMobileContainer.innerHTML = '';
                     [...orders].reverse().forEach(o => {
                         const statusColor = o.status === 'Cancelled' ? '#dc3545' : (o.status === 'Shipped' ? '#17a2b8' : '#ffc107');
+                        
                         const pendingRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'pending');
                         const rejectedRequest = cancellationRequests.find(r => r.orderId === o.orderId && r.status === 'rejected');
+                        
                         let cancelRequestHtml = '';
                         if (pendingRequest) {
-                            cancelRequestHtml = `<div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 8px;"><div style="color: #856404; margin-bottom: 8px;">⏳ Cancellation Request Pending</div><div style="display: flex; gap: 8px;"><button class="btn btn-approve-cancel" onclick="approveCancellation(${pendingRequest.id}, ${o.orderId})" style="background:#27ae60;">✅ Approve</button><button class="btn btn-reject-cancel" onclick="rejectCancellation(${pendingRequest.id})" style="background:#e74c3c;">❌ Reject</button></div></div>`;
+                            cancelRequestHtml = `
+                                <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 8px;">
+                                    <div style="color: #856404; margin-bottom: 8px;">⏳ Cancellation Request Pending</div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-approve-cancel" onclick="approveCancellation(${pendingRequest.id}, ${o.orderId})" style="background:#27ae60;">✅ Approve</button>
+                                        <button class="btn btn-reject-cancel" onclick="rejectCancellation(${pendingRequest.id})" style="background:#e74c3c;">❌ Reject</button>
+                                    </div>
+                                </div>
+                            `;
                         } else if (rejectedRequest) {
                             cancelRequestHtml = `<div style="margin-top: 8px; color: #721c24; background: #f8d7da; padding: 6px 10px; border-radius: 6px;">❌ Rejected: ${rejectedRequest.rejectedReason || 'N/A'}</div>`;
                         }
-                        ordersMobileContainer.innerHTML += `<div class="order-mobile-card"><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><div><input type="checkbox" class="order-select-mobile" value="${o.orderId}" onchange="updateMobileSelectionCount()" style="margin-right: 10px;"><strong>Order #${o.orderId}</strong></div><span style="background:${statusColor}; color:white; padding:2px 8px; border-radius:12px; font-size:11px;">${o.status}</span></div><div><strong>Customer:</strong> ${escapeHtml(o.customerName)}</div><div><strong>Product:</strong> ${escapeHtml(o.productName)} (x${o.quantity})</div><div><strong>Total:</strong> ₹${o.totalPrice}</div><div><strong>User:</strong> ${escapeHtml(o.username)}</div><div style="margin-top: 10px;"><input type="text" id="tracking-mob-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;"><div style="display: flex; gap: 8px; flex-wrap: wrap;"><button class="btn btn-verify" onclick="updateTrackingMobile(${o.orderId})">Update</button><button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button><button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button></div></div>${cancelRequestHtml}</div>`;
+                        
+                        ordersMobileContainer.innerHTML += `
+                            <div class="order-mobile-card">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <div>
+                                        <input type="checkbox" class="order-select-mobile" value="${o.orderId}" onchange="updateMobileSelectionCount()" style="margin-right: 10px;">
+                                        <strong>Order #${o.orderId}</strong>
+                                    </div>
+                                    <span style="background:${statusColor}; color:white; padding:2px 8px; border-radius:12px; font-size:11px;">${o.status}</span>
+                                </div>
+                                <div><strong>Customer:</strong> ${escapeHtml(o.customerName)}</div>
+                                <div><strong>Product:</strong> ${escapeHtml(o.productName)} (x${o.quantity})</div>
+                                <div><strong>Total:</strong> ₹${o.totalPrice}</div>
+                                <div><strong>User:</strong> ${escapeHtml(o.username)}</div>
+                                <div style="margin-top: 10px;">
+                                    <input type="text" id="tracking-mob-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:100%; margin-bottom:8px;">
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                        <button class="btn btn-verify" onclick="updateTrackingMobile(${o.orderId})">Update</button>
+                                        <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
+                                        <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
+                                    </div>
+                                </div>
+                                ${cancelRequestHtml}
+                            </div>
+                        `;
                     });
                 }
 
-                // Render Inventory
+                // ============ RENDER INVENTORY ============
                 const inventoryTableBody = document.getElementById('inventory-table-body');
                 if (inventoryTableBody) {
                     inventoryTableBody.innerHTML = '';
@@ -1667,44 +1856,91 @@
                         products.forEach(p => {
                             const description = p.description ? p.description : 'No description provided';
                             const imageCount = p.images ? p.images.length : 1;
-                            inventoryTableBody.innerHTML += `<tr><td><strong>${escapeHtml(p.name)}</strong></td><td><strong id="stock-${p.id}">${p.stock}</strong></td><td>₹${p.price}</td><td class="description-cell" style="max-width:300px; white-space:normal; word-wrap:break-word;">${escapeHtml(description)}</td><td><span style="font-size: 11px; background: #e8e8e8; padding: 2px 6px; border-radius: 10px;">📸 ${imageCount}</span></td><td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></td><td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></td></tr>`;
+                            inventoryTableBody.innerHTML += `
+                                <tr>
+                                    <td><strong>${escapeHtml(p.name)}</strong></td>
+                                    <td><strong id="stock-${p.id}">${p.stock}</strong></td>
+                                    <td>₹${p.price}</td>
+                                    <td class="description-cell" style="max-width:300px; white-space:normal; word-wrap:break-word;">${escapeHtml(description)}</td>
+                                    <td><span style="font-size: 11px; background: #e8e8e8; padding: 2px 6px; border-radius: 10px;">📸 ${imageCount}</span></td>
+                                    <td><div class="stock-control"><input type="number" id="stock-change-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStock(${p.id})">Update</button></div></td>
+                                    <td><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></td>
+                                 `
                         });
                     } else {
                         inventoryTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No products found. Add some!</td></tr>';
                     }
                 }
 
+                // Mobile inventory view
                 const inventoryMobileContainer = document.getElementById('inventory-mobile-container');
                 if (inventoryMobileContainer) {
                     inventoryMobileContainer.innerHTML = '';
                     if (products && products.length > 0) {
                         products.forEach(p => {
-                            inventoryMobileContainer.innerHTML += `<div class="order-mobile-card"><strong>${escapeHtml(p.name)}</strong><div>Price: ₹${p.price} | Stock: <strong id="stock-mob-${p.id}">${p.stock}</strong></div><div style="font-size: 12px; color: #666; margin-top: 5px; white-space: pre-wrap;">📝 ${p.description ? escapeHtml(p.description) : 'No description'}</div><div class="stock-control" style="margin-top: 10px;"><input type="number" id="stock-change-mob-${p.id}" placeholder="+/- amount" value="0" step="1"><button class="btn-update" onclick="updateStockMobile(${p.id})">Update Stock</button><button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button></div></div>`;
+                            inventoryMobileContainer.innerHTML += `
+                                <div class="order-mobile-card">
+                                    <strong>${escapeHtml(p.name)}</strong>
+                                    <div>Price: ₹${p.price} | Stock: <strong id="stock-mob-${p.id}">${p.stock}</strong></div>
+                                    <div style="font-size: 12px; color: #666; margin-top: 5px; white-space: pre-wrap;">📝 ${p.description ? escapeHtml(p.description) : 'No description'}</div>
+                                    <div class="stock-control" style="margin-top: 10px;">
+                                        <input type="number" id="stock-change-mob-${p.id}" placeholder="+/- amount" value="0" step="1">
+                                        <button class="btn-update" onclick="updateStockMobile(${p.id})">Update Stock</button>
+                                        <button class="btn btn-delete" onclick="deleteItem('products', ${p.id})">Delete</button>
+                                    </div>
+                                </div>
+                            `;
                         });
                     } else {
                         inventoryMobileContainer.innerHTML = '<div class="order-mobile-card" style="text-align:center;">No products found. Add some!</div>';
                     }
                 }
 
-                // Render Users
+                // ============ RENDER USERS ============
                 const usersTableBody = document.getElementById('users-table-body');
                 if (usersTableBody) {
                     usersTableBody.innerHTML = '';
                     if (users && users.length > 0) {
                         users.forEach((u, index) => {
-                            usersTableBody.innerHTML += `<tr><td>${index + 1}</td><td>${u.id || 'N/A'}</td><td>${escapeHtml(u.username) || 'N/A'}</td><td>${u.phone || 'N/A'}</td><td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></td><td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</td><td><button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button><button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button></td></tr>`;
+                            usersTableBody.innerHTML += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${u.id || 'N/A'}</td>
+                                    <td>${escapeHtml(u.username) || 'N/A'}</td>
+                                    <td>${u.phone || 'N/A'}</td>
+                                    <td><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></td>
+                                    <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</td>
+                                    <td>
+                                        <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
+                                        <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
+                                        </td>
+                                 `
                         });
                     } else {
                         usersTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users found.</td></tr>';
                     }
                 }
 
+                // Mobile users view
                 const usersMobileContainer = document.getElementById('users-mobile-container');
                 if (usersMobileContainer) {
                     usersMobileContainer.innerHTML = '';
                     if (users && users.length > 0) {
                         users.forEach((u, index) => {
-                            usersMobileContainer.innerHTML += `<div class="order-mobile-card"><div><strong>${index + 1}. ${escapeHtml(u.username)}</strong> (ID: ${u.id})</div><div>📞 Phone: ${u.phone || 'N/A'}</div><div>📅 Registered: ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</div><div style="margin-top: 8px;"><span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span></div><div style="margin-top: 10px;"><button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button><button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button></div></div>`;
+                            usersMobileContainer.innerHTML += `
+                                <div class="order-mobile-card">
+                                    <div><strong>${index + 1}. ${escapeHtml(u.username)}</strong> (ID: ${u.id})</div>
+                                    <div>📞 Phone: ${u.phone || 'N/A'}</div>
+                                    <div>📅 Registered: ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</div>
+                                    <div style="margin-top: 8px;">
+                                        <span class="status-badge ${u.status === 'Verified' ? 'status-verified' : 'status-pending'}">${u.status || 'Pending'}</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <button class="btn btn-verify" onclick="toggleUser(${u.id}, '${u.status}')">${u.status === 'Verified' ? 'Unverify' : 'Verify'}</button>
+                                        <button class="btn btn-delete" onclick="deleteItem('users', ${u.id})">Remove</button>
+                                    </div>
+                                </div>
+                            `;
                         });
                     } else {
                         usersMobileContainer.innerHTML = '<div class="order-mobile-card" style="text-align:center;">No users found.</div>';
@@ -1719,6 +1955,7 @@
             }
         }
       
+        // Mobile selection functions
         function updateMobileSelectionCount() {
             const checkboxes = document.querySelectorAll('.order-select-mobile:checked');
             selectedOrders.clear();
@@ -1726,6 +1963,7 @@
             document.getElementById('selection-info').innerText = `${selectedOrders.size} order(s) selected`;
         }
 
+        // Mobile tracking update wrapper
         async function updateTrackingMobile(orderId) {
             const trackingId = document.getElementById(`tracking-mob-${orderId}`).value;
             if (!trackingId) { alert("Enter tracking ID"); return; }
@@ -1770,8 +2008,19 @@
             const selectAllCheckbox = document.getElementById('select-all-checkbox');
             const checkboxes = document.querySelectorAll('.order-select');
             const mobileCheckboxes = document.querySelectorAll('.order-select-mobile');
-            checkboxes.forEach(cb => { cb.checked = selectAllCheckbox.checked; if (selectAllCheckbox.checked) selectedOrders.add(cb.value); else selectedOrders.delete(cb.value); });
-            mobileCheckboxes.forEach(cb => { cb.checked = selectAllCheckbox.checked; if (selectAllCheckbox.checked) selectedOrders.add(cb.value); else selectedOrders.delete(cb.value); });
+            
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+                if (selectAllCheckbox.checked) selectedOrders.add(cb.value);
+                else selectedOrders.delete(cb.value);
+            });
+            
+            mobileCheckboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+                if (selectAllCheckbox.checked) selectedOrders.add(cb.value);
+                else selectedOrders.delete(cb.value);
+            });
+            
             updateSelectionCount();
         }
 
@@ -1781,6 +2030,89 @@
             selectedOrders.clear();
             if (document.getElementById('select-all-checkbox')) document.getElementById('select-all-checkbox').checked = false;
             updateSelectionCount();
+        }
+
+        // ============ BULK PRINT FUNCTION ============
+        async function printBulkLabels() {
+            if (selectedOrders.size === 0) { 
+                alert("Please select at least one order to print labels."); 
+                return; 
+            }
+            try {
+                const response = await fetch(`${API_BASE}/history`);
+                const allOrders = await response.json();
+                const ordersToPrint = allOrders.filter(o => selectedOrders.has(o.orderId.toString()));
+                if (ordersToPrint.length === 0) { 
+                    alert("No orders found to print."); 
+                    return; 
+                }
+                
+                let bulkHtml = `<div class="bulk-label-container">`;
+                for (let i = 0; i < ordersToPrint.length; i++) {
+                    const order = ordersToPrint[i];
+                    if (i % 4 === 0) { 
+                        if (i > 0) bulkHtml += `</div>`; 
+                        bulkHtml += `<div class="label-grid">`; 
+                    }
+                    bulkHtml += `
+                        <div class="print-label-card">
+                            <div class="label-shop-name">SAARES BY KUHU</div>
+                            <div class="label-order-id">ORDER #${order.orderId}</div>
+                            <div class="label-buyer-section">
+                                <div class="label-section-title">BUYER DETAILS:</div>
+                                <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
+                                <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
+                                <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
+                            </div>
+                            <div class="label-seller-section">
+                                <div class="label-section-title">SENDER DETAILS:</div>
+                                <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                                <div class="label-line">Near-Industrial Area, Purneacity</div>
+                                <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                                <div class="label-line">Phone: +91 9304288748</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                bulkHtml += `</div></div>`;
+                
+                const printContainer = document.getElementById('bulk-label-printout');
+                printContainer.innerHTML = bulkHtml;
+                printContainer.style.display = 'block';
+                window.print();
+                printContainer.style.display = 'none';
+                alert(`${ordersToPrint.length} label(s) printed successfully!`);
+            } catch (error) { 
+                console.error("Error printing bulk labels:", error);
+                alert("Error printing labels. Please try again."); 
+            }
+        }
+
+        // ============ SINGLE PRINT FUNCTION ============
+        function printLabel(order) {
+            const buffer = document.getElementById('shipping-label-printout');
+            buffer.innerHTML = `
+                <div class="shipping-label">
+                    <div class="label-shop-name">SAARES BY KUHU</div>
+                    <div class="label-order-id">ORDER #${order.orderId}</div>
+                    <div class="label-buyer-section">
+                        <div class="label-section-title">BUYER DETAILS:</div>
+                        <div class="label-line">${escapeHtml(order.customerName) || 'N/A'}</div>
+                        <div class="label-line">${escapeHtml(order.address) || 'No Address'}</div>
+                        <div class="label-line">Phone: ${escapeHtml(order.phone) || 'N/A'}</div>
+                    </div>
+                    <div class="label-seller-section">
+                        <div class="label-section-title">SENDER DETAILS:</div>
+                        <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                        <div class="label-line">Near-Industrial Area, Purneacity</div>
+                        <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                        <div class="label-line">Phone: +91 9304288748</div>
+                    </div>
+                </div>
+            `;
+            buffer.style.display = 'block'; 
+            window.print(); 
+            buffer.style.display = 'none';
         }
 
         async function deleteSingleOrder(orderId) {
@@ -1818,22 +2150,44 @@
             const price = document.getElementById('p-price').value;
             const stock = document.getElementById('p-stock').value;
             const description = document.getElementById('p-description').value;
+            
+            // Get uploaded image URLs
             const imageUrls = getUploadedImageUrls();
             const mainImage = imageUrls[0];
+            
             const select = document.getElementById('p-cat');
             const newCategoryInput = document.getElementById('p-cat-new');
             let category = '';
             if (select.style.display !== 'none' && select.value) category = select.value;
             else if (newCategoryInput.style.display !== 'none' && newCategoryInput.value.trim()) category = newCategoryInput.value.trim();
             else category = 'General';
+            
             if (!name || !price || !stock) { alert("Please fill all required fields"); return; }
+            
             try {
-                await fetch(`${API_BASE}/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, price: parseFloat(price), stock: parseInt(stock), category, description: description || '', image: mainImage, images: imageUrls }) });
+                await fetch(`${API_BASE}/products`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ 
+                        name, 
+                        price: parseFloat(price), 
+                        stock: parseInt(stock), 
+                        category, 
+                        description: description || '',
+                        image: mainImage, 
+                        images: imageUrls 
+                    }) 
+                });
+                
+                // Clear form
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-stock').value = '';
                 document.getElementById('p-description').value = '';
+                
+                // Clear image uploads
                 clearImageUploads();
+                
                 const catSelect = document.getElementById('p-cat');
                 const catNewInput = document.getElementById('p-cat-new');
                 const toggleBtn = document.getElementById('toggle-cat-btn');
@@ -1842,6 +2196,7 @@
                 catSelect.value = '';
                 if (toggleBtn) toggleBtn.textContent = '+ New';
                 catNewInput.value = '';
+                
                 loadAll();
                 loadCategories();
                 alert("Product added successfully with " + imageUrls.length + " image(s) and description!");
@@ -1864,6 +2219,7 @@
             } catch (error) { alert("Error updating user"); }
         }
 
+        // Initialize
         checkAdminSession();
     </script>
 </body>
