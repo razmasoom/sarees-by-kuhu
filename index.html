@@ -66,7 +66,7 @@
         .user-dropdown a:hover { background: #f8f9fa; color: #27ae60; }
         .user-dropdown a:last-child { border-bottom: none; }
         
-        /* Logo Styles - BIGGER */
+        /* Logo Styles */
         .logo-container {
             cursor: pointer;
             display: flex;
@@ -149,7 +149,7 @@
             width: 100%;
         }
         
-        /* CART DRAWER - Completely hidden when closed */
+        /* CART DRAWER */
         .cart-drawer {
             display: none !important;
             position: fixed;
@@ -228,9 +228,6 @@
             display: flex;
             gap: 15px;
             margin-top: 10px;
-        }
-        .social-links a {
-            display: inline-block;
         }
         .copyright {
             text-align: center;
@@ -351,72 +348,23 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
-        /* ========== MOBILE STYLES ========== */
+        /* Mobile Styles */
         @media screen and (max-width: 768px) {
-            .store-logo {
-                height: 75px;
-                max-width: 240px;
-            }
-            header {
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                gap: 12px;
-                padding: 12px;
-            }
-            .logo-container {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-            }
+            .store-logo { height: 75px; max-width: 240px; }
+            header { flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 12px; padding: 12px; }
+            .logo-container { display: flex; justify-content: center; width: 100%; }
             #search-bar { width: 90%; margin: 0 auto; }
-            header > div:last-child {
-                display: inline-block;
-                background: #f0c14b;
-                color: #111;
-                padding: 8px 20px;
-                border-radius: 8px;
-                font-weight: bold;
-            }
-            #shop-container {
-                padding: 15px;
-                gap: 12px;
-            }
-            .product-card {
-                width: calc(50% - 6px);
-                min-width: auto;
-                padding: 10px;
-            }
+            header > div:last-child { display: inline-block; background: #f0c14b; color: #111; padding: 8px 20px; border-radius: 8px; font-weight: bold; }
+            #shop-container { padding: 15px; gap: 12px; }
+            .product-card { width: calc(50% - 6px); min-width: auto; padding: 10px; }
             .product-card img { height: 120px; }
             .product-card h3 { font-size: 12px; }
             .view-details-btn { font-size: 11px; padding: 6px 10px; }
-            .category-nav {
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                justify-content: flex-start;
-                -webkit-overflow-scrolling: touch;
-            }
+            .category-nav { overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; -webkit-overflow-scrolling: touch; }
             .cat-btn { white-space: nowrap; }
-            .user-bar { 
-                padding: 8px 12px; 
-                text-align: center; 
-                font-size: 12px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-            }
+            .user-bar { padding: 8px 12px; text-align: center; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
             .store-name-header { float: none; display: block; margin-bottom: 5px; }
-            .user-bar a {
-                display: inline-block;
-                margin: 0 8px;
-                background: #f0c14b;
-                color: #111 !important;
-                padding: 6px 15px;
-                border-radius: 6px;
-                text-decoration: none;
-            }
+            .user-bar a { display: inline-block; margin: 0 8px; background: #f0c14b; color: #111 !important; padding: 6px 15px; border-radius: 6px; text-decoration: none; }
             .footer { padding: 20px 15px; }
             .footer-content { flex-direction: column; gap: 20px; text-align: center; }
             .footer-section { text-align: center; }
@@ -522,15 +470,15 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL -->
+    <!-- SUCCESS MODAL - Using window.location directly -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content">
             <div class="success-icon">✅</div>
             <h3>Order Placed Successfully!</h3>
             <p>Your order has been confirmed and will be processed soon.</p>
             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="closeSuccessModalAndContinue()">🛍️ Continue Shopping</button>
-                <button onclick="closeSuccessModalAndViewOrders()" class="view-orders-btn">📋 View My Orders</button>
+                <button onclick="document.getElementById('successModal').classList.remove('show'); showStorefront(); loadProducts();">🛍️ Continue Shopping</button>
+                <button onclick="viewOrdersAfterSuccess()" class="view-orders-btn">📋 View My Orders</button>
             </div>
         </div>
     </div>
@@ -555,7 +503,7 @@
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <a onclick="showStorefront()">Shop Now</a>
-                <a onclick="toggleOrderHistoryView()">My Orders</a>
+                <a onclick="viewOrdersDirect()">My Orders</a>
                 <a onclick="openContactModal()">Contact Us</a>
                 <a onclick="openProfileModal()">My Profile</a>
             </div>
@@ -582,7 +530,6 @@
         let allProducts = [];
         let currentCategory = 'All';
 
-        // Helper function
         function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
         
         function showMessage(msg, isErr = false) {
@@ -594,19 +541,64 @@
             setTimeout(() => d.remove(), 3000);
         }
 
-        // ============ SUCCESS MODAL HANDLERS ============
-        function closeSuccessModalAndContinue() {
-            const modal = document.getElementById('successModal');
-            modal.classList.remove('show');
-            showStorefront();
-            loadProducts();
+        // ============ ORDER VIEW FUNCTION - DIRECT APPROACH ============
+        async function viewOrdersDirect() {
+            const username = localStorage.getItem('user');
+            if (!username) { 
+                alert("Please login first"); 
+                window.location.href = "auth.html"; 
+                return; 
+            }
+            
+            // Hide shop view, show orders view
+            document.getElementById('shop-container').style.display = 'none';
+            document.getElementById('category-menu').style.display = 'none';
+            document.getElementById('search-bar').style.display = 'none';
+            document.getElementById('orders-history-container').style.display = 'block';
+            
+            try {
+                const res = await fetch(`${API_BASE}/history`);
+                const orders = await res.json();
+                const userOrders = orders.filter(o => o.username === username).reverse();
+                
+                if (userOrders.length === 0) { 
+                    document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; 
+                    return; 
+                }
+                
+                document.getElementById('history-items-list').innerHTML = userOrders.map(o => `
+                    <div class="order-history-card">
+                        <div class="order-history-header" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <span>🆔 Order #${o.orderId}</span>
+                            <span>📅 ${o.date || 'N/A'}</span>
+                        </div>
+                        <div><strong>${escapeHtml(o.productName)}</strong> x ${o.quantity} = ₹${o.totalPrice}</div>
+                        <div>Status: ${o.status}</div>
+                        ${o.trackingId ? `<div class="tracking-info">📦 Tracking: ${o.trackingId}</div>` : ''}
+                        ${o.status === 'Pending' ? `<button class="cancel-order-btn" onclick="requestCancellation(${o.orderId})">❌ Request Cancellation</button>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">Error loading orders. Please try again.</p>';
+            }
         }
         
-        function closeSuccessModalAndViewOrders() {
-            const modal = document.getElementById('successModal');
-            modal.classList.remove('show');
-            // Directly call the order history function
-            toggleOrderHistoryView();
+        // Wrapper for success modal
+        function viewOrdersAfterSuccess() {
+            document.getElementById('successModal').classList.remove('show');
+            viewOrdersDirect();
+        }
+        
+        // Keep old function name for compatibility
+        const toggleOrderHistoryView = viewOrdersDirect;
+        
+        async function requestCancellation(orderId) {
+            if (!confirm("Request cancellation for this order?")) return;
+            const res = await fetch(`${API_BASE}/orders/${orderId}/request-cancel`, { method: 'POST' });
+            const result = await res.json();
+            alert(result.message);
+            viewOrdersDirect();
         }
 
         // ============ AUTH ============
@@ -619,7 +611,7 @@
                         <span class="user-name" onclick="toggleUserDropdown()">👤 Welcome, <b>${escapeHtml(loggedInUser)}</b> ▼</span>
                         <div id="userDropdown" class="user-dropdown">
                             <a onclick="openProfileModal(); closeDropdown()">👤 My Profile</a>
-                            <a onclick="toggleOrderHistoryView(); closeDropdown()">📋 My Orders</a>
+                            <a onclick="viewOrdersDirect(); closeDropdown()">📋 My Orders</a>
                             <a onclick="openContactModal(); closeDropdown()">📞 Contact</a>
                             <a onclick="logout()">🚪 Logout</a>
                         </div>
@@ -743,40 +735,6 @@
         function filterCategory(cat) { currentCategory = cat; loadProducts(); }
         function goToProductPage(id) { window.location.href = `product.html?id=${id}`; }
         
-        // ============ ORDERS ============
-        async function toggleOrderHistoryView() {
-            const username = localStorage.getItem('user');
-            if (!username) { alert("Please login"); window.location.href = "auth.html"; return; }
-            document.getElementById('shop-container').style.display = 'none';
-            document.getElementById('category-menu').style.display = 'none';
-            document.getElementById('search-bar').style.display = 'none';
-            document.getElementById('orders-history-container').style.display = 'block';
-            const res = await fetch(`${API_BASE}/history`);
-            const orders = await res.json();
-            const userOrders = orders.filter(o => o.username === username).reverse();
-            if (userOrders.length === 0) { document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; return; }
-            document.getElementById('history-items-list').innerHTML = userOrders.map(o => `
-                <div class="order-history-card">
-                    <div class="order-history-header" style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span>🆔 Order #${o.orderId}</span>
-                        <span>📅 ${o.date || 'N/A'}</span>
-                    </div>
-                    <div><strong>${escapeHtml(o.productName)}</strong> x ${o.quantity} = ₹${o.totalPrice}</div>
-                    <div>Status: ${o.status}</div>
-                    ${o.trackingId ? `<div class="tracking-info">📦 Tracking: ${o.trackingId}</div>` : ''}
-                    ${o.status === 'Pending' ? `<button class="cancel-order-btn" onclick="requestCancellation(${o.orderId})">❌ Request Cancellation</button>` : ''}
-                </div>
-            `).join('');
-        }
-        
-        async function requestCancellation(orderId) {
-            if (!confirm("Request cancellation for this order?")) return;
-            const res = await fetch(`${API_BASE}/orders/${orderId}/request-cancel`, { method: 'POST' });
-            const result = await res.json();
-            alert(result.message);
-            toggleOrderHistoryView();
-        }
-        
         // ============ CHECKOUT ============
         function loadProfileForShipping() {
             const user = localStorage.getItem('user');
@@ -872,7 +830,6 @@
                                 if (orderSuccess) {
                                     cart = [];
                                     updateCartUI();
-                                    // Show success modal
                                     document.getElementById('successModal').classList.add('show');
                                 } else {
                                     alert("Payment verified but order placement had issues. Please contact support.");
@@ -897,7 +854,6 @@
                     alert("Payment failed: " + e.message); 
                 }
             } else {
-                // Test mode
                 showMessage("⏳ Processing test order...", false);
                 const orderSuccess = await placeOrder("test_payment", name, phone, address);
                 if (orderSuccess) {
