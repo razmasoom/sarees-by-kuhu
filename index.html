@@ -13,6 +13,7 @@
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; }
         
+        /* User Profile Bar */
         .user-bar {
             background: #131921;
             color: #ccc;
@@ -65,6 +66,7 @@
         .user-dropdown a:hover { background: #f8f9fa; color: #27ae60; }
         .user-dropdown a:last-child { border-bottom: none; }
         
+        /* Logo Styles - BIGGER */
         .logo-container {
             cursor: pointer;
             display: flex;
@@ -77,6 +79,7 @@
             object-fit: contain;
         }
         
+        /* Header */
         header {
             background: #232f3e;
             color: white;
@@ -92,6 +95,7 @@
         }
         #search-bar { padding: 10px; border-radius: 5px; border: none; width: 300px; outline: none; }
         
+        /* Category Menu */
         .category-nav {
             background: #37475a;
             padding: 10px;
@@ -110,6 +114,7 @@
         }
         .cat-btn:hover, .cat-btn.active { background: white; color: #232f3e; }
         
+        /* Product Grid */
         #shop-container {
             display: flex;
             flex-wrap: wrap;
@@ -144,6 +149,7 @@
             width: 100%;
         }
         
+        /* CART DRAWER - Completely hidden when closed */
         .cart-drawer {
             display: none !important;
             position: fixed;
@@ -158,7 +164,9 @@
             z-index: 10000;
             overflow-y: auto;
         }
-        .cart-drawer.open { display: block !important; }
+        .cart-drawer.open {
+            display: block !important;
+        }
         .close-btn {
             cursor: pointer;
             float: right;
@@ -181,6 +189,7 @@
         .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; }
         
+        /* Footer Styles */
         .footer {
             background: #232f3e;
             color: #ccc;
@@ -196,13 +205,42 @@
             flex-wrap: wrap;
             gap: 30px;
         }
-        .footer-section { flex: 1; min-width: 200px; text-align: left; }
-        .footer-section h3 { color: #f0c14b; margin-bottom: 15px; }
-        .footer-section p, .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; }
-        .footer-section a:hover { color: #f0c14b; }
-        .social-links { display: flex; gap: 15px; margin-top: 10px; }
-        .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #37475a; font-size: 12px; }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+        }
+        .footer-section h3 {
+            color: #f0c14b;
+            margin-bottom: 15px;
+        }
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .footer-section a:hover {
+            color: #f0c14b;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .social-links a {
+            display: inline-block;
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #37475a;
+            font-size: 12px;
+        }
         
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -238,6 +276,7 @@
             cursor: pointer;
         }
         
+        /* Success Modal */
         .success-modal {
             display: none;
             position: fixed;
@@ -271,6 +310,7 @@
         }
         .success-modal-content .view-orders-btn { background: #3498db; }
         
+        /* Order History */
         .order-history-card {
             background: white;
             border-radius: 8px;
@@ -293,6 +333,7 @@
             margin-top: 10px;
         }
         
+        /* Toast Message */
         .cart-message {
             position: fixed;
             bottom: 20px;
@@ -310,27 +351,78 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
+        /* ========== MOBILE STYLES ========== */
         @media screen and (max-width: 768px) {
-            .store-logo { height: 75px; max-width: 240px; }
-            header { flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 12px; padding: 12px; }
-            .logo-container { display: flex; justify-content: center; width: 100%; }
+            .store-logo {
+                height: 75px;
+                max-width: 240px;
+            }
+            header {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                gap: 12px;
+                padding: 12px;
+            }
+            .logo-container {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
             #search-bar { width: 90%; margin: 0 auto; }
-            header > div:last-child { display: inline-block; background: #f0c14b; color: #111; padding: 8px 20px; border-radius: 8px; font-weight: bold; }
-            #shop-container { padding: 15px; gap: 12px; }
-            .product-card { width: calc(50% - 6px); min-width: auto; padding: 10px; }
+            header > div:last-child {
+                display: inline-block;
+                background: #f0c14b;
+                color: #111;
+                padding: 8px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+            #shop-container {
+                padding: 15px;
+                gap: 12px;
+            }
+            .product-card {
+                width: calc(50% - 6px);
+                min-width: auto;
+                padding: 10px;
+            }
             .product-card img { height: 120px; }
             .product-card h3 { font-size: 12px; }
             .view-details-btn { font-size: 11px; padding: 6px 10px; }
-            .category-nav { overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
+            .category-nav {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
             .cat-btn { white-space: nowrap; }
-            .user-bar { padding: 8px 12px; text-align: center; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+            .user-bar { 
+                padding: 8px 12px; 
+                text-align: center; 
+                font-size: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
             .store-name-header { float: none; display: block; margin-bottom: 5px; }
-            .user-bar a { display: inline-block; margin: 0 8px; background: #f0c14b; color: #111 !important; padding: 6px 15px; border-radius: 6px; text-decoration: none; }
+            .user-bar a {
+                display: inline-block;
+                margin: 0 8px;
+                background: #f0c14b;
+                color: #111 !important;
+                padding: 6px 15px;
+                border-radius: 6px;
+                text-decoration: none;
+            }
             .footer { padding: 20px 15px; }
             .footer-content { flex-direction: column; gap: 20px; text-align: center; }
             .footer-section { text-align: center; }
             .success-modal-content { padding: 25px; margin: 15px; }
             .success-icon { font-size: 55px; }
+            .cart-message { left: 20px; right: 20px; bottom: 80px; text-align: center; }
         }
         
         @media screen and (max-width: 480px) {
@@ -364,6 +456,7 @@
 
     <nav class="category-nav" id="category-menu"></nav>
 
+    <!-- CART DRAWER -->
     <div class="cart-drawer" id="cart-view">
         <span class="close-btn" onclick="toggleCart()">&times;</span>
         <h3>Your Shopping Cart</h3>
@@ -429,15 +522,15 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL - Using direct onclick with window.location -->
+    <!-- SUCCESS MODAL -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content">
             <div class="success-icon">✅</div>
             <h3>Order Placed Successfully!</h3>
             <p>Your order has been confirmed and will be processed soon.</p>
             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button id="continueShopBtn">🛍️ Continue Shopping</button>
-                <button id="viewOrdersBtn" class="view-orders-btn">📋 View My Orders</button>
+                <button onclick="closeSuccessModalAndContinue()">🛍️ Continue Shopping</button>
+                <button onclick="closeSuccessModalAndViewOrders()" class="view-orders-btn">📋 View My Orders</button>
             </div>
         </div>
     </div>
@@ -452,6 +545,7 @@
         <div id="history-items-list">Loading orders...</div>
     </div>
 
+    <!-- Footer -->
     <div class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -509,11 +603,9 @@
                 return; 
             }
             
-            // Hide shop elements
             document.getElementById('shop-container').style.display = 'none';
             document.getElementById('category-menu').style.display = 'none';
             document.getElementById('search-bar').style.display = 'none';
-            // Show orders container
             document.getElementById('orders-history-container').style.display = 'block';
             
             try {
@@ -544,27 +636,16 @@
             }
         };
         
-        // Setup modal buttons - SIMPLE DIRECT APPROACH
-        function setupModalButtons() {
-            const continueBtn = document.getElementById('continueShopBtn');
-            const viewOrdersBtn = document.getElementById('viewOrdersBtn');
-            
-            if (continueBtn) {
-                continueBtn.onclick = function() {
-                    document.getElementById('successModal').classList.remove('show');
-                    showStorefront();
-                    loadProducts();
-                };
-            }
-            
-            if (viewOrdersBtn) {
-                viewOrdersBtn.onclick = function() {
-                    console.log("View Orders button clicked - closing modal and showing orders");
-                    document.getElementById('successModal').classList.remove('show');
-                    // Direct call to view orders
-                    viewOrdersDirect();
-                };
-            }
+        // Success modal handlers
+        function closeSuccessModalAndContinue() {
+            document.getElementById('successModal').classList.remove('show');
+            showStorefront();
+            loadProducts();
+        }
+        
+        function closeSuccessModalAndViewOrders() {
+            document.getElementById('successModal').classList.remove('show');
+            viewOrdersDirect();
         }
         
         async function requestCancellation(orderId) {
@@ -614,6 +695,10 @@
             document.getElementById('category-menu').style.display = 'flex';
             document.getElementById('search-bar').style.display = 'block';
             filterProducts();
+            // Remove the URL parameter when going back to shop
+            const url = new URL(window.location.href);
+            url.searchParams.delete('showOrders');
+            window.history.replaceState({}, '', url);
         }
         
         // ============ CART ============
@@ -804,11 +889,7 @@
                                 if (orderSuccess) {
                                     cart = [];
                                     updateCartUI();
-                                    // Show success modal
-                                    const modal = document.getElementById('successModal');
-                                    modal.classList.add('show');
-                                    // Setup buttons after modal is shown
-                                    setTimeout(setupModalButtons, 100);
+                                    document.getElementById('successModal').classList.add('show');
                                 } else {
                                     alert("Payment verified but order placement had issues. Please contact support.");
                                 }
@@ -837,9 +918,7 @@
                 if (orderSuccess) {
                     cart = [];
                     updateCartUI();
-                    const modal = document.getElementById('successModal');
-                    modal.classList.add('show');
-                    setTimeout(setupModalButtons, 100);
+                    document.getElementById('successModal').classList.add('show');
                 } else {
                     alert("[TEST MODE] Order placement failed. Please try again.");
                 }
@@ -879,6 +958,24 @@
             if (saved) { cart = JSON.parse(saved); updateCartUI(); }
         }
         
+        // ============ CHECK URL PARAMETER FOR ORDERS PAGE ============
+        function checkUrlForOrders() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('showOrders') === 'true') {
+                // Small delay to ensure products and user are loaded
+                setTimeout(function() {
+                    const username = localStorage.getItem('user');
+                    if (username) {
+                        viewOrdersDirect();
+                    } else {
+                        // If not logged in, redirect to auth page
+                        alert("Please login to view your orders");
+                        window.location.href = "auth.html";
+                    }
+                }, 500);
+            }
+        }
+        
         window.onclick = function(e) {
             const modals = ['shippingModal', 'profileModal', 'contactModal'];
             modals.forEach(id => {
@@ -899,7 +996,7 @@
         checkAuth();
         loadProducts();
         loadCart();
-        setupModalButtons();
+        checkUrlForOrders();  // This handles the ?showOrders=true parameter
     </script>
 </body>
 </html>
