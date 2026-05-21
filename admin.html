@@ -596,7 +596,7 @@
             #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
         }
         
- /* Label Styles - TO right-aligned from center, FROM left-aligned */
+/* Label Styles - TO starts from center line, FROM on left */
 .shipping-label {
     width: 600px;
     min-height: 350px;
@@ -624,24 +624,39 @@
     margin-bottom: 40px;
 }
 
-/* TO Section - Starts from center, aligned to right */
-.label-to-section {
-    text-align: right;
-    width: 50%;
-    margin-left: auto;
-    margin-right: 0;
-    margin-bottom: 35px;
-    padding-right: 10px;
+/* Container for both sections - creates the center line */
+.label-sections-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+/* Center line visual (optional - for debugging, remove if not needed) */
+.label-sections-container::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    border-left: 1px dashed #ccc;
+    opacity: 0.3;
+}
+
+/* FROM Section - takes left half (0% to 50%) */
+.label-from-section {
+    text-align: left;
+    width: 48%;
+    margin-right: auto;
     word-wrap: break-word;
     white-space: normal;
 }
 
-/* FROM Section - Left aligned */
-.label-from-section {
+/* TO Section - takes right half (50% to 100%), starts from center line */
+.label-to-section {
     text-align: left;
-    margin-left: 0;
-    margin-right: auto;
-    width: 50%;
+    width: 48%;
+    margin-left: auto;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -653,16 +668,16 @@
     text-decoration: underline;
 }
 
-/* TO section title and text are right-aligned */
+/* TO section title and text - left aligned within its container */
 .label-to-section .label-section-title {
-    text-align: right;
+    text-align: left;
 }
 
 .label-to-section .label-line {
-    text-align: right;
+    text-align: left;
 }
 
-/* FROM section title and text are left-aligned */
+/* FROM section title and text - left aligned */
 .label-from-section .label-section-title {
     text-align: left;
 }
@@ -721,24 +736,23 @@
     margin-bottom: 30px;
 }
 
-/* TO Section - Starts from center, right-aligned for bulk labels */
-.print-label-card .label-to-section {
-    text-align: right;
-    width: 50%;
-    margin-left: auto;
-    margin-right: 0;
-    margin-bottom: 30px;
-    padding-right: 10px;
+/* Container for both sections in bulk labels */
+.print-label-card .label-sections-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.print-label-card .label-from-section {
+    text-align: left;
+    width: 48%;
     word-wrap: break-word;
     white-space: normal;
 }
 
-/* FROM Section - Left aligned for bulk labels */
-.print-label-card .label-from-section {
+.print-label-card .label-to-section {
     text-align: left;
-    margin-left: 0;
-    margin-right: auto;
-    width: 50%;
+    width: 48%;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -751,11 +765,11 @@
 }
 
 .print-label-card .label-to-section .label-section-title {
-    text-align: right;
+    text-align: left;
 }
 
 .print-label-card .label-to-section .label-line {
-    text-align: right;
+    text-align: left;
 }
 
 .print-label-card .label-from-section .label-section-title {
@@ -780,6 +794,10 @@
     .shipping-label, .print-label-card {
         page-break-inside: avoid;
         break-inside: avoid;
+    }
+    /* Hide the center line when printing */
+    .label-sections-container::before {
+        display: none;
     }
 }
 
@@ -2175,18 +2193,20 @@ async function printBulkLabels() {
                 <div class="print-label-card">
                     <div class="label-shop-name">SAARES BY KUHU</div>
                     <div class="label-order-id">ORDER #${order.orderId}</div>
-                    <div class="label-to-section">
-                        <div class="label-section-title">TO:</div>
-                        <div class="label-line">${safeName}</div>
-                        <div class="label-line">${safeAddress}</div>
-                        <div class="label-line">Phone: ${safePhone}</div>
-                    </div>
-                    <div class="label-from-section">
-                        <div class="label-section-title">FROM:</div>
-                        <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                        <div class="label-line">Near-Industrial Area, Purneacity</div>
-                        <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                        <div class="label-line">Phone: +91 9304288748</div>
+                    <div class="label-sections-container">
+                        <div class="label-from-section">
+                            <div class="label-section-title">FROM:</div>
+                            <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                            <div class="label-line">Near-Industrial Area, Purneacity</div>
+                            <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                            <div class="label-line">Phone: +91 9304288748</div>
+                        </div>
+                        <div class="label-to-section">
+                            <div class="label-section-title">TO:</div>
+                            <div class="label-line">${safeName}</div>
+                            <div class="label-line">${safeAddress}</div>
+                            <div class="label-line">Phone: ${safePhone}</div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2220,18 +2240,20 @@ async function printBulkLabels() {
         <div class="shipping-label">
             <div class="label-shop-name">SAARES BY KUHU</div>
             <div class="label-order-id">ORDER #${order.orderId}</div>
-            <div class="label-to-section">
-                <div class="label-section-title">TO:</div>
-                <div class="label-line">${safeName}</div>
-                <div class="label-line">${safeAddress}</div>
-                <div class="label-line">Phone: ${safePhone}</div>
-            </div>
-            <div class="label-from-section">
-                <div class="label-section-title">FROM:</div>
-                <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                <div class="label-line">Near-Industrial Area, Purneacity</div>
-                <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                <div class="label-line">Phone: +91 9304288748</div>
+            <div class="label-sections-container">
+                <div class="label-from-section">
+                    <div class="label-section-title">FROM:</div>
+                    <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                    <div class="label-line">Near-Industrial Area, Purneacity</div>
+                    <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                    <div class="label-line">Phone: +91 9304288748</div>
+                </div>
+                <div class="label-to-section">
+                    <div class="label-section-title">TO:</div>
+                    <div class="label-line">${safeName}</div>
+                    <div class="label-line">${safeAddress}</div>
+                    <div class="label-line">Phone: ${safePhone}</div>
+                </div>
             </div>
         </div>
     `;
@@ -2239,7 +2261,6 @@ async function printBulkLabels() {
     window.print();
     buffer.style.display = 'none';
 }
-
         async function updateStock(productId) {
             const changeAmount = parseInt(document.getElementById(`stock-change-${productId}`).value);
             if (isNaN(changeAmount) || changeAmount === 0) { alert("Enter valid number (+ to add, - to subtract)"); return; }
