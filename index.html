@@ -13,6 +13,17 @@
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; }
         
+        /* Hide shop elements initially if showing orders - FIX FOR NO FLICKER */
+        body.show-orders-initially #shop-container,
+        body.show-orders-initially .category-nav,
+        body.show-orders-initially #search-bar,
+        body.show-orders-initially header > div:last-child {
+            display: none !important;
+        }
+        body.show-orders-initially #orders-history-container {
+            display: block !important;
+        }
+        
         /* User Profile Bar */
         .user-bar {
             background: #131921;
@@ -333,6 +344,11 @@
             margin-top: 10px;
         }
         
+        /* Order History Container - Hidden by default */
+        #orders-history-container {
+            display: none;
+        }
+        
         /* Toast Message */
         .cart-message {
             position: fixed;
@@ -423,6 +439,7 @@
             .success-modal-content { padding: 25px; margin: 15px; }
             .success-icon { font-size: 55px; }
             .cart-message { left: 20px; right: 20px; bottom: 80px; text-align: center; }
+            body.show-orders-initially .user-bar { margin-bottom: 0; }
         }
         
         @media screen and (max-width: 480px) {
@@ -537,7 +554,7 @@
 
     <div id="shop-container"></div>
 
-    <div id="orders-history-container" style="display: none; max-width: 800px; margin: 30px auto; padding: 0 15px;">
+    <div id="orders-history-container" style="max-width: 800px; margin: 30px auto; padding: 0 15px;">
         <div class="history-heading" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Your Order History & Tracking Details</h2>
             <button onclick="showStorefront()" style="background:#37475a; color:white; border:none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">← Back to Shopping</button>
@@ -603,10 +620,15 @@
                 return; 
             }
             
+            // Hide shop elements, show orders container
             document.getElementById('shop-container').style.display = 'none';
             document.getElementById('category-menu').style.display = 'none';
             document.getElementById('search-bar').style.display = 'none';
             document.getElementById('orders-history-container').style.display = 'block';
+            
+            // Also hide cart button in header on orders page
+            const cartHeader = document.querySelector('header > div:last-child');
+            if (cartHeader) cartHeader.style.display = 'none';
             
             try {
                 const res = await fetch(`${API_BASE}/history`);
@@ -646,6 +668,10 @@
         function closeSuccessModalAndViewOrders() {
             document.getElementById('successModal').classList.remove('show');
             viewOrdersDirect();
+            // Remove the URL parameter
+            const url = new URL(window.location.href);
+            url.searchParams.delete('showOrders');
+            window.history.replaceState({}, '', url);
         }
         
         async function requestCancellation(orderId) {
@@ -694,11 +720,16 @@
             document.getElementById('shop-container').style.display = 'flex';
             document.getElementById('category-menu').style.display = 'flex';
             document.getElementById('search-bar').style.display = 'block';
+            // Show cart button again
+            const cartHeader = document.querySelector('header > div:last-child');
+            if (cartHeader) cartHeader.style.display = 'block';
             filterProducts();
             // Remove the URL parameter when going back to shop
             const url = new URL(window.location.href);
             url.searchParams.delete('showOrders');
             window.history.replaceState({}, '', url);
+            // Remove the CSS class that hides elements
+            document.body.classList.remove('show-orders-initially');
         }
         
         // ============ CART ============
@@ -958,21 +989,23 @@
             if (saved) { cart = JSON.parse(saved); updateCartUI(); }
         }
         
-        // ============ CHECK URL PARAMETER FOR ORDERS PAGE ============
+        // ============ CHECK URL PARAMETER FOR ORDERS PAGE - NO FLICKER ============
         function checkUrlForOrders() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('showOrders') === 'true') {
-                // Small delay to ensure products and user are loaded
-                setTimeout(function() {
-                    const username = localStorage.getItem('user');
-                    if (username) {
+                // Add class to body immediately to hide shop elements BEFORE any rendering
+                document.body.classList.add('show-orders-initially');
+                
+                const username = localStorage.getItem('user');
+                if (username) {
+                    // Load orders immediately
+                    setTimeout(function() {
                         viewOrdersDirect();
-                    } else {
-                        // If not logged in, redirect to auth page
-                        alert("Please login to view your orders");
-                        window.location.href = "auth.html";
-                    }
-                }, 500);
+                    }, 50);
+                } else {
+                    alert("Please login to view your orders");
+                    window.location.href = "auth.html";
+                }
             }
         }
         
@@ -996,7 +1029,7 @@
         checkAuth();
         loadProducts();
         loadCart();
-        checkUrlForOrders();  // This handles the ?showOrders=true parameter
+        checkUrlForOrders();  // This now hides shop BEFORE rendering
     </script>
 </body>
 </html>
