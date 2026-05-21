@@ -597,7 +597,7 @@
         }
         
         /* Single Label Style */
-    .shipping-label {
+ .shipping-label {
     width: 600px;
     min-height: 350px;
     border: 2px solid #000;
@@ -605,81 +605,65 @@
     font-family: 'Courier New', monospace;
     background: white;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    box-sizing: border-box;
 }
 
 .label-shop-name {
     text-align: center;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
-    border-bottom: 1px dashed #ccc;
-    padding-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .label-order-id {
     text-align: center;
     font-size: 14px;
     font-weight: bold;
-    margin: 8px 0 30px 0;
+    margin-bottom: 40px;
 }
 
-/* Two-column layout - TO on top right, FROM on bottom left */
-.label-container {
-    position: relative;
-    flex: 1;
-    min-height: 250px;
-}
-
-/* TO Section - RIGHT side, TOP aligned */
-.label-buyer-section {
-    position: absolute;
-    top: 0;
-    right: 0;
-    text-align: right;
-    max-width: 45%;
-}
-
-/* FROM Section - LEFT side, BOTTOM aligned */
-.label-seller-section {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+/* TO Section - Starts from center, but has max-width to prevent crossing right edge */
+.label-to-section {
     text-align: left;
-    max-width: 45%;
+    margin-left: 250px;
+    margin-bottom: 35px;
+    max-width: calc(100% - 250px - 20px);
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* FROM Section - Normal left alignment */
+.label-from-section {
+    text-align: left;
+    margin-left: 0;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 .label-section-title {
     font-weight: bold;
     margin-bottom: 8px;
-    font-size: 13px;
+    font-size: 14px;
     text-decoration: underline;
 }
 
 .label-line {
     margin: 4px 0;
-    font-size: 11px;
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.5;
     word-wrap: break-word;
     white-space: normal;
+    overflow-wrap: break-word;
 }
 
-/* For buyer section (right-aligned) */
-.label-buyer-section .label-line {
-    text-align: right;
-}
-
-/* For seller section (left-aligned) */
-.label-seller-section .label-line {
-    text-align: left;
-}
         /* Bulk Label Container */
-    .bulk-label-container {
+.bulk-label-container {
     width: 100%;
     background: white;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .label-grid {
@@ -697,71 +681,59 @@
     min-height: 350px;
     background: white;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    box-sizing: border-box;
 }
 
 .print-label-card .label-shop-name {
     text-align: center;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     text-transform: uppercase;
-    border-bottom: 1px dashed #ccc;
-    padding-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .print-label-card .label-order-id {
     text-align: center;
     font-size: 12px;
     font-weight: bold;
-    margin: 6px 0 20px 0;
+    margin-bottom: 30px;
 }
 
-.print-label-card .label-container {
-    position: relative;
-    flex: 1;
-    min-height: 220px;
-}
-
-.print-label-card .label-buyer-section {
-    position: absolute;
-    top: 0;
-    right: 0;
-    text-align: right;
-    max-width: 48%;
-}
-
-.print-label-card .label-seller-section {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+/* TO Section - Centered with boundary for bulk labels */
+.print-label-card .label-to-section {
     text-align: left;
-    max-width: 48%;
+    margin-left: 120px;
+    margin-bottom: 30px;
+    max-width: calc(100% - 120px - 15px);
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* FROM Section - Left aligned for bulk labels */
+.print-label-card .label-from-section {
+    text-align: left;
+    margin-left: 0;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 .print-label-card .label-section-title {
     font-weight: bold;
     margin-bottom: 6px;
-    font-size: 11px;
+    font-size: 12px;
     text-decoration: underline;
 }
 
 .print-label-card .label-line {
     margin: 3px 0;
-    font-size: 9px;
-    line-height: 1.3;
+    font-size: 10px;
+    line-height: 1.4;
     word-wrap: break-word;
     white-space: normal;
+    overflow-wrap: break-word;
 }
 
-.print-label-card .label-buyer-section .label-line {
-    text-align: right;
-}
-
-.print-label-card .label-seller-section .label-line {
-    text-align: left;
-}
         /* ========== FOOTER STYLES ========== */
         .footer {
             background: #232f3e;
@@ -2121,7 +2093,7 @@
         }
 
         // ============ BULK PRINT FUNCTION ============
-    async function printBulkLabels() {
+ async function printBulkLabels() {
     if (selectedOrders.size === 0) {
         alert("Please select at least one order to print labels.");
         return;
@@ -2143,7 +2115,10 @@
                 bulkHtml += `<div class="label-grid">`;
             }
             
-            const safeAddress = (order.address || 'No Address').replace(/\n/g, '<br>');
+            let safeAddress = (order.address || 'No Address');
+            safeAddress = safeAddress.replace(/\n/g, '<br>');
+            safeAddress = safeAddress.replace(/([^\s]{20})/g, '$1​');
+            
             const safeName = escapeHtml(order.customerName) || 'N/A';
             const safePhone = escapeHtml(order.phone) || 'N/A';
             
@@ -2151,20 +2126,18 @@
                 <div class="print-label-card">
                     <div class="label-shop-name">SAARES BY KUHU</div>
                     <div class="label-order-id">ORDER #${order.orderId}</div>
-                    <div class="label-container">
-                        <div class="label-buyer-section">
-                            <div class="label-section-title">🎯 TO:</div>
-                            <div class="label-line">${safeName}</div>
-                            <div class="label-line">${safeAddress}</div>
-                            <div class="label-line">Phone: ${safePhone}</div>
-                        </div>
-                        <div class="label-seller-section">
-                            <div class="label-section-title">📦 FROM:</div>
-                            <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                            <div class="label-line">Near-Industrial Area, Purneacity</div>
-                            <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                            <div class="label-line">Phone: +91 9304288748</div>
-                        </div>
+                    <div class="label-to-section">
+                        <div class="label-section-title">TO:</div>
+                        <div class="label-line">${safeName}</div>
+                        <div class="label-line">${safeAddress}</div>
+                        <div class="label-line">Phone: ${safePhone}</div>
+                    </div>
+                    <div class="label-from-section">
+                        <div class="label-section-title">FROM:</div>
+                        <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                        <div class="label-line">Near-Industrial Area, Purneacity</div>
+                        <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                        <div class="label-line">Phone: +91 9304288748</div>
                     </div>
                 </div>
             `;
@@ -2185,8 +2158,13 @@
         // ============ SINGLE PRINT FUNCTION ============
      function printLabel(order) {
     const buffer = document.getElementById('shipping-label-printout');
-    // Handle long addresses with line breaks
-    const safeAddress = (order.address || 'No Address').replace(/\n/g, '<br>');
+    // Handle long addresses with line breaks - preserve existing line breaks
+    let safeAddress = (order.address || 'No Address');
+    // Convert existing line breaks to <br>
+    safeAddress = safeAddress.replace(/\n/g, '<br>');
+    // Also handle any long words by adding zero-width spaces (helps with breaking)
+    safeAddress = safeAddress.replace(/([^\s]{20})/g, '$1​');
+    
     const safeName = escapeHtml(order.customerName) || 'N/A';
     const safePhone = escapeHtml(order.phone) || 'N/A';
     
@@ -2194,20 +2172,18 @@
         <div class="shipping-label">
             <div class="label-shop-name">SAARES BY KUHU</div>
             <div class="label-order-id">ORDER #${order.orderId}</div>
-            <div class="label-container">
-                <div class="label-buyer-section">
-                    <div class="label-section-title">🎯 TO:</div>
-                    <div class="label-line">${safeName}</div>
-                    <div class="label-line">${safeAddress}</div>
-                    <div class="label-line">Phone: ${safePhone}</div>
-                </div>
-                <div class="label-seller-section">
-                    <div class="label-section-title">📦 FROM:</div>
-                    <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
-                    <div class="label-line">Near-Industrial Area, Purneacity</div>
-                    <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
-                    <div class="label-line">Phone: +91 9304288748</div>
-                </div>
+            <div class="label-to-section">
+                <div class="label-section-title">TO:</div>
+                <div class="label-line">${safeName}</div>
+                <div class="label-line">${safeAddress}</div>
+                <div class="label-line">Phone: ${safePhone}</div>
+            </div>
+            <div class="label-from-section">
+                <div class="label-section-title">FROM:</div>
+                <div class="label-line">Kuhu, Lalbagh, Purneacity</div>
+                <div class="label-line">Near-Industrial Area, Purneacity</div>
+                <div class="label-line">PS-Sadar, Purnea Bihar 854302</div>
+                <div class="label-line">Phone: +91 9304288748</div>
             </div>
         </div>
     `;
