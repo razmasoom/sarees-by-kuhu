@@ -296,6 +296,7 @@
             border-radius: 20px;
             text-align: center;
             max-width: 400px;
+            margin: 20px;
         }
         .success-icon { font-size: 70px; color: #27ae60; margin-bottom: 15px; }
         .success-modal-content button {
@@ -307,6 +308,7 @@
             cursor: pointer;
             margin: 5px;
         }
+        .success-modal-content .view-orders-btn { background: #3498db; }
         
         /* Order History */
         .order-history-card {
@@ -331,15 +333,30 @@
             margin-top: 10px;
         }
         
+        /* Toast Message */
+        .cart-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+            z-index: 10001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
         /* ========== MOBILE STYLES ========== */
         @media screen and (max-width: 768px) {
-            /* Logo bigger on mobile */
             .store-logo {
                 height: 75px;
                 max-width: 240px;
             }
-            
-            /* Logo and Cart centered */
             header {
                 flex-direction: column;
                 justify-content: center;
@@ -348,19 +365,12 @@
                 gap: 12px;
                 padding: 12px;
             }
-            
             .logo-container {
                 display: flex;
                 justify-content: center;
                 width: 100%;
             }
-            
-            #search-bar { 
-                width: 90%; 
-                margin: 0 auto;
-            }
-            
-            /* Cart button centered */
+            #search-bar { width: 90%; margin: 0 auto; }
             header > div:last-child {
                 display: inline-block;
                 background: #f0c14b;
@@ -369,8 +379,6 @@
                 border-radius: 8px;
                 font-weight: bold;
             }
-            
-            /* 2 columns for products */
             #shop-container {
                 padding: 15px;
                 gap: 12px;
@@ -383,8 +391,6 @@
             .product-card img { height: 120px; }
             .product-card h3 { font-size: 12px; }
             .view-details-btn { font-size: 11px; padding: 6px 10px; }
-            
-            /* Category scroll */
             .category-nav {
                 overflow-x: auto;
                 flex-wrap: nowrap;
@@ -392,8 +398,6 @@
                 -webkit-overflow-scrolling: touch;
             }
             .cat-btn { white-space: nowrap; }
-            
-            /* User bar mobile */
             .user-bar { 
                 padding: 8px 12px; 
                 text-align: center; 
@@ -403,13 +407,7 @@
                 align-items: center;
                 gap: 5px;
             }
-            .store-name-header { 
-                float: none; 
-                display: block; 
-                margin-bottom: 5px;
-            }
-            
-            /* Login/Register links on mobile - Yellow buttons */
+            .store-name-header { float: none; display: block; margin-bottom: 5px; }
             .user-bar a {
                 display: inline-block;
                 margin: 0 8px;
@@ -419,44 +417,23 @@
                 border-radius: 6px;
                 text-decoration: none;
             }
-            .user-bar a:hover {
-                background: #ddb347;
-                color: #111 !important;
-                text-decoration: none;
-            }
-            
-            /* Footer mobile */
-            .footer {
-                padding: 20px 15px;
-            }
-            .footer-content {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            .footer-section {
-                text-align: center;
-            }
+            .footer { padding: 20px 15px; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+            .footer-section { text-align: center; }
+            .success-modal-content { padding: 25px; margin: 15px; }
+            .success-icon { font-size: 55px; }
+            .cart-message { left: 20px; right: 20px; bottom: 80px; text-align: center; }
         }
         
         @media screen and (max-width: 480px) {
             .product-card img { height: 100px; }
             .product-card h3 { font-size: 11px; }
-            .store-logo {
-                height: 65px;
-                max-width: 200px;
-            }
+            .store-logo { height: 65px; max-width: 200px; }
         }
         
-        /* Tablet landscape */
         @media screen and (min-width: 769px) and (max-width: 1024px) {
-            .product-card {
-                width: calc(33.33% - 14px);
-            }
-            .store-logo {
-                height: 70px;
-                max-width: 220px;
-            }
+            .product-card { width: calc(33.33% - 14px); }
+            .store-logo { height: 70px; max-width: 220px; }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -479,7 +456,7 @@
 
     <nav class="category-nav" id="category-menu"></nav>
 
-    <!-- CART DRAWER - Starts hidden -->
+    <!-- CART DRAWER -->
     <div class="cart-drawer" id="cart-view">
         <span class="close-btn" onclick="toggleCart()">&times;</span>
         <h3>Your Shopping Cart</h3>
@@ -551,8 +528,10 @@
             <div class="success-icon">✅</div>
             <h3>Order Placed Successfully!</h3>
             <p>Your order has been confirmed and will be processed soon.</p>
-            <button onclick="continueShopping()">🛍️ Continue Shopping</button>
-            <button class="view-orders-btn" onclick="viewMyOrders()">📋 View My Orders</button>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button id="continueShoppingBtn">🛍️ Continue Shopping</button>
+                <button id="viewMyOrdersBtn" class="view-orders-btn">📋 View My Orders</button>
+            </div>
         </div>
     </div>
 
@@ -603,6 +582,18 @@
         let allProducts = [];
         let currentCategory = 'All';
 
+        // Helper function
+        function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+        
+        function showMessage(msg, isErr = false) {
+            const d = document.createElement('div');
+            d.className = 'cart-message';
+            d.style.background = isErr ? '#dc3545' : '#27ae60';
+            d.textContent = msg;
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 3000);
+        }
+
         // ============ AUTH ============
         function checkAuth() {
             const userBar = document.getElementById('user-bar');
@@ -627,14 +618,13 @@
         
         function toggleUserDropdown() {
             const dd = document.getElementById('userDropdown');
-            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+            if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
         }
-        function closeDropdown() { document.getElementById('userDropdown').style.display = 'none'; }
+        function closeDropdown() { const dd = document.getElementById('userDropdown'); if (dd) dd.style.display = 'none'; }
         document.addEventListener('click', function(e) {
             const dd = document.getElementById('userDropdown');
             if (dd && dd.style.display === 'block' && !e.target.closest('.user-menu')) dd.style.display = 'none';
         });
-        window.addEventListener('scroll', function() { closeDropdown(); });
         
         function logout() { localStorage.removeItem('user'); window.location.href = "index.html"; }
         function showStorefront() {
@@ -661,6 +651,7 @@
             const list = document.getElementById('cart-items');
             const countSpan = document.getElementById('cart-count');
             const totalDisplay = document.getElementById('cart-total-display');
+            if (!list) return;
             list.innerHTML = '';
             let totalItems = 0, totalPrice = 0;
             cart.forEach((item, index) => {
@@ -676,14 +667,18 @@
         
         async function removeFromCart(index) {
             const item = cart[index];
-            await fetch(`${API_BASE}/products/${item.productId}/stock`, {
-                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: item.quantity })
-            });
-            cart.splice(index, 1);
-            updateCartUI();
-            await loadProducts();
-            if (cart.length === 0) toggleCart();
+            if (!item) return;
+            try {
+                await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: item.quantity, requestId: `remove_${Date.now()}` })
+                });
+                cart.splice(index, 1);
+                updateCartUI();
+                await loadProducts();
+                showMessage(`✓ Removed ${item.name}`);
+                if (cart.length === 0) toggleCart();
+            } catch(e) { showMessage('Error removing item', true); }
         }
         
         async function addToCart(id, name, price, quantity = 1) {
@@ -699,6 +694,7 @@
             else cart.push({ productId: id, name, price, quantity });
             updateCartUI();
             await loadProducts();
+            showMessage(`✓ Added ${quantity} × ${name}`);
             return true;
         }
         
@@ -766,7 +762,37 @@
             toggleOrderHistoryView();
         }
         
-        // ============ CHECKOUT ============
+        // ============ CHECKOUT WITH PROPER SUCCESS MODAL ============
+        function showOrderSuccessModal() {
+            const modal = document.getElementById('successModal');
+            if (!modal) return;
+            
+            // Get buttons and clone to remove old listeners
+            const continueBtn = document.getElementById('continueShoppingBtn');
+            const viewOrdersBtn = document.getElementById('viewMyOrdersBtn');
+            
+            if (continueBtn) {
+                const newContinue = continueBtn.cloneNode(true);
+                continueBtn.parentNode.replaceChild(newContinue, continueBtn);
+                newContinue.onclick = () => {
+                    modal.classList.remove('show');
+                    showStorefront();
+                    loadProducts();
+                };
+            }
+            
+            if (viewOrdersBtn) {
+                const newViewOrders = viewOrdersBtn.cloneNode(true);
+                viewOrdersBtn.parentNode.replaceChild(newViewOrders, viewOrdersBtn);
+                newViewOrders.onclick = () => {
+                    modal.classList.remove('show');
+                    toggleOrderHistoryView();
+                };
+            }
+            
+            modal.classList.add('show');
+        }
+        
         function loadProfileForShipping() {
             const user = localStorage.getItem('user');
             if (user) {
@@ -790,6 +816,33 @@
         }
         function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; }
         
+        async function placeOrder(paymentId, name, phone, address) {
+            const username = localStorage.getItem('user');
+            let allSuccess = true;
+            for (let item of cart) {
+                try {
+                    const response = await fetch(`${API_BASE}/order`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ 
+                            productId: item.productId, 
+                            quantity: item.quantity, 
+                            username, 
+                            customerName: name, 
+                            phone, 
+                            address, 
+                            payment_id: paymentId,
+                            payment_status: paymentId === "test_payment" ? "test" : "completed"
+                        }) 
+                    });
+                    if (!response.ok) allSuccess = false;
+                } catch(e) {
+                    allSuccess = false;
+                }
+            }
+            return allSuccess;
+        }
+        
         async function checkout() {
             const name = document.getElementById('ship-name').value.trim();
             const phone = document.getElementById('ship-phone').value.trim();
@@ -797,48 +850,78 @@
             const email = document.getElementById('ship-email').value.trim();
             if (!name || !phone || !address) { alert("Fill all fields"); return; }
             closeShippingModal();
+            
             const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
             const useRazorpay = confirm("Choose Payment:\n\n• Click OK for Card/NetBanking (Razorpay Test)\n• Click Cancel for Test Mode (No Real Payment)");
+            
             if (useRazorpay) {
                 try {
-                    const orderRes = await fetch(`${API_BASE}/create-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: total }) });
+                    showMessage("⏳ Initializing payment...", false);
+                    const orderRes = await fetch(`${API_BASE}/create-order`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ amount: total }) 
+                    });
                     const order = await orderRes.json();
                     const keyRes = await fetch(`${API_BASE}/get-razorpay-key`);
                     const { key } = await keyRes.json();
+                    
                     const options = {
-                        key: key, amount: order.amount, currency: order.currency, name: 'Sarees By Kuhu',
-                        order_id: order.order_id, prefill: { name, contact: phone, email: email },
+                        key: key,
+                        amount: order.amount,
+                        currency: order.currency,
+                        name: 'Sarees By Kuhu',
+                        order_id: order.order_id,
+                        prefill: { name, contact: phone, email: email },
                         theme: { color: '#27ae60' },
                         handler: async (response) => {
-                            const verifyRes = await fetch(`${API_BASE}/verify-payment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(response) });
-                            if ((await verifyRes.json()).success) await placeOrder(response.razorpay_payment_id, name, phone, address);
+                            showMessage("✅ Payment received! Placing order...", false);
+                            const verifyRes = await fetch(`${API_BASE}/verify-payment`, { 
+                                method: 'POST', 
+                                headers: { 'Content-Type': 'application/json' }, 
+                                body: JSON.stringify(response) 
+                            });
+                            const verifyResult = await verifyRes.json();
+                            if (verifyResult.success) {
+                                const orderSuccess = await placeOrder(response.razorpay_payment_id, name, phone, address);
+                                if (orderSuccess) {
+                                    cart = [];
+                                    updateCartUI();
+                                    showOrderSuccessModal();
+                                } else {
+                                    alert("Payment verified but order placement had issues. Please contact support.");
+                                }
+                            } else {
+                                alert("Payment verification failed!");
+                            }
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                showMessage("Payment cancelled", true);
+                            }
                         }
                     };
-                    new Razorpay(options).open();
-                } catch(e) { alert("Payment failed"); }
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function(response) {
+                        alert("Payment failed: " + (response.error.description || "Please try again"));
+                    });
+                    rzp.open();
+                } catch(e) { 
+                    console.error("Payment error:", e);
+                    alert("Payment failed: " + e.message); 
+                }
             } else {
-                await placeOrder("test_payment", name, phone, address);
+                // Test mode
+                showMessage("⏳ Processing test order...", false);
+                const orderSuccess = await placeOrder("test_payment", name, phone, address);
+                if (orderSuccess) {
+                    cart = [];
+                    updateCartUI();
+                    showOrderSuccessModal();
+                } else {
+                    alert("[TEST MODE] Order placement failed. Please try again.");
+                }
             }
-        }
-        
-        async function placeOrder(paymentId, name, phone, address) {
-            const username = localStorage.getItem('user');
-            for (let item of cart) {
-                await fetch(`${API_BASE}/order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: item.productId, quantity: item.quantity, username, customerName: name, phone, address, payment_id: paymentId }) });
-            }
-            cart = [];
-            updateCartUI();
-            document.getElementById('successModal').classList.add('show');
-        }
-        
-        function continueShopping() {
-            document.getElementById('successModal').classList.remove('show');
-            showStorefront();
-            loadProducts();
-        }
-        function viewMyOrders() {
-            document.getElementById('successModal').classList.remove('show');
-            toggleOrderHistoryView();
         }
         
         // ============ PROFILE & CONTACT ============
@@ -869,8 +952,6 @@
             closeContactModal();
         }
         
-        function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-        
         function loadCart() {
             const saved = localStorage.getItem('cart');
             if (saved) { cart = JSON.parse(saved); updateCartUI(); }
@@ -892,6 +973,7 @@
             }
         };
         
+        // Initialize
         checkAuth();
         loadProducts();
         loadCart();
