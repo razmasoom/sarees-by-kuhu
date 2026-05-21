@@ -822,22 +822,42 @@
             modalDiv.onclick=(e)=>{ if(e.target===modalDiv){modalDiv.remove();document.body.style.overflow='auto'; startStockSync();} };
         }
         
-        // ============ UPDATED CHECKOUT WITH WORKING SUCCESS MODAL ============
+        // ============ FIXED SUCCESS MODAL ============
         function showOrderSuccessModal() {
             const modal = document.getElementById('orderSuccessModal');
             if (!modal) return;
             
-            // Remove any existing buttons and recreate with fresh click handlers
+            // Get buttons
             const continueBtn = document.getElementById('continueShoppingBtn');
             const viewOrdersBtn = document.getElementById('viewMyOrdersBtn');
             
-            // Clone and replace to remove old event listeners
-            const newContinue = continueBtn.cloneNode(true);
-            const newViewOrders = viewOrdersBtn.cloneNode(true);
-            continueBtn.parentNode.replaceChild(newContinue, continueBtn);
-            viewOrdersBtn.parentNode.replaceChild(newViewOrders, viewOrdersBtn);
+            // Remove old buttons and create fresh ones
+            const newContinue = document.createElement('button');
+            newContinue.id = 'continueShoppingBtn';
+            newContinue.innerHTML = '🛍️ Continue Shopping';
+            newContinue.style.background = '#27ae60';
+            newContinue.style.color = 'white';
+            newContinue.style.border = 'none';
+            newContinue.style.padding = '10px 20px';
+            newContinue.style.borderRadius = '8px';
+            newContinue.style.cursor = 'pointer';
+            newContinue.style.margin = '5px';
+            newContinue.style.fontWeight = 'bold';
             
-            // Set new click handlers
+            const newViewOrders = document.createElement('button');
+            newViewOrders.id = 'viewMyOrdersBtn';
+            newViewOrders.innerHTML = '📋 View My Orders';
+            newViewOrders.className = 'view-orders-btn';
+            newViewOrders.style.background = '#3498db';
+            newViewOrders.style.color = 'white';
+            newViewOrders.style.border = 'none';
+            newViewOrders.style.padding = '10px 20px';
+            newViewOrders.style.borderRadius = '8px';
+            newViewOrders.style.cursor = 'pointer';
+            newViewOrders.style.margin = '5px';
+            newViewOrders.style.fontWeight = 'bold';
+            
+            // Add click handlers
             newContinue.onclick = function() {
                 modal.classList.remove('show');
                 window.location.href = 'index.html';
@@ -845,9 +865,16 @@
             
             newViewOrders.onclick = function() {
                 modal.classList.remove('show');
-                // Direct navigation to index.html with orders view
                 window.location.href = 'index.html?showOrders=true';
             };
+            
+            // Replace buttons
+            if (continueBtn && continueBtn.parentNode) {
+                continueBtn.parentNode.replaceChild(newContinue, continueBtn);
+            }
+            if (viewOrdersBtn && viewOrdersBtn.parentNode) {
+                viewOrdersBtn.parentNode.replaceChild(newViewOrders, viewOrdersBtn);
+            }
             
             modal.classList.add('show');
         }
