@@ -596,8 +596,8 @@
             #bulk-label-printout { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
         }
         
-        /* Single Label Style */
- .shipping-label {
+      /* Label Styles - TO centered, FROM left-aligned */
+.shipping-label {
     width: 600px;
     min-height: 350px;
     border: 2px solid #000;
@@ -606,6 +606,7 @@
     background: white;
     margin: 0 auto;
     box-sizing: border-box;
+    position: relative;
 }
 
 .label-shop-name {
@@ -623,17 +624,19 @@
     margin-bottom: 40px;
 }
 
-/* TO Section - Starts from center, but has max-width to prevent crossing right edge */
+/* TO Section - Centered horizontally */
 .label-to-section {
     text-align: left;
-    margin-left: 250px;
+    width: fit-content;
+    max-width: 45%;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 35px;
-    max-width: calc(100% - 250px - 20px);
     word-wrap: break-word;
     white-space: normal;
 }
 
-/* FROM Section - Normal left alignment */
+/* FROM Section - Left aligned */
 .label-from-section {
     text-align: left;
     margin-left: 0;
@@ -658,7 +661,7 @@
     overflow-wrap: break-word;
 }
 
-        /* Bulk Label Container */
+/* Bulk Label Styles */
 .bulk-label-container {
     width: 100%;
     background: white;
@@ -699,12 +702,14 @@
     margin-bottom: 30px;
 }
 
-/* TO Section - Centered with boundary for bulk labels */
+/* TO Section - Centered horizontally for bulk labels */
 .print-label-card .label-to-section {
     text-align: left;
-    margin-left: 120px;
+    width: fit-content;
+    max-width: 48%;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 30px;
-    max-width: calc(100% - 120px - 15px);
     word-wrap: break-word;
     white-space: normal;
 }
@@ -2093,7 +2098,7 @@
         }
 
         // ============ BULK PRINT FUNCTION ============
- async function printBulkLabels() {
+async function printBulkLabels() {
     if (selectedOrders.size === 0) {
         alert("Please select at least one order to print labels.");
         return;
@@ -2117,7 +2122,7 @@
             
             let safeAddress = (order.address || 'No Address');
             safeAddress = safeAddress.replace(/\n/g, '<br>');
-            safeAddress = safeAddress.replace(/([^\s]{20})/g, '$1​');
+            safeAddress = safeAddress.replace(/([^\s]{25})/g, '$1​');
             
             const safeName = escapeHtml(order.customerName) || 'N/A';
             const safePhone = escapeHtml(order.phone) || 'N/A';
@@ -2156,14 +2161,13 @@
     }
 }
         // ============ SINGLE PRINT FUNCTION ============
-     function printLabel(order) {
+  function printLabel(order) {
     const buffer = document.getElementById('shipping-label-printout');
-    // Handle long addresses with line breaks - preserve existing line breaks
+    // Handle long addresses with line breaks
     let safeAddress = (order.address || 'No Address');
-    // Convert existing line breaks to <br>
     safeAddress = safeAddress.replace(/\n/g, '<br>');
-    // Also handle any long words by adding zero-width spaces (helps with breaking)
-    safeAddress = safeAddress.replace(/([^\s]{20})/g, '$1​');
+    // Help with long word breaking
+    safeAddress = safeAddress.replace(/([^\s]{25})/g, '$1​');
     
     const safeName = escapeHtml(order.customerName) || 'N/A';
     const safePhone = escapeHtml(order.phone) || 'N/A';
@@ -2191,7 +2195,6 @@
     window.print();
     buffer.style.display = 'none';
 }
-
         async function deleteSingleOrder(orderId) {
             if(!confirm(`Delete order #${orderId}?`)) return;
             try {
