@@ -10,6 +10,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
+// Add default route to serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Also ensure product.html, auth.html, admin.html are served correctly
+app.get('/product.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'product.html'));
+});
+
+app.get('/auth.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 const DATA_FILE = path.join(__dirname, 'data.json');
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
 const CANCELLATION_REQUESTS_FILE = path.join(__dirname, 'cancellation_requests.json');
@@ -74,9 +92,9 @@ const initDataFile = () => {
     if (!data || Array.isArray(data)) {
         data = {
             products: [
-                { id: 1, name: "Banarasi Silk Saree", price: 2500, stock: 50, category: "Silk", description: "Pure Banarasi silk saree with heavy zari work. Perfect for weddings.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
-                { id: 2, name: "Cotton Saree", price: 1200, stock: 100, category: "Cotton", description: "Comfortable cotton saree for daily wear. Easy to maintain.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] },
-                { id: 3, name: "Kanchipuram Saree", price: 3500, stock: 30, category: "Silk", description: "Authentic Kanchipuram silk saree with traditional designs.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"] }
+                { id: 1, name: "Banarasi Silk Saree", price: 2500, stock: 50, category: "Silk", description: "Pure Banarasi silk saree with heavy zari work. Perfect for weddings.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"], createdAt: new Date().toISOString() },
+                { id: 2, name: "Cotton Saree", price: 1200, stock: 100, category: "Cotton", description: "Comfortable cotton saree for daily wear. Easy to maintain.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"], createdAt: new Date().toISOString() },
+                { id: 3, name: "Kanchipuram Saree", price: 3500, stock: 30, category: "Silk", description: "Authentic Kanchipuram silk saree with traditional designs.", image: "https://via.placeholder.com/150", images: ["https://via.placeholder.com/150"], createdAt: new Date().toISOString() }
             ],
             users: [
                 { id: 1, username: "admin", password: "123", phone: "9999999999", status: "Verified", registeredAt: new Date().toISOString() }
@@ -509,7 +527,7 @@ app.post('/order', (req, res) => {
         trackingId: "",
         payment_status: payment_status || "pending",
         payment_id: payment_id || "",
-        refund_status: "none", // Track refund status: none, processing, completed, failed
+        refund_status: "none",
         refund_id: null
     };
     
@@ -878,8 +896,8 @@ app.listen(PORT, () => {
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
     console.log(`🔄 REFUNDS: Enabled - Auto-refund on cancellation approval`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
+    console.log(`   - Store: http://localhost:${PORT}/`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
-    console.log(`   - Store: http://localhost:${PORT}/index.html`);
     console.log(`   - Login: http://localhost:${PORT}/auth.html`);
     console.log(`\n✅ ========================================\n`);
 });
