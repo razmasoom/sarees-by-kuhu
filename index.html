@@ -3,35 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Sarees By Kuhu | Buyer View</title>
+    <title>Sarees By Kuhu | Premium Sarees</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; }
+        body { font-family: 'Poppins', -apple-system, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #fdf8f0 0%, #f5ede1 100%); color: #2d1b0e; }
         
-        body.show-orders-initially #shop-container,
-        body.show-orders-initially .category-nav,
-        body.show-orders-initially #search-bar,
-        body.show-orders-initially header > div:last-child {
-            display: none !important;
-        }
-        body.show-orders-initially #orders-history-container {
-            display: block !important;
-        }
-        
+        /* Modern Gradient Header */
         .user-bar {
-            background: #131921;
-            color: #ccc;
-            padding: 8px 50px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e8d5b7;
+            padding: 12px 50px;
             text-align: right;
             font-size: 14px;
             position: relative;
             z-index: 1002;
+            border-bottom: 1px solid #ffd70033;
         }
-        .store-name-header { float: left; font-weight: bold; color: #f0c14b; }
-        .user-bar a { color: #f0c14b !important; text-decoration: none; margin-left: 15px; cursor: pointer; font-weight: bold; }
-        .user-bar a:hover { text-decoration: underline; color: #ddb347 !important; }
+        .store-name-header { float: left; font-weight: bold; color: #ffd700; font-size: 16px; letter-spacing: 1px; }
+        .user-bar a { color: #ffd700 !important; text-decoration: none; margin-left: 15px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; }
+        .user-bar a:hover { color: #ffed4a !important; text-decoration: underline; }
         .user-menu { position: relative; display: inline-block; z-index: 1001; }
-        .user-name { cursor: pointer; padding: 5px 12px; background: rgba(255,255,255,0.15); border-radius: 6px; }
+        .user-name { cursor: pointer; padding: 5px 12px; background: rgba(255,215,0,0.15); border-radius: 20px; transition: all 0.3s ease; }
+        .user-name:hover { background: rgba(255,215,0,0.25); }
         .user-dropdown {
             display: none;
             position: absolute;
@@ -39,8 +32,8 @@
             top: 100%;
             background: white;
             min-width: 200px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 12px;
             z-index: 10001;
             margin-top: 8px;
             overflow: hidden;
@@ -53,106 +46,318 @@
             cursor: pointer;
             font-size: 14px;
             border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s;
         }
-        .user-dropdown a:hover { background: #f8f9fa; color: #27ae60; }
-        .user-dropdown a:last-child { border-bottom: none; }
+        .user-dropdown a:hover { background: #fdf8f0; color: #c9a03d; }
         
         .logo-container { cursor: pointer; display: flex; align-items: center; }
-        .store-logo { height: 100px; width: auto; max-width: 320px; object-fit: contain; }
+        .store-logo { height: 90px; width: auto; max-width: 300px; object-fit: contain; }
         
         header {
-            background: #232f3e;
-            color: white;
-            padding: 15px;
+            background: linear-gradient(135deg, #2d2b4a 0%, #1a1a2e 100%);
+            padding: 15px 30px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        #search-bar { padding: 10px; border-radius: 5px; border: none; width: 300px; outline: none; }
+        #search-bar {
+            padding: 12px 20px;
+            border-radius: 40px;
+            border: none;
+            width: 320px;
+            outline: none;
+            font-size: 14px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        #search-bar:focus { transform: scale(1.02); box-shadow: 0 4px 15px rgba(255,215,0,0.3); }
+        
+        .cart-header {
+            cursor: pointer;
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .cart-header:hover { transform: translateY(-2px); background: #ffed4a; box-shadow: 0 4px 15px rgba(255,215,0,0.3); }
         
         .category-nav {
-            background: #37475a;
-            padding: 10px;
+            background: linear-gradient(135deg, #3d3b5e 0%, #2d2b4a 100%);
+            padding: 12px 20px;
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
+            border-bottom: 1px solid #ffd70033;
         }
         .cat-btn {
-            background: none;
-            border: 1px solid #ffffff55;
-            color: white;
-            padding: 5px 15px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid #ffd70055;
+            color: #ffd700;
+            padding: 6px 20px;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
-        .cat-btn:hover, .cat-btn.active { background: white; color: #232f3e; }
+        .cat-btn:hover, .cat-btn.active { background: #ffd700; color: #1a1a2e; border-color: #ffd700; transform: translateY(-2px); }
         
         #shop-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: flex-start;
-            gap: 20px;
-            padding: 30px;
-            max-width: 1200px;
+            gap: 25px;
+            padding: 40px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         .product-card {
             background: white;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            width: calc(25% - 15px);
-            min-width: 200px;
+            border-radius: 20px;
+            padding: 20px;
+            width: calc(25% - 19px);
+            min-width: 240px;
             text-align: center;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             position: relative;
+            overflow: hidden;
         }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover::before { transform: translateX(0); }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+        .product-card h3 { font-size: 16px; margin: 10px 0 5px; color: #2d1b0e; }
+        .product-card p { font-size: 18px; font-weight: bold; color: #c9a03d; }
         .view-details-btn {
-            background: #27ae60;
+            background: linear-gradient(135deg, #c9a03d, #b8860b);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 10px 20px;
             cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
+            border-radius: 30px;
+            margin-top: 12px;
             width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
+        .view-details-btn:hover { transform: scale(1.02); background: linear-gradient(135deg, #d4af37, #c9a03d); }
         
         .cart-drawer {
             display: none !important;
             position: fixed;
             top: 0;
             right: 0;
-            width: 350px;
-            max-width: 85%;
+            width: 380px;
+            max-width: 90%;
             height: 100%;
             background: white;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
-            padding: 20px;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.2);
+            padding: 25px;
             z-index: 10000;
             overflow-y: auto;
         }
         .cart-drawer.open { display: block !important; }
-        .close-btn { cursor: pointer; float: right; font-size: 28px; font-weight: bold; color: #888; }
-        .checkout-btn { background: #28a745; color: white; width: 100%; border: none; padding: 12px; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; }
+        .close-btn { cursor: pointer; float: right; font-size: 28px; font-weight: bold; color: #999; transition: color 0.2s; }
+        .close-btn:hover { color: #c9a03d; }
+        .checkout-btn { background: linear-gradient(135deg, #c9a03d, #b8860b); color: white; width: 100%; border: none; padding: 14px; font-weight: bold; margin-top: 20px; border-radius: 40px; cursor: pointer; transition: all 0.3s; }
+        .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(201,160,61,0.3); }
         #cart-items { list-style: none; padding: 0; margin-top: 40px; }
-        .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; }
+        .cart-item { border-bottom: 1px solid #eee; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .remove-btn { background: #ff4d4d; color: white; border: none; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .remove-btn:hover { background: #e60000; transform: scale(1.05); }
+        
+        /* Modern Order History Styling */
+        #orders-history-container { 
+            max-width: 1000px; 
+            margin: 40px auto; 
+            padding: 0 20px;
+            display: none;
+        }
+        .history-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .history-heading h2 { 
+            font-size: 28px; 
+            background: linear-gradient(135deg, #c9a03d, #b8860b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-shop-btn {
+            background: linear-gradient(135deg, #2d2b4a, #1a1a2e);
+            color: #ffd700;
+            border: 1px solid #ffd70055;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .back-shop-btn:hover { background: #ffd700; color: #1a1a2e; border-color: #ffd700; }
+        
+        .order-history-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid #c9a03d;
+        }
+        .order-history-card:hover { transform: translateX(5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #f0e6d2;
+        }
+        .order-id { font-weight: bold; font-size: 16px; color: #c9a03d; }
+        .order-date { color: #888; font-size: 13px; }
+        
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-pending { background: #fff3e0; color: #e67e22; }
+        .status-shipped { background: #e3f2fd; color: #2196f3; }
+        .status-delivered { background: #e8f5e9; color: #4caf50; }
+        .status-cancelled { background: #ffebee; color: #f44336; }
+        
+        .order-items { margin: 15px 0; padding: 10px 0; }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0e6d2;
+        }
+        .order-total {
+            text-align: right;
+            padding-top: 12px;
+            margin-top: 12px;
+            border-top: 2px solid #f0e6d2;
+            font-size: 18px;
+            font-weight: bold;
+            color: #c9a03d;
+        }
+        .tracking-info {
+            background: #f8f5f0;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        .cancel-order-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+        .cancel-order-btn:hover { background: #e60000; transform: translateY(-2px); }
+        
+        /* Address Modal Styling */
+        .address-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .address-card {
+            background: #f8f5f0;
+            border: 2px solid #e8dcc8;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .address-card.selected {
+            border-color: #c9a03d;
+            background: #fffcf5;
+            box-shadow: 0 2px 10px rgba(201,160,61,0.2);
+        }
+        .address-card:hover { border-color: #c9a03d; transform: translateX(3px); }
+        .address-type {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .address-type.home { background: #e3f2fd; color: #2196f3; }
+        .address-type.work { background: #e8f5e9; color: #4caf50; }
+        .address-type.other { background: #fff3e0; color: #e67e22; }
+        .default-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #c9a03d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+        }
+        .add-new-address-btn {
+            background: #2d2b4a;
+            color: #ffd700;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .add-new-address-btn:hover { background: #c9a03d; color: white; }
         
         .footer {
-            background: #232f3e;
-            color: #ccc;
-            padding: 30px 50px;
-            margin-top: 50px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #e8d5b7;
+            padding: 40px 50px;
+            margin-top: 60px;
             text-align: center;
         }
         .footer-content {
@@ -164,11 +369,10 @@
             gap: 30px;
         }
         .footer-section { flex: 1; min-width: 200px; text-align: left; }
-        .footer-section h3 { color: #f0c14b; margin-bottom: 15px; }
-        .footer-section p, .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; }
-        .footer-section a:hover { color: #f0c14b; }
-        .social-links { display: flex; gap: 15px; margin-top: 10px; }
-        .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #37475a; font-size: 12px; }
+        .footer-section h3 { color: #ffd700; margin-bottom: 15px; font-size: 18px; }
+        .footer-section p, .footer-section a { color: #e8d5b7; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; transition: color 0.3s; }
+        .footer-section a:hover { color: #ffd700; }
+        .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #ffd70033; font-size: 12px; }
         
         .modal {
             display: none;
@@ -179,23 +383,46 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
         }
         .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 25px;
-            width: 85%;
-            max-width: 450px;
-            border-radius: 10px;
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 24px;
+            max-height: 85vh;
+            overflow-y: auto;
         }
-        .shipping-form input, .shipping-form textarea {
+        .shipping-form input, .shipping-form textarea, .address-form input, .address-form select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid #e8dcc8;
+            border-radius: 12px;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-        .form-submit-btn { background: #28a745; color: white; width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; }
+        .shipping-form input:focus, .shipping-form textarea:focus,
+        .address-form input:focus, .address-form select:focus {
+            outline: none;
+            border-color: #c9a03d;
+            box-shadow: 0 0 0 2px rgba(201,160,61,0.2);
+        }
+        .form-submit-btn {
+            background: linear-gradient(135deg, #c9a03d, #b8860b);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .form-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(201,160,61,0.3); }
         
         .success-modal {
             display: none;
@@ -212,59 +439,25 @@
         .success-modal.show { display: flex !important; }
         .success-modal-content {
             background: white;
-            padding: 35px;
-            border-radius: 20px;
+            padding: 40px;
+            border-radius: 30px;
             text-align: center;
             max-width: 400px;
             margin: 20px;
         }
-        .success-icon { font-size: 70px; color: #27ae60; margin-bottom: 15px; }
-        .success-modal-content button {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        .success-modal-content .view-orders-btn { background: #3498db; }
-        
-        .order-history-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .cancel-order-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .tracking-info {
-            background: #e3f2fd;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-        
-        #orders-history-container { display: none; }
-        
+        .success-icon { font-size: 80px; color: #c9a03d; margin-bottom: 15px; }
         .cart-message {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #27ae60;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #c9a03d, #b8860b);
             color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 40px;
             animation: slideIn 0.3s ease;
             z-index: 10001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            font-weight: 500;
         }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -272,40 +465,40 @@
         }
         
         @media screen and (max-width: 768px) {
-            .store-logo { height: 75px; max-width: 240px; }
-            header { flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 12px; padding: 12px; }
-            .logo-container { justify-content: center; width: 100%; }
-            #search-bar { width: 90%; margin: 0 auto; }
-            #shop-container { padding: 15px; gap: 12px; }
-            .product-card { width: calc(50% - 6px); min-width: auto; padding: 10px; }
-            .product-card img { height: 120px; }
-            .user-bar { padding: 8px 15px; text-align: center; flex-direction: column; gap: 5px; }
-            .store-name-header { float: none; display: block; margin-bottom: 5px; }
-            .footer { padding: 20px 15px; }
-            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+            .store-logo { height: 60px; max-width: 200px; }
+            header { flex-direction: column; text-align: center; padding: 15px; }
+            #search-bar { width: 100%; }
+            #shop-container { padding: 20px; gap: 15px; }
+            .product-card { width: calc(50% - 8px); min-width: auto; padding: 12px; }
+            .product-card img { height: 140px; }
+            .user-bar { padding: 10px 15px; text-align: center; flex-direction: column; }
+            .store-name-header { float: none; display: block; margin-bottom: 8px; }
+            .category-nav { gap: 8px; }
+            .cat-btn { padding: 4px 12px; font-size: 12px; }
+            .footer { padding: 30px 20px; }
+            .footer-content { flex-direction: column; gap: 25px; text-align: center; }
             .footer-section { text-align: center; }
+            .history-heading { flex-direction: column; text-align: center; }
         }
         @media screen and (max-width: 480px) {
-            .product-card img { height: 100px; }
-            .store-logo { height: 65px; max-width: 200px; }
+            .product-card img { height: 120px; }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
 <div class="user-bar" id="user-bar">
-    <span class="store-name-header">🏪 Sarees By Kuhu</span>
+    <span class="store-name-header">✨ Sarees By Kuhu</span>
 </div>
 
 <header>
     <div class="logo-container" onclick="showStorefront()">
         <img src="logo.png" alt="Sarees By Kuhu" class="store-logo" onerror="this.src='https://via.placeholder.com/250x75?text=Sarees+By+Kuhu'">
     </div>
-    <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
-    <div onclick="toggleCart()" style="cursor:pointer; font-weight: bold;">
-        🛒 Cart (<span id="cart-count">0</span>)
-    </div>
+    <input type="text" id="search-bar" placeholder="🔍 Search for beautiful sarees..." onkeyup="filterProducts()">
+    <div class="cart-header" onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</div>
 </header>
 
 <nav class="category-nav" id="category-menu"></nav>
@@ -315,68 +508,96 @@
     <h3>Your Shopping Cart</h3>
     <ul id="cart-items"></ul>
     <div id="cart-total-display"></div>
-    <button class="checkout-btn" onclick="openShippingModal()">Place Order</button>
+    <button class="checkout-btn" onclick="openShippingModal()">✨ Place Order</button>
 </div>
 
 <div id="shippingModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeShippingModal()">&times;</span>
-        <h2>Shipping Details</h2>
-        <div class="shipping-form">
-            <input type="email" id="ship-email" placeholder="Email Address" required>
-            <input type="text" id="ship-name" placeholder="Full Name" required>
-            <input type="text" id="ship-phone" placeholder="Phone Number" required>
-            <textarea id="ship-address" placeholder="Complete Address" rows="3" required></textarea>
-            <button class="form-submit-btn" onclick="checkout()">Confirm Order</button>
+        <h2 style="margin-top:0; margin-bottom:20px;">📦 Shipping Details</h2>
+        <div id="address-list-container" class="address-list"></div>
+        <button class="add-new-address-btn" onclick="showAddAddressForm()">+ Add New Address</button>
+        <div id="new-address-form" style="display: none; margin-top: 20px;">
+            <h4>New Address</h4>
+            <input type="text" id="new-addr-name" placeholder="Full Name" required>
+            <input type="tel" id="new-addr-phone" placeholder="Phone Number" required>
+            <input type="text" id="new-addr-line" placeholder="Address Line" required>
+            <input type="text" id="new-addr-city" placeholder="City" required>
+            <input type="text" id="new-addr-state" placeholder="State" required>
+            <input type="text" id="new-addr-pincode" placeholder="Pincode" required>
+            <select id="new-addr-type">
+                <option value="Home">🏠 Home</option>
+                <option value="Work">💼 Work</option>
+                <option value="Other">📍 Other</option>
+            </select>
+            <label style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                <input type="checkbox" id="new-addr-default"> Set as default
+            </label>
+            <button class="form-submit-btn" onclick="saveNewAddress()" style="margin-top: 10px;">Save Address</button>
+            <button class="add-new-address-btn" onclick="cancelNewAddress()" style="margin-top: 10px; background: #888;">Cancel</button>
         </div>
+        <button class="form-submit-btn" onclick="proceedToCheckout()" style="margin-top: 20px;">Continue to Payment →</button>
+    </div>
+</div>
+
+<div id="addressSelectionModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAddressModal()">&times;</span>
+        <h2>Select Shipping Address</h2>
+        <div id="address-selection-list"></div>
+        <button class="form-submit-btn" onclick="confirmAddressSelection()">Use Selected Address</button>
     </div>
 </div>
 
 <div id="profileModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeProfileModal()">&times;</span>
-        <h2>My Profile</h2>
-        <input type="email" id="profile-email" placeholder="Email" style="width:100%; margin:5px 0; padding:10px;">
-        <input type="text" id="profile-name" placeholder="Full Name" style="width:100%; margin:5px 0; padding:10px;">
-        <input type="tel" id="profile-phone" placeholder="Phone" style="width:100%; margin:5px 0; padding:10px;">
-        <textarea id="profile-address" placeholder="Shipping Address" rows="2" style="width:100%; margin:5px 0; padding:10px;"></textarea>
-        <button onclick="saveProfile()" style="background:#27ae60; color:white; width:100%; padding:12px; margin-top:10px; border:none; border-radius:8px;">Save Profile</button>
+        <h2>👤 My Profile</h2>
+        <input type="email" id="profile-email" placeholder="Email" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;">
+        <input type="text" id="profile-name" placeholder="Full Name" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;">
+        <input type="tel" id="profile-phone" placeholder="Phone" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;">
+        <textarea id="profile-address" placeholder="Default Shipping Address" rows="2" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;"></textarea>
+        <button onclick="saveProfile()" style="background:linear-gradient(135deg,#c9a03d,#b8860b); color:white; width:100%; padding:14px; margin-top:10px; border:none; border-radius:40px; cursor:pointer; font-weight:bold;">Save Profile</button>
+        <hr style="margin: 20px 0;">
+        <h4>📦 Saved Addresses</h4>
+        <div id="saved-addresses-list" style="max-height: 200px; overflow-y: auto;"></div>
+        <button class="add-new-address-btn" onclick="showProfileAddAddress()" style="margin-top: 10px;">+ Add New Address</button>
     </div>
 </div>
 
 <div id="contactModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeContactModal()">&times;</span>
-        <h2>Contact Us</h2>
+        <h2>📞 Contact Us</h2>
         <hr>
         <p>✉️ Kahkashanp7@gmail.com</p>
         <p>📍 Lalbagh, Purneacity, Bihar 854302</p>
         <hr style="margin:15px 0;">
-        <input type="text" id="contact-name" placeholder="Your Name" style="width:100%; margin:5px 0; padding:10px;">
-        <input type="email" id="contact-email" placeholder="Your Email" style="width:100%; margin:5px 0; padding:10px;">
-        <textarea id="contact-message" placeholder="Message" rows="3" style="width:100%; margin:5px 0; padding:10px;"></textarea>
-        <button onclick="sendContactMessage()" style="background:#28a745; color:white; padding:10px; width:100%; border:none; border-radius:5px;">Send</button>
+        <input type="text" id="contact-name" placeholder="Your Name" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;">
+        <input type="email" id="contact-email" placeholder="Your Email" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;">
+        <textarea id="contact-message" placeholder="Message" rows="3" style="width:100%; margin:5px 0; padding:12px; border-radius:12px; border:1px solid #e8dcc8;"></textarea>
+        <button onclick="sendContactMessage()" style="background:linear-gradient(135deg,#c9a03d,#b8860b); color:white; padding:12px; width:100%; border:none; border-radius:40px; cursor:pointer;">Send Message</button>
     </div>
 </div>
 
 <div id="successModal" class="success-modal">
     <div class="success-modal-content">
-        <div class="success-icon">✅</div>
+        <div class="success-icon">✨</div>
         <h3>Order Placed Successfully!</h3>
         <p>Your order has been confirmed and will be processed soon.</p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <button onclick="closeSuccessModalAndContinue()">🛍️ Continue Shopping</button>
-            <button onclick="closeSuccessModalAndViewOrders()" class="view-orders-btn">📋 View My Orders</button>
+            <button onclick="closeSuccessModalAndContinue()" style="background:linear-gradient(135deg,#c9a03d,#b8860b); color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer;">🛍️ Continue Shopping</button>
+            <button onclick="closeSuccessModalAndViewOrders()" class="view-orders-btn" style="background:#2d2b4a; color:#ffd700; border:none; padding:10px 20px; border-radius:30px; cursor:pointer;">📋 View My Orders</button>
         </div>
     </div>
 </div>
 
 <div id="shop-container"></div>
 
-<div id="orders-history-container" style="max-width: 800px; margin: 30px auto; padding: 0 15px;">
-    <div class="history-heading" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>Your Order History & Tracking Details</h2>
-        <button onclick="showStorefront()" style="background:#37475a; color:white; border:none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">← Back to Shopping</button>
+<div id="orders-history-container">
+    <div class="history-heading">
+        <h2>📋 Your Order History</h2>
+        <button class="back-shop-btn" onclick="showStorefront()">← Back to Shopping</button>
     </div>
     <div id="history-items-list">Loading orders...</div>
 </div>
@@ -396,13 +617,15 @@
     let cart = [];
     let allProducts = [];
     let currentCategory = 'All';
+    let selectedAddressId = null;
+    let userAddresses = [];
 
     function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
     
     function showMessage(msg, isErr = false) {
         const d = document.createElement('div');
         d.className = 'cart-message';
-        d.style.background = isErr ? '#dc3545' : '#27ae60';
+        d.style.background = isErr ? '#f44336' : 'linear-gradient(135deg, #c9a03d, #b8860b)';
         d.textContent = msg;
         document.body.appendChild(d);
         setTimeout(() => d.remove(), 3000);
@@ -413,7 +636,7 @@
         const userBar = document.getElementById('user-bar');
         const loggedInUser = localStorage.getItem('user');
         if (loggedInUser) {
-            userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
+            userBar.innerHTML = `<span class="store-name-header">✨ Sarees By Kuhu</span>
                 <div class="user-menu">
                     <span class="user-name" onclick="toggleUserDropdown()">👤 Welcome, <b>${escapeHtml(loggedInUser)}</b> ▼</span>
                     <div id="userDropdown" class="user-dropdown">
@@ -424,7 +647,7 @@
                     </div>
                 </div>`;
         } else {
-            userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
+            userBar.innerHTML = `<span class="store-name-header">✨ Sarees By Kuhu</span>
                 <a href="auth.html">🔑 Login / Register</a>
                 <a onclick="openContactModal()">📞 Contact</a>`;
         }
@@ -435,12 +658,235 @@
     document.addEventListener('click', function(e) { const dd = document.getElementById('userDropdown'); if (dd && dd.style.display === 'block' && !e.target.closest('.user-menu')) dd.style.display = 'none'; });
     function logout() { localStorage.removeItem('user'); window.location.href = "index.html"; }
     
+    // Address Functions
+    async function loadUserAddresses() {
+        const username = localStorage.getItem('user');
+        if (!username) return [];
+        try {
+            const response = await fetch(`${API_BASE}/addresses/${username}`);
+            const addresses = await response.json();
+            userAddresses = addresses;
+            return addresses;
+        } catch (error) {
+            console.error("Error loading addresses:", error);
+            return [];
+        }
+    }
+    
+    async function displayAddressesInModal() {
+        const addresses = await loadUserAddresses();
+        const container = document.getElementById('address-list-container');
+        if (!container) return;
+        
+        if (addresses.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#888;">No saved addresses. Add one below.</p>';
+            selectedAddressId = null;
+        } else {
+            const defaultAddr = addresses.find(a => a.isDefault);
+            if (defaultAddr && !selectedAddressId) selectedAddressId = defaultAddr.id;
+            
+            container.innerHTML = addresses.map(addr => `
+                <div class="address-card ${selectedAddressId === addr.id ? 'selected' : ''}" onclick="selectAddress(${addr.id})">
+                    ${addr.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                    <div class="address-type ${addr.addressType.toLowerCase()}">${addr.addressType}</div>
+                    <div><strong>${escapeHtml(addr.name)}</strong></div>
+                    <div>📞 ${addr.phone}</div>
+                    <div>${escapeHtml(addr.addressLine)}, ${escapeHtml(addr.city)}</div>
+                    <div>${escapeHtml(addr.state)} - ${addr.pincode}</div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function selectAddress(id) {
+        selectedAddressId = id;
+        document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+        const selectedCard = document.querySelector(`.address-card[onclick="selectAddress(${id})"]`);
+        if (selectedCard) selectedCard.classList.add('selected');
+    }
+    
+    function showAddAddressForm() {
+        document.getElementById('new-address-form').style.display = 'block';
+    }
+    
+    function cancelNewAddress() {
+        document.getElementById('new-address-form').style.display = 'none';
+        document.getElementById('new-addr-name').value = '';
+        document.getElementById('new-addr-phone').value = '';
+        document.getElementById('new-addr-line').value = '';
+        document.getElementById('new-addr-city').value = '';
+        document.getElementById('new-addr-state').value = '';
+        document.getElementById('new-addr-pincode').value = '';
+        document.getElementById('new-addr-type').value = 'Home';
+        document.getElementById('new-addr-default').checked = false;
+    }
+    
+    async function saveNewAddress() {
+        const username = localStorage.getItem('user');
+        if (!username) {
+            alert("Please login first");
+            window.location.href = "auth.html";
+            return;
+        }
+        
+        const addressData = {
+            username,
+            name: document.getElementById('new-addr-name').value.trim(),
+            phone: document.getElementById('new-addr-phone').value.trim(),
+            addressLine: document.getElementById('new-addr-line').value.trim(),
+            city: document.getElementById('new-addr-city').value.trim(),
+            state: document.getElementById('new-addr-state').value.trim(),
+            pincode: document.getElementById('new-addr-pincode').value.trim(),
+            addressType: document.getElementById('new-addr-type').value,
+            isDefault: document.getElementById('new-addr-default').checked
+        };
+        
+        if (!addressData.name || !addressData.phone || !addressData.addressLine || !addressData.city || !addressData.state || !addressData.pincode) {
+            alert("Please fill all fields");
+            return;
+        }
+        
+        if (!/^\d{10}$/.test(addressData.phone)) {
+            alert("Please enter a valid 10-digit phone number");
+            return;
+        }
+        
+        if (!/^\d{6}$/.test(addressData.pincode)) {
+            alert("Please enter a valid 6-digit pincode");
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE}/addresses`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(addressData)
+            });
+            
+            if (response.ok) {
+                showMessage("Address saved successfully!");
+                cancelNewAddress();
+                await displayAddressesInModal();
+                if (addressData.isDefault) selectedAddressId = (await response.json()).id;
+            } else {
+                alert("Failed to save address");
+            }
+        } catch (error) {
+            console.error("Error saving address:", error);
+            alert("Error saving address");
+        }
+    }
+    
+    async function displaySavedAddressesInProfile() {
+        const addresses = await loadUserAddresses();
+        const container = document.getElementById('saved-addresses-list');
+        if (!container) return;
+        
+        if (addresses.length === 0) {
+            container.innerHTML = '<p style="color:#888;">No saved addresses</p>';
+            return;
+        }
+        
+        container.innerHTML = addresses.map(addr => `
+            <div style="background:#f8f5f0; border-radius:12px; padding:12px; margin-bottom:10px; position:relative;">
+                ${addr.isDefault ? '<span style="position:absolute; top:8px; right:8px; background:#c9a03d; color:white; padding:2px 8px; border-radius:20px; font-size:10px;">Default</span>' : ''}
+                <div><strong>${escapeHtml(addr.name)}</strong> (${addr.addressType})</div>
+                <div>📞 ${addr.phone}</div>
+                <div>${escapeHtml(addr.addressLine)}, ${escapeHtml(addr.city)}</div>
+                <div>${escapeHtml(addr.state)} - ${addr.pincode}</div>
+                <button onclick="deleteAddress(${addr.id})" style="margin-top:8px; background:#ff4d4d; color:white; border:none; padding:4px 12px; border-radius:20px; cursor:pointer;">Delete</button>
+                ${!addr.isDefault ? `<button onclick="setDefaultAddress(${addr.id})" style="margin-top:8px; margin-left:8px; background:#c9a03d; color:white; border:none; padding:4px 12px; border-radius:20px; cursor:pointer;">Set Default</button>` : ''}
+            </div>
+        `).join('');
+    }
+    
+    async function deleteAddress(id) {
+        if (!confirm("Delete this address?")) return;
+        try {
+            await fetch(`${API_BASE}/addresses/${id}`, { method: 'DELETE' });
+            showMessage("Address deleted");
+            await displayAddressesInModal();
+            await displaySavedAddressesInProfile();
+        } catch (error) {
+            alert("Error deleting address");
+        }
+    }
+    
+    async function setDefaultAddress(id) {
+        try {
+            await fetch(`${API_BASE}/addresses/${id}/default`, { method: 'PATCH' });
+            showMessage("Default address updated");
+            await displayAddressesInModal();
+            await displaySavedAddressesInProfile();
+        } catch (error) {
+            alert("Error setting default address");
+        }
+    }
+    
+    function showProfileAddAddress() {
+        const newForm = document.createElement('div');
+        newForm.innerHTML = `
+            <div style="margin-top: 15px; padding: 15px; background: #f8f5f0; border-radius: 12px;">
+                <h4>New Address</h4>
+                <input type="text" id="profile-new-name" placeholder="Full Name" style="width:100%; margin:5px 0; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="tel" id="profile-new-phone" placeholder="Phone" style="width:100%; margin:5px 0; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="profile-new-line" placeholder="Address Line" style="width:100%; margin:5px 0; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="profile-new-city" placeholder="City" style="width:100%; margin:5px 0; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="profile-new-state" placeholder="State" style="width:100%; margin:5px 0; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="profile-new-pincode" placeholder="Pincode" style="width:100%; margin:5px 0; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <select id="profile-new-type" style="width:100%; margin:5px 0; padding:10px; border-radius:8px;">
+                    <option value="Home">🏠 Home</option>
+                    <option value="Work">💼 Work</option>
+                    <option value="Other">📍 Other</option>
+                </select>
+                <label><input type="checkbox" id="profile-new-default"> Set as default</label>
+                <button onclick="saveProfileNewAddress()" style="background:#c9a03d; color:white; border:none; padding:10px; border-radius:8px; margin-top:10px; width:100%;">Save</button>
+                <button onclick="this.parentElement.remove()" style="background:#888; color:white; border:none; padding:8px; border-radius:8px; margin-top:5px; width:100%;">Cancel</button>
+            </div>
+        `;
+        document.getElementById('saved-addresses-list').appendChild(newForm);
+    }
+    
+    async function saveProfileNewAddress() {
+        const username = localStorage.getItem('user');
+        if (!username) return;
+        
+        const addressData = {
+            username,
+            name: document.getElementById('profile-new-name').value.trim(),
+            phone: document.getElementById('profile-new-phone').value.trim(),
+            addressLine: document.getElementById('profile-new-line').value.trim(),
+            city: document.getElementById('profile-new-city').value.trim(),
+            state: document.getElementById('profile-new-state').value.trim(),
+            pincode: document.getElementById('profile-new-pincode').value.trim(),
+            addressType: document.getElementById('profile-new-type').value,
+            isDefault: document.getElementById('profile-new-default').checked
+        };
+        
+        if (!addressData.name || !addressData.phone || !addressData.addressLine || !addressData.city || !addressData.state || !addressData.pincode) {
+            alert("Please fill all fields");
+            return;
+        }
+        
+        try {
+            await fetch(`${API_BASE}/addresses`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(addressData)
+            });
+            showMessage("Address saved!");
+            await displaySavedAddressesInProfile();
+        } catch (error) {
+            alert("Error saving address");
+        }
+    }
+    
     function showStorefront() {
         document.getElementById('orders-history-container').style.display = 'none';
         document.getElementById('shop-container').style.display = 'flex';
         document.getElementById('category-menu').style.display = 'flex';
         document.getElementById('search-bar').style.display = 'block';
-        const cartHeader = document.querySelector('header > div:last-child');
+        const cartHeader = document.querySelector('.cart-header');
         if (cartHeader) cartHeader.style.display = 'block';
         filterProducts();
         const url = new URL(window.location.href);
@@ -449,7 +895,7 @@
         document.body.classList.remove('show-orders-initially');
     }
     
-    // View Orders
+    // View Orders with improved styling
     window.viewOrdersDirect = async function() {
         const username = localStorage.getItem('user');
         if (!username) { alert("Please login first"); window.location.href = "auth.html"; return; }
@@ -459,7 +905,7 @@
         document.getElementById('search-bar').style.display = 'none';
         document.getElementById('orders-history-container').style.display = 'block';
         
-        const cartHeader = document.querySelector('header > div:last-child');
+        const cartHeader = document.querySelector('.cart-header');
         if (cartHeader) cartHeader.style.display = 'none';
         
         try {
@@ -468,22 +914,42 @@
             const userOrders = orders.filter(o => o.username === username).reverse();
             
             if (userOrders.length === 0) { 
-                document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; 
+                document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:60px; background:white; border-radius:20px;">✨ You haven\'t placed any orders yet. Start shopping!</p>'; 
                 return; 
             }
             
-            document.getElementById('history-items-list').innerHTML = userOrders.map(order => `
+            document.getElementById('history-items-list').innerHTML = userOrders.map(order => {
+                let statusClass = '';
+                let statusIcon = '';
+                if (order.status === 'Pending') { statusClass = 'status-pending'; statusIcon = '⏳'; }
+                else if (order.status === 'Shipped') { statusClass = 'status-shipped'; statusIcon = '🚚'; }
+                else if (order.status === 'Delivered') { statusClass = 'status-delivered'; statusIcon = '✅'; }
+                else if (order.status === 'Cancelled') { statusClass = 'status-cancelled'; statusIcon = '❌'; }
+                
+                return `
                 <div class="order-history-card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <div><span>🆔 Order #${order.orderId}</span><span style="margin-left:10px; background:#37475a; color:white; padding:2px 8px; border-radius:4px; font-size:11px;">${order.status}</span></div>
-                        <span>📅 ${order.date || 'N/A'}</span>
+                    <div class="order-header">
+                        <div>
+                            <span class="order-id">🆔 ORDER #${order.orderId}</span>
+                            <span class="order-date">📅 ${order.date || 'N/A'}</span>
+                        </div>
+                        <span class="status-badge ${statusClass}">${statusIcon} ${order.status}</span>
                     </div>
-                    ${order.items.map(item => `<div style="border-bottom:1px solid #eee; padding:8px 0;"><strong>${escapeHtml(item.productName)}</strong> x ${item.quantity} = ₹${item.subtotal}</div>`).join('')}
-                    <div style="margin-top:10px; padding-top:10px; border-top:2px solid #ddd;"><strong>Total: ₹${order.totalAmount}</strong></div>
-                    ${order.trackingId ? `<div class="tracking-info">📦 Tracking: ${order.trackingId}</div>` : ''}
-                    ${order.status === 'Pending' ? `<button class="cancel-order-btn" onclick="requestCancellation(${order.orderId})" style="margin-top:10px;">❌ Request Cancellation</button>` : ''}
+                    <div class="order-items">
+                        ${order.items.map(item => `
+                            <div class="order-item">
+                                <span><strong>${escapeHtml(item.productName)}</strong> × ${item.quantity}</span>
+                                <span>₹${item.subtotal}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="order-total">
+                        Total Amount: ₹${order.totalAmount}
+                    </div>
+                    ${order.trackingId ? `<div class="tracking-info">📦 Tracking ID: ${order.trackingId}</div>` : ''}
+                    ${order.status === 'Pending' ? `<button class="cancel-order-btn" onclick="requestCancellation(${order.orderId})">❌ Request Cancellation</button>` : ''}
                 </div>
-            `).join('');
+            `}).join('');
         } catch (error) {
             console.error("Error loading orders:", error);
             document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">Error loading orders. Please try again.</p>';
@@ -500,7 +966,6 @@
         } catch(e) { alert("Error: " + e.message); }
     }
     
-    // Success Modal Handlers
     function closeSuccessModalAndContinue() {
         document.getElementById('successModal').classList.remove('show');
         showStorefront();
@@ -510,9 +975,6 @@
     function closeSuccessModalAndViewOrders() {
         document.getElementById('successModal').classList.remove('show');
         viewOrdersDirect();
-        const url = new URL(window.location.href);
-        url.searchParams.delete('showOrders');
-        window.history.replaceState({}, '', url);
     }
     
     // Cart Functions
@@ -593,8 +1055,8 @@
             <div class="product-card" onclick="goToProductPage(${p.id})">
                 <img src="${p.images?.[0] || p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
                 <h3>${escapeHtml(p.name)}</h3>
-                <p style="color:#B12704; font-weight:bold;">₹${p.price}</p>
-                <p style="font-size:12px; color:${p.stock > 0 ? '#28a745' : 'red'}">${p.stock > 0 ? 'Stock: ' + p.stock : 'Out of Stock'}</p>
+                <p style="color:#c9a03d; font-weight:bold;">₹${p.price}</p>
+                <p style="font-size:12px; color:${p.stock > 0 ? '#4caf50' : '#f44336'}">${p.stock > 0 ? '✓ In Stock' : '✗ Out of Stock'}</p>
                 <button class="view-details-btn" onclick="event.stopPropagation(); goToProductPage(${p.id})">View Details →</button>
             </div>
         `).join('');
@@ -623,14 +1085,67 @@
         }
     }
     
-    function openShippingModal() {
+    async function openShippingModal() {
         if (cart.length === 0) { alert("Cart is empty"); return; }
         if (!localStorage.getItem('user')) { alert("Please login"); window.location.href = "auth.html"; return; }
         toggleCart();
-        loadProfileForShipping();
+        await displayAddressesInModal();
         document.getElementById('shippingModal').style.display = 'block';
     }
-    function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; }
+    function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; cancelNewAddress(); }
+    
+    async function proceedToCheckout() {
+        if (!selectedAddressId) {
+            alert("Please select a shipping address");
+            return;
+        }
+        
+        const selectedAddr = userAddresses.find(a => a.id === selectedAddressId);
+        if (!selectedAddr) {
+            alert("Selected address not found");
+            return;
+        }
+        
+        const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
+        const orderData = { 
+            cartItems: cart.map(item => ({ productId: item.productId, quantity: item.quantity })),
+            customerName: selectedAddr.name, 
+            phone: selectedAddr.phone, 
+            address: `${selectedAddr.addressLine}, ${selectedAddr.city}, ${selectedAddr.state} - ${selectedAddr.pincode}`
+        };
+        
+        closeShippingModal();
+        
+        const useRazorpay = confirm("Choose Payment:\n• OK for Card/NetBanking (Razorpay)\n• Cancel for Test Mode");
+        
+        if(useRazorpay){
+            try{ 
+                const orderRes = await fetch(`${API_BASE}/create-order`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({amount:total}) }); 
+                const order = await orderRes.json(); 
+                const keyRes = await fetch(`${API_BASE}/get-razorpay-key`); 
+                const {key} = await keyRes.json(); 
+                const options = { key, amount: order.amount, currency: order.currency, name: 'Sarees By Kuhu', order_id: order.order_id, prefill: { name: selectedAddr.name, contact: selectedAddr.phone }, theme: { color: '#c9a03d' }, handler: async (response) => { 
+                    const verifyRes = await fetch(`${API_BASE}/verify-payment`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(response) }); 
+                    if((await verifyRes.json()).success) { 
+                        const orderSuccess = await placeOrder(orderData, response.razorpay_payment_id);
+                        if(orderSuccess) {
+                            cart = []; 
+                            updateCartUI(); 
+                            document.getElementById('successModal').classList.add('show');
+                        } else { alert("Payment verified but order placement had issues."); }
+                    } else alert("Verification failed"); 
+                } }; 
+                new Razorpay(options).open(); 
+            } catch(e){ alert("Payment error: " + e.message); }
+        } else { 
+            const orderSuccess = await placeOrder(orderData, "test_payment");
+            if(orderSuccess) {
+                cart = []; 
+                updateCartUI(); 
+                document.getElementById('successModal').classList.add('show');
+            } else { alert("[TEST MODE] Order placement failed. Please try again."); }
+        }
+    }
     
     async function placeOrder(orderData, paymentId) { 
         const username = localStorage.getItem('user');
@@ -668,81 +1183,14 @@
         }
     }
     
-    async function checkout() {
-        const name = document.getElementById('ship-name').value.trim(); 
-        const phone = document.getElementById('ship-phone').value.trim(); 
-        const address = document.getElementById('ship-address').value.trim(); 
-        const email = document.getElementById('ship-email').value.trim();
-        
-        if(!name || !phone || !address){ alert("Fill all fields"); return; }
-        
-        const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-        
-        const orderData = { 
-            cartItems: cart.map(item => ({ productId: item.productId, quantity: item.quantity })),
-            customerName: name, 
-            customerEmail: email, 
-            phone: phone, 
-            address: address
-        };
-        
-        closeShippingModal();
-        
-        const useRazorpay = confirm("Choose Payment:\n• OK for Card/NetBanking (Razorpay)\n• Cancel for Test Mode");
-        
-        if(useRazorpay){
-            try{ 
-                const orderRes = await fetch(`${API_BASE}/create-order`, { 
-                    method:'POST', 
-                    headers:{'Content-Type':'application/json'}, 
-                    body:JSON.stringify({amount:total}) 
-                }); 
-                const order = await orderRes.json(); 
-                const keyRes = await fetch(`${API_BASE}/get-razorpay-key`); 
-                const {key} = await keyRes.json(); 
-                const options = { 
-                    key, amount: order.amount, currency: order.currency, name: 'Sarees By Kuhu', 
-                    order_id: order.order_id, prefill: { name, contact: phone, email }, 
-                    theme: { color: '#27ae60' }, 
-                    handler: async (response) => { 
-                        const verifyRes = await fetch(`${API_BASE}/verify-payment`, { 
-                            method:'POST', 
-                            headers:{'Content-Type':'application/json'}, 
-                            body:JSON.stringify(response) 
-                        }); 
-                        if((await verifyRes.json()).success) { 
-                            const orderSuccess = await placeOrder(orderData, response.razorpay_payment_id);
-                            if(orderSuccess) {
-                                cart = []; 
-                                updateCartUI(); 
-                                document.getElementById('successModal').classList.add('show');
-                            } else { 
-                                alert("Payment verified but order placement had issues."); 
-                            }
-                        } else alert("Verification failed"); 
-                    } 
-                }; 
-                new Razorpay(options).open(); 
-            } catch(e){ alert("Payment error: " + e.message); }
-        } else { 
-            const orderSuccess = await placeOrder(orderData, "test_payment");
-            if(orderSuccess) {
-                cart = []; 
-                updateCartUI(); 
-                document.getElementById('successModal').classList.add('show');
-            } else { 
-                alert("[TEST MODE] Order placement failed. Please try again."); 
-            }
-        }
-    }
-    
     // Profile & Contact
-    function openProfileModal() {
+    async function openProfileModal() {
         const user = localStorage.getItem('user');
         if (!user) { alert("Login first"); window.location.href = "auth.html"; return; }
         const p = localStorage.getItem(`profile_${user}`);
         if (p) { const d = JSON.parse(p); document.getElementById('profile-email').value = d.email || ''; document.getElementById('profile-name').value = d.name || ''; document.getElementById('profile-phone').value = d.phone || ''; document.getElementById('profile-address').value = d.address || ''; }
         else { document.getElementById('profile-email').value = ''; document.getElementById('profile-name').value = ''; document.getElementById('profile-phone').value = ''; document.getElementById('profile-address').value = ''; }
+        await displaySavedAddressesInProfile();
         document.getElementById('profileModal').style.display = 'block';
     }
     function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
@@ -773,7 +1221,6 @@
     function checkUrlForOrders() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('showOrders') === 'true') {
-            document.body.classList.add('show-orders-initially');
             const username = localStorage.getItem('user');
             if (username) {
                 setTimeout(function() { viewOrdersDirect(); }, 50);
@@ -791,7 +1238,7 @@
             if (e.target === modal) modal.style.display = 'none';
         });
         const cartDrawer = document.getElementById('cart-view');
-        const cartHeader = document.querySelector('header div[onclick="toggleCart()"]');
+        const cartHeader = document.querySelector('.cart-header');
         if (cartDrawer && cartDrawer.classList && cartDrawer.classList.contains('open')) {
             if (!cartDrawer.contains(e.target) && cartHeader && !cartHeader.contains(e.target)) {
                 cartDrawer.classList.remove('open');
