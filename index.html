@@ -5,15 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Sarees By Kuhu | Buyer View</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; }
         
-        /* Hide shop elements initially if showing orders - FIX FOR NO FLICKER */
         body.show-orders-initially #shop-container,
         body.show-orders-initially .category-nav,
         body.show-orders-initially #search-bar,
@@ -24,7 +18,6 @@
             display: block !important;
         }
         
-        /* User Profile Bar */
         .user-bar {
             background: #131921;
             color: #ccc;
@@ -34,22 +27,9 @@
             position: relative;
             z-index: 1002;
         }
-        .store-name-header {
-            float: left;
-            font-weight: bold;
-            color: #f0c14b;
-        }
-        .user-bar a {
-            color: #f0c14b !important;
-            text-decoration: none;
-            margin-left: 15px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .user-bar a:hover {
-            text-decoration: underline;
-            color: #ddb347 !important;
-        }
+        .store-name-header { float: left; font-weight: bold; color: #f0c14b; }
+        .user-bar a { color: #f0c14b !important; text-decoration: none; margin-left: 15px; cursor: pointer; font-weight: bold; }
+        .user-bar a:hover { text-decoration: underline; color: #ddb347 !important; }
         .user-menu { position: relative; display: inline-block; z-index: 1001; }
         .user-name { cursor: pointer; padding: 5px 12px; background: rgba(255,255,255,0.15); border-radius: 6px; }
         .user-dropdown {
@@ -77,20 +57,9 @@
         .user-dropdown a:hover { background: #f8f9fa; color: #27ae60; }
         .user-dropdown a:last-child { border-bottom: none; }
         
-        /* Logo Styles - BIGGER */
-        .logo-container {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-        .store-logo {
-            height: 100px;
-            width: auto;
-            max-width: 320px;
-            object-fit: contain;
-        }
+        .logo-container { cursor: pointer; display: flex; align-items: center; }
+        .store-logo { height: 100px; width: auto; max-width: 320px; object-fit: contain; }
         
-        /* Header */
         header {
             background: #232f3e;
             color: white;
@@ -106,7 +75,6 @@
         }
         #search-bar { padding: 10px; border-radius: 5px; border: none; width: 300px; outline: none; }
         
-        /* Category Menu */
         .category-nav {
             background: #37475a;
             padding: 10px;
@@ -125,7 +93,6 @@
         }
         .cat-btn:hover, .cat-btn.active { background: white; color: #232f3e; }
         
-        /* Product Grid */
         #shop-container {
             display: flex;
             flex-wrap: wrap;
@@ -160,7 +127,6 @@
             width: 100%;
         }
         
-        /* CART DRAWER - Completely hidden when closed */
         .cart-drawer {
             display: none !important;
             position: fixed;
@@ -175,32 +141,13 @@
             z-index: 10000;
             overflow-y: auto;
         }
-        .cart-drawer.open {
-            display: block !important;
-        }
-        .close-btn {
-            cursor: pointer;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            color: #888;
-        }
-        .checkout-btn {
-            background: #28a745;
-            color: white;
-            width: 100%;
-            border: none;
-            padding: 12px;
-            font-weight: bold;
-            margin-top: 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+        .cart-drawer.open { display: block !important; }
+        .close-btn { cursor: pointer; float: right; font-size: 28px; font-weight: bold; color: #888; }
+        .checkout-btn { background: #28a745; color: white; width: 100%; border: none; padding: 12px; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; }
         #cart-items { list-style: none; padding: 0; margin-top: 40px; }
         .cart-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .remove-btn { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; }
         
-        /* Footer Styles */
         .footer {
             background: #232f3e;
             color: #ccc;
@@ -216,42 +163,13 @@
             flex-wrap: wrap;
             gap: 30px;
         }
-        .footer-section {
-            flex: 1;
-            min-width: 200px;
-            text-align: left;
-        }
-        .footer-section h3 {
-            color: #f0c14b;
-            margin-bottom: 15px;
-        }
-        .footer-section p, .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-        .footer-section a:hover {
-            color: #f0c14b;
-        }
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        .social-links a {
-            display: inline-block;
-        }
-        .copyright {
-            text-align: center;
-            padding-top: 20px;
-            margin-top: 20px;
-            border-top: 1px solid #37475a;
-            font-size: 12px;
-        }
+        .footer-section { flex: 1; min-width: 200px; text-align: left; }
+        .footer-section h3 { color: #f0c14b; margin-bottom: 15px; }
+        .footer-section p, .footer-section a { color: #ccc; text-decoration: none; display: block; margin-bottom: 8px; cursor: pointer; }
+        .footer-section a:hover { color: #f0c14b; }
+        .social-links { display: flex; gap: 15px; margin-top: 10px; }
+        .copyright { text-align: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #37475a; font-size: 12px; }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -277,17 +195,8 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .form-submit-btn {
-            background: #28a745;
-            color: white;
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+        .form-submit-btn { background: #28a745; color: white; width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; }
         
-        /* Success Modal */
         .success-modal {
             display: none;
             position: fixed;
@@ -321,7 +230,6 @@
         }
         .success-modal-content .view-orders-btn { background: #3498db; }
         
-        /* Order History */
         .order-history-card {
             background: white;
             border-radius: 8px;
@@ -344,12 +252,8 @@
             margin-top: 10px;
         }
         
-        /* Order History Container - Hidden by default */
-        #orders-history-container {
-            display: none;
-        }
+        #orders-history-container { display: none; }
         
-        /* Toast Message */
         .cart-message {
             position: fixed;
             bottom: 20px;
@@ -367,673 +271,539 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
-        /* ========== MOBILE STYLES ========== */
         @media screen and (max-width: 768px) {
-            .store-logo {
-                height: 75px;
-                max-width: 240px;
-            }
-            header {
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                gap: 12px;
-                padding: 12px;
-            }
-            .logo-container {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-            }
+            .store-logo { height: 75px; max-width: 240px; }
+            header { flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 12px; padding: 12px; }
+            .logo-container { justify-content: center; width: 100%; }
             #search-bar { width: 90%; margin: 0 auto; }
-            header > div:last-child {
-                display: inline-block;
-                background: #f0c14b;
-                color: #111;
-                padding: 8px 20px;
-                border-radius: 8px;
-                font-weight: bold;
-            }
-            #shop-container {
-                padding: 15px;
-                gap: 12px;
-            }
-            .product-card {
-                width: calc(50% - 6px);
-                min-width: auto;
-                padding: 10px;
-            }
+            #shop-container { padding: 15px; gap: 12px; }
+            .product-card { width: calc(50% - 6px); min-width: auto; padding: 10px; }
             .product-card img { height: 120px; }
-            .product-card h3 { font-size: 12px; }
-            .view-details-btn { font-size: 11px; padding: 6px 10px; }
-            .category-nav {
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                justify-content: flex-start;
-                -webkit-overflow-scrolling: touch;
-            }
-            .cat-btn { white-space: nowrap; }
-            .user-bar { 
-                padding: 8px 12px; 
-                text-align: center; 
-                font-size: 12px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-            }
+            .user-bar { padding: 8px 15px; text-align: center; flex-direction: column; gap: 5px; }
             .store-name-header { float: none; display: block; margin-bottom: 5px; }
-            .user-bar a {
-                display: inline-block;
-                margin: 0 8px;
-                background: #f0c14b;
-                color: #111 !important;
-                padding: 6px 15px;
-                border-radius: 6px;
-                text-decoration: none;
-            }
             .footer { padding: 20px 15px; }
             .footer-content { flex-direction: column; gap: 20px; text-align: center; }
             .footer-section { text-align: center; }
-            .success-modal-content { padding: 25px; margin: 15px; }
-            .success-icon { font-size: 55px; }
-            .cart-message { left: 20px; right: 20px; bottom: 80px; text-align: center; }
-            body.show-orders-initially .user-bar { margin-bottom: 0; }
         }
-        
         @media screen and (max-width: 480px) {
             .product-card img { height: 100px; }
-            .product-card h3 { font-size: 11px; }
             .store-logo { height: 65px; max-width: 200px; }
-        }
-        
-        @media screen and (min-width: 769px) and (max-width: 1024px) {
-            .product-card { width: calc(33.33% - 14px); }
-            .store-logo { height: 70px; max-width: 220px; }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
-    <div class="user-bar" id="user-bar">
-        <span class="store-name-header">🏪 Sarees By Kuhu</span>
+<div class="user-bar" id="user-bar">
+    <span class="store-name-header">🏪 Sarees By Kuhu</span>
+</div>
+
+<header>
+    <div class="logo-container" onclick="showStorefront()">
+        <img src="logo.png" alt="Sarees By Kuhu" class="store-logo" onerror="this.src='https://via.placeholder.com/250x75?text=Sarees+By+Kuhu'">
     </div>
-
-    <header>
-        <div class="logo-container" onclick="showStorefront()">
-            <img src="logo.png" alt="Sarees By Kuhu" class="store-logo" onerror="this.src='https://via.placeholder.com/250x75?text=Sarees+By+Kuhu'">
-        </div>
-        <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
-        <div onclick="toggleCart()" style="cursor:pointer; font-weight: bold;">
-            🛒 Cart (<span id="cart-count">0</span>)
-        </div>
-    </header>
-
-    <nav class="category-nav" id="category-menu"></nav>
-
-    <!-- CART DRAWER -->
-    <div class="cart-drawer" id="cart-view">
-        <span class="close-btn" onclick="toggleCart()">&times;</span>
-        <h3>Your Shopping Cart</h3>
-        <ul id="cart-items"></ul>
-        <div id="cart-total-display"></div>
-        <button class="checkout-btn" onclick="openShippingModal()">Place Order</button>
+    <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
+    <div onclick="toggleCart()" style="cursor:pointer; font-weight: bold;">
+        🛒 Cart (<span id="cart-count">0</span>)
     </div>
+</header>
 
-    <div id="shippingModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeShippingModal()">&times;</span>
-            <h2>Shipping Details</h2>
-            <div class="shipping-form">
-                <input type="email" id="ship-email" placeholder="Email Address" required>
-                <input type="text" id="ship-name" placeholder="Full Name" required>
-                <input type="text" id="ship-phone" placeholder="Phone Number" required>
-                <textarea id="ship-address" placeholder="Complete Address" rows="3" required></textarea>
-                <button class="form-submit-btn" onclick="checkout()">Confirm Order</button>
-            </div>
+<nav class="category-nav" id="category-menu"></nav>
+
+<div class="cart-drawer" id="cart-view">
+    <span class="close-btn" onclick="toggleCart()">&times;</span>
+    <h3>Your Shopping Cart</h3>
+    <ul id="cart-items"></ul>
+    <div id="cart-total-display"></div>
+    <button class="checkout-btn" onclick="openShippingModal()">Place Order</button>
+</div>
+
+<div id="shippingModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeShippingModal()">&times;</span>
+        <h2>Shipping Details</h2>
+        <div class="shipping-form">
+            <input type="email" id="ship-email" placeholder="Email Address" required>
+            <input type="text" id="ship-name" placeholder="Full Name" required>
+            <input type="text" id="ship-phone" placeholder="Phone Number" required>
+            <textarea id="ship-address" placeholder="Complete Address" rows="3" required></textarea>
+            <button class="form-submit-btn" onclick="checkout()">Confirm Order</button>
         </div>
     </div>
+</div>
 
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeProfileModal()">&times;</span>
-            <h2>My Profile</h2>
-            <div class="profile-form-group" style="margin-bottom:15px;">
-                <label>📧 Email Address</label>
-                <input type="email" id="profile-email" placeholder="Your email address" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
-            </div>
-            <div class="profile-form-group" style="margin-bottom:15px;">
-                <label>👤 Full Name</label>
-                <input type="text" id="profile-name" placeholder="Your full name" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
-            </div>
-            <div class="profile-form-group" style="margin-bottom:15px;">
-                <label>📞 Phone Number</label>
-                <input type="tel" id="profile-phone" placeholder="Mobile number" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
-            </div>
-            <div class="profile-form-group" style="margin-bottom:15px;">
-                <label>📍 Default Shipping Address</label>
-                <textarea id="profile-address" placeholder="House/Office No., Locality, Landmark, City, State, PIN" rows="3" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
-            </div>
-            <button onclick="saveProfile()" style="background:#27ae60; color:white; padding:12px; width:100%; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">💾 Save Profile</button>
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeProfileModal()">&times;</span>
+        <h2>My Profile</h2>
+        <input type="email" id="profile-email" placeholder="Email" style="width:100%; margin:5px 0; padding:10px;">
+        <input type="text" id="profile-name" placeholder="Full Name" style="width:100%; margin:5px 0; padding:10px;">
+        <input type="tel" id="profile-phone" placeholder="Phone" style="width:100%; margin:5px 0; padding:10px;">
+        <textarea id="profile-address" placeholder="Shipping Address" rows="2" style="width:100%; margin:5px 0; padding:10px;"></textarea>
+        <button onclick="saveProfile()" style="background:#27ae60; color:white; width:100%; padding:12px; margin-top:10px; border:none; border-radius:8px;">Save Profile</button>
+    </div>
+</div>
+
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeContactModal()">&times;</span>
+        <h2>Contact Us</h2>
+        <hr>
+        <p>✉️ Kahkashanp7@gmail.com</p>
+        <p>📍 Lalbagh, Purneacity, Bihar 854302</p>
+        <hr style="margin:15px 0;">
+        <input type="text" id="contact-name" placeholder="Your Name" style="width:100%; margin:5px 0; padding:10px;">
+        <input type="email" id="contact-email" placeholder="Your Email" style="width:100%; margin:5px 0; padding:10px;">
+        <textarea id="contact-message" placeholder="Message" rows="3" style="width:100%; margin:5px 0; padding:10px;"></textarea>
+        <button onclick="sendContactMessage()" style="background:#28a745; color:white; padding:10px; width:100%; border:none; border-radius:5px;">Send</button>
+    </div>
+</div>
+
+<div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <div class="success-icon">✅</div>
+        <h3>Order Placed Successfully!</h3>
+        <p>Your order has been confirmed and will be processed soon.</p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="closeSuccessModalAndContinue()">🛍️ Continue Shopping</button>
+            <button onclick="closeSuccessModalAndViewOrders()" class="view-orders-btn">📋 View My Orders</button>
         </div>
     </div>
+</div>
 
-    <div id="contactModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeContactModal()">&times;</span>
-            <h2>Contact Us</h2>
-            <hr style="margin-bottom:15px;">
-            <div style="text-align:center;">
-                <p>✉️ <strong>Email:</strong> Kahkashanp7@gmail.com</p>
-                <p>📍 <strong>Address:</strong> PS-Sadar, Purnea<br>Near-Industrial Area, Purneacity<br>Bihar 854302</p>
-                <p>🕐 <strong>Business Hours:</strong> Mon-Sat: 10 AM - 7 PM</p>
-                <hr style="margin:20px 0;">
-                <h3>Send us a message</h3>
-                <input type="text" id="contact-name" placeholder="Your Name" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:8px;">
-                <input type="email" id="contact-email" placeholder="Your Email" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:8px;">
-                <textarea id="contact-message" placeholder="Your Message" rows="4" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
-                <button onclick="sendContactMessage()" style="background:#28a745; color:white; width:100%; padding:10px; border:none; border-radius:5px; cursor:pointer;">Send Message</button>
-            </div>
-        </div>
+<div id="shop-container"></div>
+
+<div id="orders-history-container" style="max-width: 800px; margin: 30px auto; padding: 0 15px;">
+    <div class="history-heading" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Your Order History & Tracking Details</h2>
+        <button onclick="showStorefront()" style="background:#37475a; color:white; border:none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">← Back to Shopping</button>
     </div>
+    <div id="history-items-list">Loading orders...</div>
+</div>
 
-    <!-- SUCCESS MODAL -->
-    <div id="successModal" class="success-modal">
-        <div class="success-modal-content">
-            <div class="success-icon">✅</div>
-            <h3>Order Placed Successfully!</h3>
-            <p>Your order has been confirmed and will be processed soon.</p>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="closeSuccessModalAndContinue()">🛍️ Continue Shopping</button>
-                <button onclick="closeSuccessModalAndViewOrders()" class="view-orders-btn">📋 View My Orders</button>
-            </div>
-        </div>
+<div class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>About Us</h3><p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p></div>
+        <div class="footer-section"><h3>Quick Links</h3><a onclick="showStorefront()">Shop Now</a><a onclick="viewOrdersDirect()">My Orders</a><a onclick="openContactModal()">Contact Us</a><a onclick="openProfileModal()">My Profile</a></div>
+        <div class="footer-section"><h3>Contact Info</h3><p>✉️ Kahkashanp7@gmail.com</p><p>📍 Lalbagh, Purneacity<br>Bihar 854302</p></div>
+        <div class="footer-section"><h3>Follow Us</h3><div class="social-links"><a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a></div></div>
     </div>
+    <div class="copyright">&copy; 2024 Sarees By Kuhu. All rights reserved.</div>
+</div>
 
-    <div id="shop-container"></div>
+<script>
+    const API_BASE = window.location.origin;
+    let cart = [];
+    let allProducts = [];
+    let currentCategory = 'All';
 
-    <div id="orders-history-container" style="max-width: 800px; margin: 30px auto; padding: 0 15px;">
-        <div class="history-heading" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Your Order History & Tracking Details</h2>
-            <button onclick="showStorefront()" style="background:#37475a; color:white; border:none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">← Back to Shopping</button>
-        </div>
-        <div id="history-items-list">Loading orders...</div>
-    </div>
+    function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+    
+    function showMessage(msg, isErr = false) {
+        const d = document.createElement('div');
+        d.className = 'cart-message';
+        d.style.background = isErr ? '#dc3545' : '#27ae60';
+        d.textContent = msg;
+        document.body.appendChild(d);
+        setTimeout(() => d.remove(), 3000);
+    }
 
-    <!-- Footer -->
-    <div class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About Us</h3>
-                <p>Your trusted online shopping destination for authentic sarees. Quality products at best prices.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a onclick="showStorefront()">Shop Now</a>
-                <a onclick="viewOrdersDirect()">My Orders</a>
-                <a onclick="openContactModal()">Contact Us</a>
-                <a onclick="openProfileModal()">My Profile</a>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Info</h3>
-                <p>✉️ Kahkashanp7@gmail.com</p>
-                <p>📍 Lalbagh, Purneacity<br>Bihar 854302</p>
-            </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-links">
-                    <a href="https://www.facebook.com/share/18QcF6v5Yf/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
-                </div>
-            </div>
-        </div>
-        <div class="copyright">
-            &copy; 2024 Sarees By Kuhu. All rights reserved.
-        </div>
-    </div>
-
-    <script>
-        const API_BASE = window.location.origin;
-        let cart = [];
-        let allProducts = [];
-        let currentCategory = 'All';
-
-        function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-        
-        function showMessage(msg, isErr = false) {
-            const d = document.createElement('div');
-            d.className = 'cart-message';
-            d.style.background = isErr ? '#dc3545' : '#27ae60';
-            d.textContent = msg;
-            document.body.appendChild(d);
-            setTimeout(() => d.remove(), 3000);
+    // Auth Functions
+    function checkAuth() {
+        const userBar = document.getElementById('user-bar');
+        const loggedInUser = localStorage.getItem('user');
+        if (loggedInUser) {
+            userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
+                <div class="user-menu">
+                    <span class="user-name" onclick="toggleUserDropdown()">👤 Welcome, <b>${escapeHtml(loggedInUser)}</b> ▼</span>
+                    <div id="userDropdown" class="user-dropdown">
+                        <a onclick="openProfileModal(); closeDropdown()">👤 My Profile</a>
+                        <a onclick="viewOrdersDirect(); closeDropdown()">📋 My Orders</a>
+                        <a onclick="openContactModal(); closeDropdown()">📞 Contact</a>
+                        <a onclick="logout()">🚪 Logout</a>
+                    </div>
+                </div>`;
+        } else {
+            userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
+                <a href="auth.html">🔑 Login / Register</a>
+                <a onclick="openContactModal()">📞 Contact</a>`;
         }
-
-        // ============ ORDER VIEW FUNCTION ============
-  // Replace viewOrdersDirect function
-window.viewOrdersDirect = async function() {
-    console.log("viewOrdersDirect called - showing orders");
-    const username = localStorage.getItem('user');
-    if (!username) { 
-        alert("Please login first"); 
-        window.location.href = "auth.html"; 
-        return; 
     }
     
-    document.getElementById('shop-container').style.display = 'none';
-    document.getElementById('category-menu').style.display = 'none';
-    document.getElementById('search-bar').style.display = 'none';
-    document.getElementById('orders-history-container').style.display = 'block';
+    function toggleUserDropdown() { const dd = document.getElementById('userDropdown'); if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; }
+    function closeDropdown() { const dd = document.getElementById('userDropdown'); if (dd) dd.style.display = 'none'; }
+    document.addEventListener('click', function(e) { const dd = document.getElementById('userDropdown'); if (dd && dd.style.display === 'block' && !e.target.closest('.user-menu')) dd.style.display = 'none'; });
+    function logout() { localStorage.removeItem('user'); window.location.href = "index.html"; }
     
-    const cartHeader = document.querySelector('header > div:last-child');
-    if (cartHeader) cartHeader.style.display = 'none';
-    
-    try {
-        const res = await fetch(`${API_BASE}/history`);
-        const orders = await res.json();
-        const userOrders = orders.filter(o => o.username === username).reverse();
-        
-        if (userOrders.length === 0) { 
-            document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; 
-            return; 
-        }
-        
-        // Display each order with its items
-        document.getElementById('history-items-list').innerHTML = userOrders.map(order => `
-            <div class="order-history-card">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <div>
-                        <span>🆔 Order #${order.orderId}</span>
-                        <span style="margin-left:10px; background:#37475a; color:white; padding:2px 8px; border-radius:4px; font-size:11px;">${order.status}</span>
-                    </div>
-                    <span>📅 ${order.date || 'N/A'}</span>
-                </div>
-                
-                ${order.items.map(item => `
-                    <div style="border-bottom:1px solid #eee; padding:8px 0;">
-                        <strong>${escapeHtml(item.productName)}</strong> x ${item.quantity} = ₹${item.subtotal}
-                    </div>
-                `).join('')}
-                
-                <div style="margin-top:10px; padding-top:10px; border-top:2px solid #ddd;">
-                    <strong>Total: ₹${order.totalAmount}</strong>
-                </div>
-                
-                ${order.trackingId ? `<div class="tracking-info">📦 Tracking: ${order.trackingId}</div>` : ''}
-                
-                ${order.status === 'Pending' ? 
-                    `<button class="cancel-order-btn" onclick="requestCancellation(${order.orderId})" style="margin-top:10px;">❌ Request Cancellation</button>` : ''}
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error("Error loading orders:", error);
-        document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">Error loading orders. Please try again.</p>';
+    function showStorefront() {
+        document.getElementById('orders-history-container').style.display = 'none';
+        document.getElementById('shop-container').style.display = 'flex';
+        document.getElementById('category-menu').style.display = 'flex';
+        document.getElementById('search-bar').style.display = 'block';
+        const cartHeader = document.querySelector('header > div:last-child');
+        if (cartHeader) cartHeader.style.display = 'block';
+        filterProducts();
+        const url = new URL(window.location.href);
+        url.searchParams.delete('showOrders');
+        window.history.replaceState({}, '', url);
+        document.body.classList.remove('show-orders-initially');
     }
-};
-        // Success modal handlers
-        function closeSuccessModalAndContinue() {
-            document.getElementById('successModal').classList.remove('show');
-            showStorefront();
-            loadProducts();
-        }
+    
+    // View Orders
+    window.viewOrdersDirect = async function() {
+        const username = localStorage.getItem('user');
+        if (!username) { alert("Please login first"); window.location.href = "auth.html"; return; }
         
-        function closeSuccessModalAndViewOrders() {
-            document.getElementById('successModal').classList.remove('show');
-            viewOrdersDirect();
-            // Remove the URL parameter
-            const url = new URL(window.location.href);
-            url.searchParams.delete('showOrders');
-            window.history.replaceState({}, '', url);
-        }
+        document.getElementById('shop-container').style.display = 'none';
+        document.getElementById('category-menu').style.display = 'none';
+        document.getElementById('search-bar').style.display = 'none';
+        document.getElementById('orders-history-container').style.display = 'block';
         
-        async function requestCancellation(orderId) {
-            if (!confirm("Request cancellation for this order?")) return;
+        const cartHeader = document.querySelector('header > div:last-child');
+        if (cartHeader) cartHeader.style.display = 'none';
+        
+        try {
+            const res = await fetch(`${API_BASE}/history`);
+            const orders = await res.json();
+            const userOrders = orders.filter(o => o.username === username).reverse();
+            
+            if (userOrders.length === 0) { 
+                document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; 
+                return; 
+            }
+            
+            document.getElementById('history-items-list').innerHTML = userOrders.map(order => `
+                <div class="order-history-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <div><span>🆔 Order #${order.orderId}</span><span style="margin-left:10px; background:#37475a; color:white; padding:2px 8px; border-radius:4px; font-size:11px;">${order.status}</span></div>
+                        <span>📅 ${order.date || 'N/A'}</span>
+                    </div>
+                    ${order.items.map(item => `<div style="border-bottom:1px solid #eee; padding:8px 0;"><strong>${escapeHtml(item.productName)}</strong> x ${item.quantity} = ₹${item.subtotal}</div>`).join('')}
+                    <div style="margin-top:10px; padding-top:10px; border-top:2px solid #ddd;"><strong>Total: ₹${order.totalAmount}</strong></div>
+                    ${order.trackingId ? `<div class="tracking-info">📦 Tracking: ${order.trackingId}</div>` : ''}
+                    ${order.status === 'Pending' ? `<button class="cancel-order-btn" onclick="requestCancellation(${order.orderId})" style="margin-top:10px;">❌ Request Cancellation</button>` : ''}
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error("Error loading orders:", error);
+            document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">Error loading orders. Please try again.</p>';
+        }
+    };
+    
+    async function requestCancellation(orderId) {
+        if (!confirm("Request cancellation for this order?")) return;
+        try {
             const res = await fetch(`${API_BASE}/orders/${orderId}/request-cancel`, { method: 'POST' });
             const result = await res.json();
             alert(result.message);
             viewOrdersDirect();
-        }
-
-        // ============ AUTH ============
-        function checkAuth() {
-            const userBar = document.getElementById('user-bar');
-            const loggedInUser = localStorage.getItem('user');
-            if (loggedInUser) {
-                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
-                    <div class="user-menu">
-                        <span class="user-name" onclick="toggleUserDropdown()">👤 Welcome, <b>${escapeHtml(loggedInUser)}</b> ▼</span>
-                        <div id="userDropdown" class="user-dropdown">
-                            <a onclick="openProfileModal(); closeDropdown()">👤 My Profile</a>
-                            <a onclick="viewOrdersDirect(); closeDropdown()">📋 My Orders</a>
-                            <a onclick="openContactModal(); closeDropdown()">📞 Contact</a>
-                            <a onclick="logout()">🚪 Logout</a>
-                        </div>
-                    </div>`;
-            } else {
-                userBar.innerHTML = `<span class="store-name-header">🏪 Sarees By Kuhu</span>
-                    <a href="auth.html">🔑 Login / Register</a>
-                    <a onclick="openContactModal()">📞 Contact</a>`;
-            }
-        }
-        
-        function toggleUserDropdown() {
-            const dd = document.getElementById('userDropdown');
-            if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-        }
-        function closeDropdown() { const dd = document.getElementById('userDropdown'); if (dd) dd.style.display = 'none'; }
-        document.addEventListener('click', function(e) {
-            const dd = document.getElementById('userDropdown');
-            if (dd && dd.style.display === 'block' && !e.target.closest('.user-menu')) dd.style.display = 'none';
-        });
-        
-        function logout() { localStorage.removeItem('user'); window.location.href = "index.html"; }
-        function showStorefront() {
-            document.getElementById('orders-history-container').style.display = 'none';
-            document.getElementById('shop-container').style.display = 'flex';
-            document.getElementById('category-menu').style.display = 'flex';
-            document.getElementById('search-bar').style.display = 'block';
-            // Show cart button again
-            const cartHeader = document.querySelector('header > div:last-child');
-            if (cartHeader) cartHeader.style.display = 'block';
-            filterProducts();
-            // Remove the URL parameter when going back to shop
-            const url = new URL(window.location.href);
-            url.searchParams.delete('showOrders');
-            window.history.replaceState({}, '', url);
-            // Remove the CSS class that hides elements
-            document.body.classList.remove('show-orders-initially');
-        }
-        
-        // ============ CART ============
-        function toggleCart() {
-            const drawer = document.getElementById('cart-view');
-            if (drawer.classList.contains('open')) {
-                drawer.classList.remove('open');
-                drawer.style.display = 'none';
-            } else {
-                drawer.style.display = 'block';
-                setTimeout(() => drawer.classList.add('open'), 10);
-            }
-        }
-        
-        function updateCartUI() {
-            const list = document.getElementById('cart-items');
-            const countSpan = document.getElementById('cart-count');
-            const totalDisplay = document.getElementById('cart-total-display');
-            if (!list) return;
-            list.innerHTML = '';
-            let totalItems = 0, totalPrice = 0;
-            cart.forEach((item, index) => {
-                totalItems += item.quantity;
-                totalPrice += item.price * item.quantity;
-                list.innerHTML += `<li class="cart-item"><div><strong>${escapeHtml(item.name)}</strong><br>₹${item.price} x ${item.quantity}</div><div>₹${item.price * item.quantity} <button class="remove-btn" onclick="removeFromCart(${index})">✕ Remove</button></div></li>`;
-            });
-            countSpan.innerText = totalItems;
-            localStorage.setItem('cart', JSON.stringify(cart));
-            if (cart.length > 0) totalDisplay.innerHTML = `<h4 style="text-align:right;">Total: ₹${totalPrice}</h4>`;
-            else totalDisplay.innerHTML = '';
-        }
-        
-        async function removeFromCart(index) {
-            const item = cart[index];
-            if (!item) return;
-            try {
-                await fetch(`${API_BASE}/products/${item.productId}/stock`, {
-                    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: item.quantity, requestId: `remove_${Date.now()}` })
-                });
-                cart.splice(index, 1);
-                updateCartUI();
-                await loadProducts();
-                showMessage(`✓ Removed ${item.name}`);
-                if (cart.length === 0) toggleCart();
-            } catch(e) { showMessage('Error removing item', true); }
-        }
-        
-        async function addToCart(id, name, price, quantity = 1) {
-            if (!localStorage.getItem('user')) { alert("Please login first"); window.location.href = "auth.html"; return false; }
-            const product = allProducts.find(p => p.id === id);
-            if (quantity > product.stock) { alert(`Only ${product.stock} available!`); return false; }
-            await fetch(`${API_BASE}/products/${id}/stock`, {
-                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: -quantity })
-            });
-            const existing = cart.find(item => item.productId === id);
-            if (existing) existing.quantity += quantity;
-            else cart.push({ productId: id, name, price, quantity });
-            updateCartUI();
-            await loadProducts();
-            showMessage(`✓ Added ${quantity} × ${name}`);
-            return true;
-        }
-        
-        // ============ PRODUCTS ============
-        async function loadProducts() {
-            const res = await fetch(`${API_BASE}/products`);
-            allProducts = await res.json();
-            const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(c => c))];
-            document.getElementById('category-menu').innerHTML = cats.map(c => `<button class="cat-btn ${currentCategory === c ? 'active' : ''}" onclick="filterCategory('${c}')">${c}</button>`).join('');
-            filterProducts();
-        }
-        
-        function displayProducts(products) {
-            const container = document.getElementById('shop-container');
-            container.innerHTML = products.map(p => `
-                <div class="product-card" onclick="goToProductPage(${p.id})">
-                    <img src="${p.images?.[0] || p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
-                    <h3>${escapeHtml(p.name)}</h3>
-                    <p style="color:#B12704; font-weight:bold;">₹${p.price}</p>
-                    <p style="font-size:12px; color:${p.stock > 0 ? '#28a745' : 'red'}">${p.stock > 0 ? 'Stock: ' + p.stock : 'Out of Stock'}</p>
-                    <button class="view-details-btn" onclick="event.stopPropagation(); goToProductPage(${p.id})">View Details →</button>
-                </div>
-            `).join('');
-        }
-        
-        function filterProducts() {
-            const search = document.getElementById('search-bar').value.toLowerCase();
-            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (currentCategory === 'All' || p.category === currentCategory));
-            displayProducts(filtered);
-        }
-        function filterCategory(cat) { currentCategory = cat; loadProducts(); }
-        function goToProductPage(id) { window.location.href = `product.html?id=${id}`; }
-        
-        // ============ CHECKOUT ============
-        function loadProfileForShipping() {
-            const user = localStorage.getItem('user');
-            if (user) {
-                const profile = localStorage.getItem(`profile_${user}`);
-                if (profile) {
-                    const p = JSON.parse(profile);
-                    if (p.name) document.getElementById('ship-name').value = p.name;
-                    if (p.phone) document.getElementById('ship-phone').value = p.phone;
-                    if (p.address) document.getElementById('ship-address').value = p.address;
-                    if (p.email) document.getElementById('ship-email').value = p.email;
-                }
-            }
-        }
-        
-        function openShippingModal() {
-            if (cart.length === 0) { alert("Cart is empty"); return; }
-            if (!localStorage.getItem('user')) { alert("Please login"); window.location.href = "auth.html"; return; }
-            toggleCart();
-            loadProfileForShipping();
-            document.getElementById('shippingModal').style.display = 'block';
-        }
-        function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; }
-        
-        async function placeOrder(orderData, paymentId) { 
-    const username = localStorage.getItem('user');
+        } catch(e) { alert("Error: " + e.message); }
+    }
     
-    const response = await fetch(`${API_BASE}/order`, { 
-        method:'POST', 
-        headers:{'Content-Type':'application/json'}, 
-        body:JSON.stringify({ 
-            items: orderData.items,  // Send all items
-            username: username, 
-            customerName: orderData.customerName, 
-            phone: orderData.phone, 
-            address: orderData.address, 
-            payment_id: paymentId,
-            payment_status: paymentId === "test_payment" ? "test" : "completed"
-        }) 
-    });
+    // Success Modal Handlers
+    function closeSuccessModalAndContinue() {
+        document.getElementById('successModal').classList.remove('show');
+        showStorefront();
+        loadProducts();
+    }
     
-    return response.ok;
-}catch(e) {
-                    allSuccess = false;
-                }
-            }
-            return allSuccess;
-        }
-        
-async function checkout() {
-    const name = document.getElementById('ship-name').value.trim(); 
-    const phone = document.getElementById('ship-phone').value.trim(); 
-    const address = document.getElementById('ship-address').value.trim(); 
-    const email = document.getElementById('ship-email').value.trim();
+    function closeSuccessModalAndViewOrders() {
+        document.getElementById('successModal').classList.remove('show');
+        viewOrdersDirect();
+        const url = new URL(window.location.href);
+        url.searchParams.delete('showOrders');
+        window.history.replaceState({}, '', url);
+    }
     
-    if(!name || !phone || !address){ alert("Fill all fields"); return; }
-    
-    const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-    // Prepare items array (NOT separate orders)
-    const orderItems = cart.map(item => ({
-        productId: item.productId,
-        quantity: item.quantity
-    }));
-    
-    const orderData = { 
-        items: orderItems,  // Send as array
-        customerName: name, 
-        customerEmail: email, 
-        phone: phone, 
-        address: address
-    };
-    
-    closeShippingModal();
-           
-         const useRazorpay = confirm("Choose Payment:\n• OK for Card/NetBanking (Razorpay)\n• Cancel for Test Mode");
-    
-    if(useRazorpay){
-        try{ 
-            const orderRes = await fetch(`${API_BASE}/create-order`, { 
-                method:'POST', 
-                headers:{'Content-Type':'application/json'}, 
-                body:JSON.stringify({amount:total}) 
-            }); 
-            const order = await orderRes.json(); 
-            const keyRes = await fetch(`${API_BASE}/get-razorpay-key`); 
-            const {key} = await keyRes.json(); 
-            const options = { 
-                key, amount: order.amount, currency: order.currency, name: 'Sarees By Kuhu', 
-                order_id: order.order_id, prefill: { name, contact: phone, email }, 
-                theme: { color: '#27ae60' }, 
-                handler: async (response) => { 
-                    const verifyRes = await fetch(`${API_BASE}/verify-payment`, { 
-                        method:'POST', 
-                        headers:{'Content-Type':'application/json'}, 
-                        body:JSON.stringify(response) 
-                    }); 
-                    if((await verifyRes.json()).success) { 
-                        const orderSuccess = await placeOrder(orderData, response.razorpay_payment_id);
-                        if(orderSuccess) {
-                            cart = []; 
-                            updateCartUI(); 
-                            showOrderSuccessModal();
-                        } else { 
-                            alert("Payment verified but order placement had issues."); 
-                        }
-                    } else alert("Verification failed"); 
-                } 
-            }; 
-            new Razorpay(options).open(); 
-        } catch(e){ alert("Payment error: " + e.message); }
-    } else { 
-        const orderSuccess = await placeOrder(orderData, "test_payment");
-        if(orderSuccess) {
-            cart = []; 
-            updateCartUI(); 
-            showOrderSuccessModal();
-        } else { 
-            alert("[TEST MODE] Order placement failed"); 
+    // Cart Functions
+    function toggleCart() {
+        const drawer = document.getElementById('cart-view');
+        if (drawer.classList.contains('open')) {
+            drawer.classList.remove('open');
+            drawer.style.display = 'none';
+        } else {
+            drawer.style.display = 'block';
+            setTimeout(() => drawer.classList.add('open'), 10);
         }
     }
-}
-        
-        // ============ PROFILE & CONTACT ============
-        function openProfileModal() {
-            const user = localStorage.getItem('user');
-            if (!user) { alert("Login first"); window.location.href = "auth.html"; return; }
-            const p = localStorage.getItem(`profile_${user}`);
-            if (p) { const d = JSON.parse(p); document.getElementById('profile-email').value = d.email || ''; document.getElementById('profile-name').value = d.name || ''; document.getElementById('profile-phone').value = d.phone || ''; document.getElementById('profile-address').value = d.address || ''; }
-            document.getElementById('profileModal').style.display = 'block';
-        }
-        function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
-        function saveProfile() {
-            const user = localStorage.getItem('user');
-            if (!user) { alert("Login first"); return; }
-            localStorage.setItem(`profile_${user}`, JSON.stringify({ email: document.getElementById('profile-email').value, name: document.getElementById('profile-name').value, phone: document.getElementById('profile-phone').value, address: document.getElementById('profile-address').value }));
-            alert("✅ Profile saved successfully!");
-            closeProfileModal();
-        }
-        function openContactModal() { document.getElementById('contactModal').style.display = 'block'; }
-        function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; document.getElementById('contact-name').value = ''; document.getElementById('contact-email').value = ''; document.getElementById('contact-message').value = ''; }
-        function sendContactMessage() { 
-            const name = document.getElementById('contact-name').value.trim();
-            const email = document.getElementById('contact-email').value.trim();
-            const message = document.getElementById('contact-message').value.trim();
-            if (!name || !email || !message) { alert("Please fill in all fields"); return; }
-            if (!email.includes('@')) { alert("Please enter a valid email address"); return; }
-            alert(`Thank you ${name}!\n\nWe have received your message and will get back to you soon.\n\nRegards,\nSarees By Kuhu Team`);
-            closeContactModal();
-        }
-        
-        function loadCart() {
-            const saved = localStorage.getItem('cart');
-            if (saved) { cart = JSON.parse(saved); updateCartUI(); }
-        }
-        
-        // ============ CHECK URL PARAMETER FOR ORDERS PAGE - NO FLICKER ============
-        function checkUrlForOrders() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('showOrders') === 'true') {
-                // Add class to body immediately to hide shop elements BEFORE any rendering
-                document.body.classList.add('show-orders-initially');
-                
-                const username = localStorage.getItem('user');
-                if (username) {
-                    // Load orders immediately
-                    setTimeout(function() {
-                        viewOrdersDirect();
-                    }, 50);
-                } else {
-                    alert("Please login to view your orders");
-                    window.location.href = "auth.html";
-                }
-            }
-        }
-        
-        window.onclick = function(e) {
-            const modals = ['shippingModal', 'profileModal', 'contactModal'];
-            modals.forEach(id => {
-                const modal = document.getElementById(id);
-                if (e.target === modal) modal.style.display = 'none';
+    
+    function updateCartUI() {
+        const list = document.getElementById('cart-items');
+        const countSpan = document.getElementById('cart-count');
+        const totalDisplay = document.getElementById('cart-total-display');
+        if (!list) return;
+        list.innerHTML = '';
+        let totalItems = 0, totalPrice = 0;
+        cart.forEach((item, index) => {
+            totalItems += item.quantity;
+            totalPrice += item.price * item.quantity;
+            list.innerHTML += `<li class="cart-item"><div><strong>${escapeHtml(item.name)}</strong><br>₹${item.price} x ${item.quantity}</div><div>₹${item.price * item.quantity} <button class="remove-btn" onclick="removeFromCart(${index})">✕ Remove</button></div></li>`;
+        });
+        countSpan.innerText = totalItems;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        if (cart.length > 0) totalDisplay.innerHTML = `<h4 style="text-align:right;">Total: ₹${totalPrice}</h4>`;
+        else totalDisplay.innerHTML = '';
+    }
+    
+    async function removeFromCart(index) {
+        const item = cart[index];
+        if (!item) return;
+        try {
+            await fetch(`${API_BASE}/products/${item.productId}/stock`, {
+                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: item.quantity, requestId: `remove_${Date.now()}` })
             });
-            const cartDrawer = document.getElementById('cart-view');
-            const cartHeader = document.querySelector('header div[onclick="toggleCart()"]');
-            if (cartDrawer && cartDrawer.classList && cartDrawer.classList.contains('open')) {
-                if (!cartDrawer.contains(e.target) && cartHeader && !cartHeader.contains(e.target)) {
-                    cartDrawer.classList.remove('open');
-                    cartDrawer.style.display = 'none';
-                }
+            cart.splice(index, 1);
+            updateCartUI();
+            await loadProducts();
+            showMessage(`✓ Removed ${item.name}`);
+            if (cart.length === 0) toggleCart();
+        } catch(e) { showMessage('Error removing item', true); }
+    }
+    
+    async function addToCart(id, name, price, quantity = 1) {
+        if (!localStorage.getItem('user')) { alert("Please login first"); window.location.href = "auth.html"; return false; }
+        const product = allProducts.find(p => p.id === id);
+        if (quantity > product.stock) { alert(`Only ${product.stock} available!`); return false; }
+        await fetch(`${API_BASE}/products/${id}/stock`, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: -quantity, requestId: `add_${Date.now()}` })
+        });
+        const existing = cart.find(item => item.productId === id);
+        if (existing) existing.quantity += quantity;
+        else cart.push({ productId: id, name, price, quantity });
+        updateCartUI();
+        await loadProducts();
+        showMessage(`✓ Added ${quantity} × ${name}`);
+        return true;
+    }
+    
+    // Product Functions
+    async function loadProducts() {
+        const res = await fetch(`${API_BASE}/products`);
+        allProducts = await res.json();
+        const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(c => c))];
+        document.getElementById('category-menu').innerHTML = cats.map(c => `<button class="cat-btn ${currentCategory === c ? 'active' : ''}" onclick="filterCategory('${c}')">${c}</button>`).join('');
+        filterProducts();
+    }
+    
+    function displayProducts(products) {
+        const container = document.getElementById('shop-container');
+        container.innerHTML = products.map(p => `
+            <div class="product-card" onclick="goToProductPage(${p.id})">
+                <img src="${p.images?.[0] || p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
+                <h3>${escapeHtml(p.name)}</h3>
+                <p style="color:#B12704; font-weight:bold;">₹${p.price}</p>
+                <p style="font-size:12px; color:${p.stock > 0 ? '#28a745' : 'red'}">${p.stock > 0 ? 'Stock: ' + p.stock : 'Out of Stock'}</p>
+                <button class="view-details-btn" onclick="event.stopPropagation(); goToProductPage(${p.id})">View Details →</button>
+            </div>
+        `).join('');
+    }
+    
+    function filterProducts() {
+        const search = document.getElementById('search-bar').value.toLowerCase();
+        const filtered = allProducts.filter(p => p.name.toLowerCase().includes(search) && (currentCategory === 'All' || p.category === currentCategory));
+        displayProducts(filtered);
+    }
+    function filterCategory(cat) { currentCategory = cat; filterProducts(); }
+    function goToProductPage(id) { window.location.href = `product.html?id=${id}`; }
+    
+    // Checkout Functions
+    function loadProfileForShipping() {
+        const user = localStorage.getItem('user');
+        if (user) {
+            const profile = localStorage.getItem(`profile_${user}`);
+            if (profile) {
+                const p = JSON.parse(profile);
+                if (p.name) document.getElementById('ship-name').value = p.name;
+                if (p.phone) document.getElementById('ship-phone').value = p.phone;
+                if (p.address) document.getElementById('ship-address').value = p.address;
+                if (p.email) document.getElementById('ship-email').value = p.email;
             }
+        }
+    }
+    
+    function openShippingModal() {
+        if (cart.length === 0) { alert("Cart is empty"); return; }
+        if (!localStorage.getItem('user')) { alert("Please login"); window.location.href = "auth.html"; return; }
+        toggleCart();
+        loadProfileForShipping();
+        document.getElementById('shippingModal').style.display = 'block';
+    }
+    function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; }
+    
+    async function placeOrder(orderData, paymentId) { 
+        const username = localStorage.getItem('user');
+        if (!username) return false;
+        
+        try {
+            const response = await fetch(`${API_BASE}/order`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    items: orderData.cartItems.map(item => ({
+                        productId: item.productId,
+                        quantity: item.quantity
+                    })),
+                    username: username, 
+                    customerName: orderData.customerName, 
+                    phone: orderData.phone, 
+                    address: orderData.address, 
+                    payment_id: paymentId,
+                    payment_status: paymentId === "test_payment" ? "test" : "completed"
+                }) 
+            });
+            
+            if (response.ok) {
+                console.log("Order placed successfully");
+                return true;
+            } else {
+                const error = await response.json();
+                console.error("Order failed:", error);
+                return false;
+            }
+        } catch(e) {
+            console.error("Order error:", e);
+            return false;
+        }
+    }
+    
+    async function checkout() {
+        const name = document.getElementById('ship-name').value.trim(); 
+        const phone = document.getElementById('ship-phone').value.trim(); 
+        const address = document.getElementById('ship-address').value.trim(); 
+        const email = document.getElementById('ship-email').value.trim();
+        
+        if(!name || !phone || !address){ alert("Fill all fields"); return; }
+        
+        const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
+        
+        const orderData = { 
+            cartItems: cart.map(item => ({ productId: item.productId, quantity: item.quantity })),
+            customerName: name, 
+            customerEmail: email, 
+            phone: phone, 
+            address: address
         };
         
-        // Initialize
-        checkAuth();
-        loadProducts();
-        loadCart();
-        checkUrlForOrders();  // This now hides shop BEFORE rendering
-    </script>
+        closeShippingModal();
+        
+        const useRazorpay = confirm("Choose Payment:\n• OK for Card/NetBanking (Razorpay)\n• Cancel for Test Mode");
+        
+        if(useRazorpay){
+            try{ 
+                const orderRes = await fetch(`${API_BASE}/create-order`, { 
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({amount:total}) 
+                }); 
+                const order = await orderRes.json(); 
+                const keyRes = await fetch(`${API_BASE}/get-razorpay-key`); 
+                const {key} = await keyRes.json(); 
+                const options = { 
+                    key, amount: order.amount, currency: order.currency, name: 'Sarees By Kuhu', 
+                    order_id: order.order_id, prefill: { name, contact: phone, email }, 
+                    theme: { color: '#27ae60' }, 
+                    handler: async (response) => { 
+                        const verifyRes = await fetch(`${API_BASE}/verify-payment`, { 
+                            method:'POST', 
+                            headers:{'Content-Type':'application/json'}, 
+                            body:JSON.stringify(response) 
+                        }); 
+                        if((await verifyRes.json()).success) { 
+                            const orderSuccess = await placeOrder(orderData, response.razorpay_payment_id);
+                            if(orderSuccess) {
+                                cart = []; 
+                                updateCartUI(); 
+                                document.getElementById('successModal').classList.add('show');
+                            } else { 
+                                alert("Payment verified but order placement had issues."); 
+                            }
+                        } else alert("Verification failed"); 
+                    } 
+                }; 
+                new Razorpay(options).open(); 
+            } catch(e){ alert("Payment error: " + e.message); }
+        } else { 
+            const orderSuccess = await placeOrder(orderData, "test_payment");
+            if(orderSuccess) {
+                cart = []; 
+                updateCartUI(); 
+                document.getElementById('successModal').classList.add('show');
+            } else { 
+                alert("[TEST MODE] Order placement failed. Please try again."); 
+            }
+        }
+    }
+    
+    // Profile & Contact
+    function openProfileModal() {
+        const user = localStorage.getItem('user');
+        if (!user) { alert("Login first"); window.location.href = "auth.html"; return; }
+        const p = localStorage.getItem(`profile_${user}`);
+        if (p) { const d = JSON.parse(p); document.getElementById('profile-email').value = d.email || ''; document.getElementById('profile-name').value = d.name || ''; document.getElementById('profile-phone').value = d.phone || ''; document.getElementById('profile-address').value = d.address || ''; }
+        else { document.getElementById('profile-email').value = ''; document.getElementById('profile-name').value = ''; document.getElementById('profile-phone').value = ''; document.getElementById('profile-address').value = ''; }
+        document.getElementById('profileModal').style.display = 'block';
+    }
+    function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+    function saveProfile() {
+        const user = localStorage.getItem('user');
+        if (!user) { alert("Login first"); return; }
+        localStorage.setItem(`profile_${user}`, JSON.stringify({ email: document.getElementById('profile-email').value, name: document.getElementById('profile-name').value, phone: document.getElementById('profile-phone').value, address: document.getElementById('profile-address').value }));
+        alert("✅ Profile saved successfully!");
+        closeProfileModal();
+    }
+    function openContactModal() { document.getElementById('contactModal').style.display = 'block'; }
+    function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; document.getElementById('contact-name').value = ''; document.getElementById('contact-email').value = ''; document.getElementById('contact-message').value = ''; }
+    function sendContactMessage() { 
+        const name = document.getElementById('contact-name').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const message = document.getElementById('contact-message').value.trim();
+        if (!name || !email || !message) { alert("Please fill in all fields"); return; }
+        if (!email.includes('@')) { alert("Please enter a valid email address"); return; }
+        alert(`Thank you ${name}!\n\nWe have received your message and will get back to you soon.\n\nRegards,\nSarees By Kuhu Team`);
+        closeContactModal();
+    }
+    
+    function loadCart() {
+        const saved = localStorage.getItem('cart');
+        if (saved) { cart = JSON.parse(saved); updateCartUI(); }
+    }
+    
+    function checkUrlForOrders() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('showOrders') === 'true') {
+            document.body.classList.add('show-orders-initially');
+            const username = localStorage.getItem('user');
+            if (username) {
+                setTimeout(function() { viewOrdersDirect(); }, 50);
+            } else {
+                alert("Please login to view your orders");
+                window.location.href = "auth.html";
+            }
+        }
+    }
+    
+    window.onclick = function(e) {
+        const modals = ['shippingModal', 'profileModal', 'contactModal'];
+        modals.forEach(id => {
+            const modal = document.getElementById(id);
+            if (e.target === modal) modal.style.display = 'none';
+        });
+        const cartDrawer = document.getElementById('cart-view');
+        const cartHeader = document.querySelector('header div[onclick="toggleCart()"]');
+        if (cartDrawer && cartDrawer.classList && cartDrawer.classList.contains('open')) {
+            if (!cartDrawer.contains(e.target) && cartHeader && !cartHeader.contains(e.target)) {
+                cartDrawer.classList.remove('open');
+                cartDrawer.style.display = 'none';
+            }
+        }
+    };
+    
+    checkAuth();
+    loadProducts();
+    loadCart();
+    checkUrlForOrders();
+</script>
 </body>
 </html>
