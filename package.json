@@ -1,18 +1,17 @@
 {
-  "name": "my-shopping-app",
+  "name": "sarees-by-kuhu",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "E-commerce website for sarees",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "keywords": [],
+  "keywords": ["ecommerce", "sarees", "shopping"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "razorpay": "^2.9.6"
   }
