@@ -3,15 +3,16 @@ const cors = require('cors');
 const fs = require('fs');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const path = require('path');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const DATA_FILE = './data.json';
-const ORDERS_FILE = './orders.json';
-const CANCELLATION_REQUESTS_FILE = './cancellation_requests.json';
+const DATA_FILE = path.join(__dirname, 'data.json');
+const ORDERS_FILE = path.join(__dirname, 'orders.json');
+const CANCELLATION_REQUESTS_FILE = path.join(__dirname, 'cancellation_requests.json');
 
 // Track processed operations to prevent duplicates
 const processedOperations = new Map();
@@ -125,7 +126,7 @@ app.post('/users', (req, res) => {
     }
     
     const newUser = {
-        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 2,
         username,
         password,
         phone: phone || "",
@@ -170,7 +171,7 @@ app.delete('/users/:id', (req, res) => {
     
     res.json({ 
         success: true, 
-        message: `User ${deletedUser?.username} deleted along with ${orders.length} orders`
+        message: `User ${deletedUser?.username} deleted along with their orders`
     });
 });
 
@@ -202,7 +203,7 @@ app.post('/products', (req, res) => {
     }
     
     const newProduct = {
-        id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+        id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 4,
         name: req.body.name,
         price: Number(req.body.price),
         stock: Number(req.body.stock),
@@ -297,15 +298,16 @@ app.get('/history', (req, res) => {
     res.json(orders);
 });
 
+// FIXED: Single order endpoint that handles multiple items correctly
 app.post('/order', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let orders = readJSON(ORDERS_FILE, []);
     const products = data.products || [];
     const users = data.users || [];
     
-    // NEW: Accept array of items
     const { items, username, customerName, address, phone, payment_id, payment_status } = req.body;
     
+    // Find user
     const user = users.find(u => u.username === username);
     if (!user) return res.status(401).json({ message: "User not found" });
     if (user.status !== 'Verified') return res.status(401).json({ message: "Account not verified" });
@@ -316,20 +318,23 @@ app.post('/order', (req, res) => {
     const orderItems = [];
     
     // Process each item in the cart
-    for (const item of items) {
-        const product = products.find(p => p.id === item.productId);
-        if (!product) continue;
-        
-        totalAmount += product.price * item.quantity;
-        
-        orderItems.push({
-            productId: product.id,
-            productName: product.name,
-            description: product.description || '',
-            quantity: item.quantity,
-            price: product.price,
-            subtotal: product.price * item.quantity
-        });
+    if (items && Array.isArray(items)) {
+        for (const item of items) {
+            const product = products.find(p => p.id === item.productId);
+            if (!product) continue;
+            
+            const itemTotal = product.price * item.quantity;
+            totalAmount += itemTotal;
+            
+            orderItems.push({
+                productId: product.id,
+                productName: product.name,
+                description: product.description || '',
+                quantity: item.quantity,
+                price: product.price,
+                subtotal: itemTotal
+            });
+        }
     }
     
     // Create ONE order containing all items
@@ -339,7 +344,7 @@ app.post('/order', (req, res) => {
         customerName: customerName || 'N/A',
         address: address || 'No Address',
         phone: phone || 'N/A',
-        items: orderItems,  // Array of items
+        items: orderItems,
         totalAmount: totalAmount,
         date: new Date().toLocaleString(),
         status: "Pending",
@@ -354,6 +359,7 @@ app.post('/order', (req, res) => {
     console.log(`✅ Order #${orderId} created for ${username} with ${orderItems.length} items, total: ₹${totalAmount}`);
     res.status(201).json(newOrder);
 });
+
 app.patch('/history/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     const orderId = parseInt(req.params.id);
@@ -367,6 +373,45 @@ app.patch('/history/:id', (req, res) => {
     } else {
         res.status(404).json({ message: "Order not found" });
     }
+});
+
+// Delete single order
+app.delete('/orders/:id', (req, res) => {
+    let orders = readJSON(ORDERS_FILE, []);
+    let data = readJSON(DATA_FILE, { products: [], users: [] });
+    const orderId = parseInt(req.params.id);
+    const orderIndex = orders.findIndex(o => o.orderId === orderId);
+    
+    if (orderIndex === -1) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    
+    const order = orders[orderIndex];
+    const deleteKey = `delete_order_${orderId}`;
+    
+    if (isOperationProcessed(deleteKey)) {
+        return res.status(400).json({ message: "Order deletion already in progress" });
+    }
+    
+    // Restore stock for cancelled orders or for any order being deleted
+    if (order.items && order.items.length > 0) {
+        const products = data.products || [];
+        for (const item of order.items) {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+                product.stock += item.quantity;
+                console.log(`✅ Stock restored for deleted order item: ${product.name} +${item.quantity}`);
+            }
+        }
+        data.products = products;
+        writeJSON(DATA_FILE, data);
+    }
+    
+    orders = orders.filter(o => o.orderId !== orderId);
+    writeJSON(ORDERS_FILE, orders);
+    markOperationProcessed(deleteKey);
+    
+    res.json({ success: true, message: "Order deleted and stock restored" });
 });
 
 // ============ CANCELLATION REQUEST ROUTES ============
@@ -410,9 +455,9 @@ app.post('/orders/:id/request-cancel', (req, res) => {
     const request = {
         id: Date.now(),
         orderId: orderId,
-        productName: order.productName,
+        productName: order.productName || (order.items && order.items[0]?.productName),
         username: order.username,
-        quantity: order.quantity,
+        items: order.items,
         status: 'pending',
         requestedAt: new Date().toISOString(),
         orderDetails: order
@@ -489,13 +534,18 @@ app.post('/cancellation-requests/:requestId/approve', (req, res) => {
         return res.status(400).json({ message: "Approval already in progress" });
     }
     
+    // Restore stock for each item in the order
     const products = data.products || [];
-    const product = products.find(p => p.id === order.productId);
-    if (product) {
-        product.stock += order.quantity;
+    if (order.items && order.items.length > 0) {
+        for (const item of order.items) {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+                product.stock += item.quantity;
+                console.log(`✅ Stock restored for approved cancellation: ${product.name} +${item.quantity}`);
+            }
+        }
         data.products = products;
         writeJSON(DATA_FILE, data);
-        console.log(`✅ Stock restored for approved cancellation: ${product.name} +${order.quantity}`);
     }
     
     order.status = 'Cancelled';
@@ -511,8 +561,7 @@ app.post('/cancellation-requests/:requestId/approve', (req, res) => {
     
     res.json({ 
         success: true, 
-        message: "Cancellation approved and stock restored",
-        restoredQuantity: order.quantity
+        message: "Cancellation approved and stock restored"
     });
 });
 
@@ -543,41 +592,6 @@ app.post('/cancellation-requests/:requestId/reject', (req, res) => {
         message: "Cancellation request rejected",
         reason: request.rejectedReason
     });
-});
-
-app.delete('/orders/:id', (req, res) => {
-    let orders = readJSON(ORDERS_FILE, []);
-    let data = readJSON(DATA_FILE, { products: [], users: [] });
-    const orderId = parseInt(req.params.id);
-    const orderIndex = orders.findIndex(o => o.orderId === orderId);
-    
-    if (orderIndex === -1) {
-        return res.status(404).json({ message: "Order not found" });
-    }
-    
-    const order = orders[orderIndex];
-    const deleteKey = `delete_order_${orderId}`;
-    
-    if (isOperationProcessed(deleteKey)) {
-        return res.status(400).json({ message: "Order deletion already in progress" });
-    }
-    
-    if (order.status !== 'Cancelled') {
-        const products = data.products || [];
-        const product = products.find(p => p.id === order.productId);
-        if (product) {
-            product.stock += order.quantity;
-            data.products = products;
-            writeJSON(DATA_FILE, data);
-            console.log(`✅ Stock restored for deleted order: ${product.name} +${order.quantity}`);
-        }
-    }
-    
-    orders = orders.filter(o => o.orderId !== orderId);
-    writeJSON(ORDERS_FILE, orders);
-    markOperationProcessed(deleteKey);
-    
-    res.json({ success: true, message: "Order deleted and stock restored" });
 });
 
 // ============ ADMIN ROUTES ============
