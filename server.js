@@ -113,6 +113,47 @@ initOrdersFile();
 initCancellationRequestsFile();
 initAddressesFile();
 
+// ============ REFUND ROUTE ============
+
+// Process refund for cancelled order
+async function processRefund(paymentId, amount, reason = "Order cancelled by seller approval") {
+    try {
+        console.log(`🔄 Processing refund for Payment ID: ${paymentId}, Amount: ₹${amount}`);
+        
+        // Check if it's a test payment (no actual refund needed)
+        if (paymentId === "test_payment") {
+            console.log(`✅ Test mode refund processed (no actual refund) for ${paymentId}`);
+            return { success: true, message: "Test mode refund processed", refundId: "test_refund_" + Date.now() };
+        }
+        
+        // Create refund using Razorpay API
+        const refund = await razorpay.payments.refund(paymentId, {
+            amount: Math.round(amount * 100), // Amount in paise
+            speed: 'normal',
+            notes: {
+                reason: reason,
+                refund_initiated_by: "admin",
+                timestamp: new Date().toISOString()
+            }
+        });
+        
+        console.log(`✅ Refund successful! Refund ID: ${refund.id}`);
+        return { success: true, refundId: refund.id, refundData: refund };
+        
+    } catch (error) {
+        console.error(`❌ Refund failed for payment ${paymentId}:`, error);
+        
+        // Handle specific Razorpay errors
+        if (error.error && error.error.code === 'BAD_REQUEST_ERROR') {
+            return { success: false, error: "Invalid payment ID or payment already refunded" };
+        } else if (error.error && error.error.code === 'PAYMENT_NOT_FOUND') {
+            return { success: false, error: "Payment not found" };
+        }
+        
+        return { success: false, error: error.message || "Refund processing failed" };
+    }
+}
+
 // ============ ADDRESS ROUTES ============
 
 // Get all addresses for a user
@@ -467,13 +508,15 @@ app.post('/order', (req, res) => {
         status: "Pending",
         trackingId: "",
         payment_status: payment_status || "pending",
-        payment_id: payment_id || ""
+        payment_id: payment_id || "",
+        refund_status: "none", // Track refund status: none, processing, completed, failed
+        refund_id: null
     };
     
     orders.push(newOrder);
     writeJSON(ORDERS_FILE, orders);
     
-    console.log(`✅ Order #${orderId} created for ${username} with ${orderItems.length} items, total: ₹${totalAmount}`);
+    console.log(`✅ Order #${orderId} created for ${username} with ${orderItems.length} items, total: ₹${totalAmount}, Payment ID: ${payment_id}`);
     res.status(201).json(newOrder);
 });
 
@@ -509,6 +552,7 @@ app.delete('/orders/:id', (req, res) => {
         return res.status(400).json({ message: "Order deletion already in progress" });
     }
     
+    // Restore stock for deleted order items
     if (order.items && order.items.length > 0) {
         const products = data.products || [];
         for (const item of order.items) {
@@ -529,7 +573,7 @@ app.delete('/orders/:id', (req, res) => {
     res.json({ success: true, message: "Order deleted and stock restored" });
 });
 
-// ============ CANCELLATION REQUEST ROUTES ============
+// ============ CANCELLATION REQUEST ROUTES WITH REFUND ============
 
 app.post('/orders/:id/request-cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
@@ -592,7 +636,7 @@ app.get('/cancellation-requests', (req, res) => {
     res.json(requests);
 });
 
-app.post('/cancellation-requests/:requestId/approve', (req, res) => {
+app.post('/cancellation-requests/:requestId/approve', async (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let cancellationRequests = readJSON(CANCELLATION_REQUESTS_FILE, []);
@@ -647,33 +691,71 @@ app.post('/cancellation-requests/:requestId/approve', (req, res) => {
         return res.status(400).json({ message: "Approval already in progress" });
     }
     
+    // PROCESS REFUND FIRST
+    let refundResult = null;
+    if (order.payment_id && order.payment_id !== "test_payment") {
+        console.log(`💰 Initiating refund for order #${orderId} - Payment ID: ${order.payment_id}, Amount: ₹${order.totalAmount}`);
+        
+        refundResult = await processRefund(order.payment_id, order.totalAmount, "Order cancelled by seller approval");
+        
+        if (!refundResult.success) {
+            console.error(`❌ Refund failed for order #${orderId}: ${refundResult.error}`);
+            return res.status(500).json({ 
+                success: false, 
+                message: `Refund failed: ${refundResult.error}. Cannot approve cancellation.`,
+                refundError: refundResult.error
+            });
+        }
+        
+        console.log(`✅ Refund processed successfully! Refund ID: ${refundResult.refundId}`);
+        order.refund_status = "completed";
+        order.refund_id = refundResult.refundId;
+        order.refund_processed_at = new Date().toISOString();
+    } else {
+        console.log(`ℹ️ Test payment - No refund needed for order #${orderId}`);
+        order.refund_status = "test_mode";
+        order.refund_id = "test_refund_" + Date.now();
+    }
+    
+    // Restore stock
     const products = data.products || [];
     if (order.items && order.items.length > 0) {
         for (const item of order.items) {
             const product = products.find(p => p.id === item.productId);
             if (product) {
                 product.stock += item.quantity;
-                console.log(`✅ Stock restored for approved cancellation: ${product.name} +${item.quantity}`);
+                console.log(`✅ Stock restored for cancelled order: ${product.name} +${item.quantity}`);
             }
         }
         data.products = products;
         writeJSON(DATA_FILE, data);
     }
     
+    // Update order status to Cancelled
     order.status = 'Cancelled';
+    order.cancelled_at = new Date().toISOString();
     orders[orderIndex] = order;
     writeJSON(ORDERS_FILE, orders);
     
+    // Update cancellation request
     request.status = 'approved';
     request.processedAt = new Date().toISOString();
+    request.refund_status = order.refund_status;
+    request.refund_id = order.refund_id;
     cancellationRequests[requestIndex] = request;
     writeJSON(CANCELLATION_REQUESTS_FILE, cancellationRequests);
     
     markOperationProcessed(approveKey);
     
+    // Send success response with refund info
+    const refundMessage = order.payment_id === "test_payment" 
+        ? " (Test mode - no actual refund processed)"
+        : ` Refund of ₹${order.totalAmount} has been initiated to the original payment method.`;
+    
     res.json({ 
         success: true, 
-        message: "Cancellation approved and stock restored"
+        message: `✅ Cancellation approved! Stock restored.${refundMessage}`,
+        refund: refundResult
     });
 });
 
@@ -701,7 +783,7 @@ app.post('/cancellation-requests/:requestId/reject', (req, res) => {
     
     res.json({ 
         success: true, 
-        message: "Cancellation request rejected",
+        message: "Cancellation request rejected (No refund will be processed)",
         reason: request.rejectedReason
     });
 });
@@ -794,6 +876,7 @@ app.listen(PORT, () => {
     console.log(`📁 Cancellation requests file: ${CANCELLATION_REQUESTS_FILE}`);
     console.log(`📁 Addresses file: ${ADDRESSES_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
+    console.log(`🔄 REFUNDS: Enabled - Auto-refund on cancellation approval`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
