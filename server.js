@@ -298,7 +298,6 @@ app.get('/history', (req, res) => {
     res.json(orders);
 });
 
-// FIXED: Single order endpoint that handles multiple items correctly
 app.post('/order', (req, res) => {
     let data = readJSON(DATA_FILE, { products: [], users: [] });
     let orders = readJSON(ORDERS_FILE, []);
@@ -307,17 +306,14 @@ app.post('/order', (req, res) => {
     
     const { items, username, customerName, address, phone, payment_id, payment_status } = req.body;
     
-    // Find user
     const user = users.find(u => u.username === username);
     if (!user) return res.status(401).json({ message: "User not found" });
     if (user.status !== 'Verified') return res.status(401).json({ message: "Account not verified" });
     
-    // Create SINGLE order ID for ALL items
     const orderId = Date.now();
     let totalAmount = 0;
     const orderItems = [];
     
-    // Process each item in the cart
     if (items && Array.isArray(items)) {
         for (const item of items) {
             const product = products.find(p => p.id === item.productId);
@@ -337,7 +333,6 @@ app.post('/order', (req, res) => {
         }
     }
     
-    // Create ONE order containing all items
     const newOrder = {
         orderId: orderId,
         username: username || 'Guest',
@@ -375,7 +370,6 @@ app.patch('/history/:id', (req, res) => {
     }
 });
 
-// Delete single order
 app.delete('/orders/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let data = readJSON(DATA_FILE, { products: [], users: [] });
@@ -393,7 +387,6 @@ app.delete('/orders/:id', (req, res) => {
         return res.status(400).json({ message: "Order deletion already in progress" });
     }
     
-    // Restore stock for cancelled orders or for any order being deleted
     if (order.items && order.items.length > 0) {
         const products = data.products || [];
         for (const item of order.items) {
@@ -416,7 +409,6 @@ app.delete('/orders/:id', (req, res) => {
 
 // ============ CANCELLATION REQUEST ROUTES ============
 
-// Buyer requests cancellation
 app.post('/orders/:id/request-cancel', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     let cancellationRequests = readJSON(CANCELLATION_REQUESTS_FILE, []);
@@ -455,7 +447,6 @@ app.post('/orders/:id/request-cancel', (req, res) => {
     const request = {
         id: Date.now(),
         orderId: orderId,
-        productName: order.productName || (order.items && order.items[0]?.productName),
         username: order.username,
         items: order.items,
         status: 'pending',
@@ -534,7 +525,6 @@ app.post('/cancellation-requests/:requestId/approve', (req, res) => {
         return res.status(400).json({ message: "Approval already in progress" });
     }
     
-    // Restore stock for each item in the order
     const products = data.products || [];
     if (order.items && order.items.length > 0) {
         for (const item of order.items) {
@@ -681,12 +671,6 @@ app.listen(PORT, () => {
     console.log(`📁 Orders file: ${ORDERS_FILE}`);
     console.log(`📁 Cancellation requests file: ${CANCELLATION_REQUESTS_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
-    console.log(`\n✅ FEATURES:`);
-    console.log(`   - Cancellation request workflow (buyer requests, seller approves/rejects)`);
-    console.log(`   - Duplicate operation prevention`);
-    console.log(`   - Stock management with request IDs`);
-    console.log(`   - Profile saving for users (localStorage based)`);
-    console.log(`   - Order success popup modal`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`   - Store: http://localhost:${PORT}/index.html`);
