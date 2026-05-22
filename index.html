@@ -611,53 +611,66 @@
         }
 
         // ============ ORDER VIEW FUNCTION ============
-        window.viewOrdersDirect = async function() {
-            console.log("viewOrdersDirect called - showing orders");
-            const username = localStorage.getItem('user');
-            if (!username) { 
-                alert("Please login first"); 
-                window.location.href = "auth.html"; 
-                return; 
-            }
-            
-            // Hide shop elements, show orders container
-            document.getElementById('shop-container').style.display = 'none';
-            document.getElementById('category-menu').style.display = 'none';
-            document.getElementById('search-bar').style.display = 'none';
-            document.getElementById('orders-history-container').style.display = 'block';
-            
-            // Also hide cart button in header on orders page
-            const cartHeader = document.querySelector('header > div:last-child');
-            if (cartHeader) cartHeader.style.display = 'none';
-            
-            try {
-                const res = await fetch(`${API_BASE}/history`);
-                const orders = await res.json();
-                const userOrders = orders.filter(o => o.username === username).reverse();
-                
-                if (userOrders.length === 0) { 
-                    document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; 
-                    return; 
-                }
-                
-                document.getElementById('history-items-list').innerHTML = userOrders.map(o => `
-                    <div class="order-history-card">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <span>🆔 Order #${o.orderId}</span>
-                            <span>📅 ${o.date || 'N/A'}</span>
-                        </div>
-                        <div><strong>${escapeHtml(o.productName)}</strong> x ${o.quantity} = ₹${o.totalPrice}</div>
-                        <div>Status: ${o.status}</div>
-                        ${o.trackingId ? `<div class="tracking-info">📦 Tracking: ${o.trackingId}</div>` : ''}
-                        ${o.status === 'Pending' ? `<button class="cancel-order-btn" onclick="requestCancellation(${o.orderId})">❌ Request Cancellation</button>` : ''}
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error("Error loading orders:", error);
-                document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">Error loading orders. Please try again.</p>';
-            }
-        };
+  // Replace viewOrdersDirect function
+window.viewOrdersDirect = async function() {
+    console.log("viewOrdersDirect called - showing orders");
+    const username = localStorage.getItem('user');
+    if (!username) { 
+        alert("Please login first"); 
+        window.location.href = "auth.html"; 
+        return; 
+    }
+    
+    document.getElementById('shop-container').style.display = 'none';
+    document.getElementById('category-menu').style.display = 'none';
+    document.getElementById('search-bar').style.display = 'none';
+    document.getElementById('orders-history-container').style.display = 'block';
+    
+    const cartHeader = document.querySelector('header > div:last-child');
+    if (cartHeader) cartHeader.style.display = 'none';
+    
+    try {
+        const res = await fetch(`${API_BASE}/history`);
+        const orders = await res.json();
+        const userOrders = orders.filter(o => o.username === username).reverse();
         
+        if (userOrders.length === 0) { 
+            document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">You haven\'t placed any orders yet.</p>'; 
+            return; 
+        }
+        
+        // Display each order with its items
+        document.getElementById('history-items-list').innerHTML = userOrders.map(order => `
+            <div class="order-history-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <div>
+                        <span>🆔 Order #${order.orderId}</span>
+                        <span style="margin-left:10px; background:#37475a; color:white; padding:2px 8px; border-radius:4px; font-size:11px;">${order.status}</span>
+                    </div>
+                    <span>📅 ${order.date || 'N/A'}</span>
+                </div>
+                
+                ${order.items.map(item => `
+                    <div style="border-bottom:1px solid #eee; padding:8px 0;">
+                        <strong>${escapeHtml(item.productName)}</strong> x ${item.quantity} = ₹${item.subtotal}
+                    </div>
+                `).join('')}
+                
+                <div style="margin-top:10px; padding-top:10px; border-top:2px solid #ddd;">
+                    <strong>Total: ₹${order.totalAmount}</strong>
+                </div>
+                
+                ${order.trackingId ? `<div class="tracking-info">📦 Tracking: ${order.trackingId}</div>` : ''}
+                
+                ${order.status === 'Pending' ? 
+                    `<button class="cancel-order-btn" onclick="requestCancellation(${order.orderId})" style="margin-top:10px;">❌ Request Cancellation</button>` : ''}
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error("Error loading orders:", error);
+        document.getElementById('history-items-list').innerHTML = '<p style="text-align:center; padding:40px;">Error loading orders. Please try again.</p>';
+    }
+};
         // Success modal handlers
         function closeSuccessModalAndContinue() {
             document.getElementById('successModal').classList.remove('show');
@@ -849,112 +862,103 @@
         }
         function closeShippingModal() { document.getElementById('shippingModal').style.display = 'none'; }
         
-        async function placeOrder(paymentId, name, phone, address) {
-            const username = localStorage.getItem('user');
-            let allSuccess = true;
-            for (let item of cart) {
-                try {
-                    const response = await fetch(`${API_BASE}/order`, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ 
-                            productId: item.productId, 
-                            quantity: item.quantity, 
-                            username, 
-                            customerName: name, 
-                            phone, 
-                            address, 
-                            payment_id: paymentId,
-                            payment_status: paymentId === "test_payment" ? "test" : "completed"
-                        }) 
-                    });
-                    if (!response.ok) allSuccess = false;
-                } catch(e) {
+        async function placeOrder(orderData, paymentId) { 
+    const username = localStorage.getItem('user');
+    
+    const response = await fetch(`${API_BASE}/order`, { 
+        method:'POST', 
+        headers:{'Content-Type':'application/json'}, 
+        body:JSON.stringify({ 
+            items: orderData.items,  // Send all items
+            username: username, 
+            customerName: orderData.customerName, 
+            phone: orderData.phone, 
+            address: orderData.address, 
+            payment_id: paymentId,
+            payment_status: paymentId === "test_payment" ? "test" : "completed"
+        }) 
+    });
+    
+    return response.ok;
+}catch(e) {
                     allSuccess = false;
                 }
             }
             return allSuccess;
         }
         
-        async function checkout() {
-            const name = document.getElementById('ship-name').value.trim();
-            const phone = document.getElementById('ship-phone').value.trim();
-            const address = document.getElementById('ship-address').value.trim();
-            const email = document.getElementById('ship-email').value.trim();
-            if (!name || !phone || !address) { alert("Fill all fields"); return; }
-            closeShippingModal();
-            
-            const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-            const useRazorpay = confirm("Choose Payment:\n\n• Click OK for Card/NetBanking (Razorpay Test)\n• Click Cancel for Test Mode (No Real Payment)");
-            
-            if (useRazorpay) {
-                try {
-                    showMessage("⏳ Initializing payment...", false);
-                    const orderRes = await fetch(`${API_BASE}/create-order`, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ amount: total }) 
-                    });
-                    const order = await orderRes.json();
-                    const keyRes = await fetch(`${API_BASE}/get-razorpay-key`);
-                    const { key } = await keyRes.json();
-                    
-                    const options = {
-                        key: key,
-                        amount: order.amount,
-                        currency: order.currency,
-                        name: 'Sarees By Kuhu',
-                        order_id: order.order_id,
-                        prefill: { name, contact: phone, email: email },
-                        theme: { color: '#27ae60' },
-                        handler: async (response) => {
-                            showMessage("✅ Payment received! Placing order...", false);
-                            const verifyRes = await fetch(`${API_BASE}/verify-payment`, { 
-                                method: 'POST', 
-                                headers: { 'Content-Type': 'application/json' }, 
-                                body: JSON.stringify(response) 
-                            });
-                            const verifyResult = await verifyRes.json();
-                            if (verifyResult.success) {
-                                const orderSuccess = await placeOrder(response.razorpay_payment_id, name, phone, address);
-                                if (orderSuccess) {
-                                    cart = [];
-                                    updateCartUI();
-                                    document.getElementById('successModal').classList.add('show');
-                                } else {
-                                    alert("Payment verified but order placement had issues. Please contact support.");
-                                }
-                            } else {
-                                alert("Payment verification failed!");
-                            }
-                        },
-                        modal: {
-                            ondismiss: function() {
-                                showMessage("Payment cancelled", true);
-                            }
+async function checkout() {
+    const name = document.getElementById('ship-name').value.trim(); 
+    const phone = document.getElementById('ship-phone').value.trim(); 
+    const address = document.getElementById('ship-address').value.trim(); 
+    const email = document.getElementById('ship-email').value.trim();
+    
+    if(!name || !phone || !address){ alert("Fill all fields"); return; }
+    
+    const total = cart.reduce((s,i)=>s+(i.price*i.quantity),0);
+    // Prepare items array (NOT separate orders)
+    const orderItems = cart.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity
+    }));
+    
+    const orderData = { 
+        items: orderItems,  // Send as array
+        customerName: name, 
+        customerEmail: email, 
+        phone: phone, 
+        address: address
+    };
+    
+    closeShippingModal();
+           
+         const useRazorpay = confirm("Choose Payment:\n• OK for Card/NetBanking (Razorpay)\n• Cancel for Test Mode");
+    
+    if(useRazorpay){
+        try{ 
+            const orderRes = await fetch(`${API_BASE}/create-order`, { 
+                method:'POST', 
+                headers:{'Content-Type':'application/json'}, 
+                body:JSON.stringify({amount:total}) 
+            }); 
+            const order = await orderRes.json(); 
+            const keyRes = await fetch(`${API_BASE}/get-razorpay-key`); 
+            const {key} = await keyRes.json(); 
+            const options = { 
+                key, amount: order.amount, currency: order.currency, name: 'Sarees By Kuhu', 
+                order_id: order.order_id, prefill: { name, contact: phone, email }, 
+                theme: { color: '#27ae60' }, 
+                handler: async (response) => { 
+                    const verifyRes = await fetch(`${API_BASE}/verify-payment`, { 
+                        method:'POST', 
+                        headers:{'Content-Type':'application/json'}, 
+                        body:JSON.stringify(response) 
+                    }); 
+                    if((await verifyRes.json()).success) { 
+                        const orderSuccess = await placeOrder(orderData, response.razorpay_payment_id);
+                        if(orderSuccess) {
+                            cart = []; 
+                            updateCartUI(); 
+                            showOrderSuccessModal();
+                        } else { 
+                            alert("Payment verified but order placement had issues."); 
                         }
-                    };
-                    const rzp = new Razorpay(options);
-                    rzp.on('payment.failed', function(response) {
-                        alert("Payment failed: " + (response.error.description || "Please try again"));
-                    });
-                    rzp.open();
-                } catch(e) { 
-                    console.error("Payment error:", e);
-                    alert("Payment failed: " + e.message); 
-                }
-            } else {
-                showMessage("⏳ Processing test order...", false);
-                const orderSuccess = await placeOrder("test_payment", name, phone, address);
-                if (orderSuccess) {
-                    cart = [];
-                    updateCartUI();
-                    document.getElementById('successModal').classList.add('show');
-                } else {
-                    alert("[TEST MODE] Order placement failed. Please try again.");
-                }
-            }
+                    } else alert("Verification failed"); 
+                } 
+            }; 
+            new Razorpay(options).open(); 
+        } catch(e){ alert("Payment error: " + e.message); }
+    } else { 
+        const orderSuccess = await placeOrder(orderData, "test_payment");
+        if(orderSuccess) {
+            cart = []; 
+            updateCartUI(); 
+            showOrderSuccessModal();
+        } else { 
+            alert("[TEST MODE] Order placement failed"); 
         }
+    }
+}
         
         // ============ PROFILE & CONTACT ============
         function openProfileModal() {
