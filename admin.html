@@ -1885,26 +1885,28 @@
                             cancelRequestHtml = `<div><span class="status-badge status-cancelled">❌ Rejected: ${rejectedRequest.rejectedReason || 'N/A'}</span></div>`;
                         }
                         
-                        ordersTableBody.innerHTML += `
-                            <tr>
-                                <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
-                                <td>${o.orderId || 'N/A'}</td>
-                                <td>${escapeHtml(o.username) || 'N/A'}</td>
-                                <td>${escapeHtml(o.customerName) || 'N/A'}</td>
-                                <td>${escapeHtml(o.productName) || 'N/A'}</td>
-                                <td>${o.quantity || 0}</td>
-                                <td>₹${o.totalPrice || 0}</td>
-                                <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px; font-size:11px;">${o.status || 'Pending'}</span></td>
-                                <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
-                                <td style="min-width: 140px;">${cancelRequestHtml || '<span style="color:#888; font-size:11px;">No request</span>'}</td>
-                                <td>
-                                    <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
-                                    <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
-                                    <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
-                                    </td>
-                             `
-                    });
-                }
+// Show items as a list within each order row
+ordersTableBody.innerHTML += `
+    <tr>
+        <td><input type="checkbox" class="order-select" value="${o.orderId}" onchange="updateSelectionCount()"></td>
+        <td>${o.orderId || 'N/A'}</td>
+        <td>${escapeHtml(o.username) || 'N/A'}</td>
+        <td>${escapeHtml(o.customerName) || 'N/A'}</td>
+        <td>
+            ${o.items.map(item => `${escapeHtml(item.productName)} (x${item.quantity})`).join('<br>')}
+        </td>
+        <td>${o.items.length} items</td>
+        <td>₹${o.totalAmount}</td>
+        <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:12px;">${o.status}</span></td>
+        <td><input type="text" id="tracking-${o.orderId}" placeholder="Tracking ID" value="${o.trackingId || ''}" style="width:120px;"></td>
+        <td style="min-width: 140px;">${cancelRequestHtml || '<span style="color:#888;">No request</span>'}</td>
+        <td>
+            <button class="btn btn-verify" onclick="updateTracking(${o.orderId})">Update</button>
+            <button class="btn btn-print" onclick="printLabel(${JSON.stringify(o).replace(/"/g, '&quot;')})">Print</button>
+            <button class="btn btn-delete" onclick="deleteSingleOrder(${o.orderId})">Delete</button>
+        </td>
+    </tr>
+`;
 
                 // ============ RENDER ORDERS - MOBILE CARD VIEW ============
                 const ordersMobileContainer = document.getElementById('orders-mobile-container');
