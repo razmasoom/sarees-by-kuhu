@@ -13,6 +13,7 @@ app.use(express.static(__dirname));
 const DATA_FILE = path.join(__dirname, 'data.json');
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
 const CANCELLATION_REQUESTS_FILE = path.join(__dirname, 'cancellation_requests.json');
+const ADDRESSES_FILE = path.join(__dirname, 'addresses.json');
 
 // Track processed operations to prevent duplicates
 const processedOperations = new Map();
@@ -101,9 +102,125 @@ const initCancellationRequestsFile = () => {
     }
 };
 
+const initAddressesFile = () => {
+    if (!fs.existsSync(ADDRESSES_FILE)) {
+        writeJSON(ADDRESSES_FILE, []);
+    }
+};
+
 initDataFile();
 initOrdersFile();
 initCancellationRequestsFile();
+initAddressesFile();
+
+// ============ ADDRESS ROUTES ============
+
+// Get all addresses for a user
+app.get('/addresses/:username', (req, res) => {
+    const addresses = readJSON(ADDRESSES_FILE, []);
+    const userAddresses = addresses.filter(a => a.username === req.params.username);
+    res.json(userAddresses);
+});
+
+// Add new address
+app.post('/addresses', (req, res) => {
+    const addresses = readJSON(ADDRESSES_FILE, []);
+    const { username, name, phone, addressLine, city, state, pincode, addressType, isDefault } = req.body;
+    
+    const newAddress = {
+        id: Date.now(),
+        username,
+        name,
+        phone,
+        addressLine,
+        city,
+        state,
+        pincode,
+        addressType: addressType || 'Home',
+        isDefault: isDefault || false,
+        createdAt: new Date().toISOString()
+    };
+    
+    // If this is default, remove default from other addresses
+    if (newAddress.isDefault) {
+        addresses.forEach(a => {
+            if (a.username === username) a.isDefault = false;
+        });
+    } else {
+        // If no default exists, make this default
+        const hasDefault = addresses.some(a => a.username === username && a.isDefault);
+        if (!hasDefault) newAddress.isDefault = true;
+    }
+    
+    addresses.push(newAddress);
+    writeJSON(ADDRESSES_FILE, addresses);
+    res.status(201).json(newAddress);
+});
+
+// Update address
+app.put('/addresses/:id', (req, res) => {
+    const addresses = readJSON(ADDRESSES_FILE, []);
+    const id = parseInt(req.params.id);
+    const index = addresses.findIndex(a => a.id === id);
+    
+    if (index === -1) {
+        return res.status(404).json({ message: "Address not found" });
+    }
+    
+    const { name, phone, addressLine, city, state, pincode, addressType, isDefault } = req.body;
+    const username = addresses[index].username;
+    
+    addresses[index] = { ...addresses[index], name, phone, addressLine, city, state, pincode, addressType };
+    
+    if (isDefault) {
+        addresses.forEach(a => {
+            if (a.username === username) a.isDefault = false;
+        });
+        addresses[index].isDefault = true;
+    }
+    
+    writeJSON(ADDRESSES_FILE, addresses);
+    res.json(addresses[index]);
+});
+
+// Delete address
+app.delete('/addresses/:id', (req, res) => {
+    const addresses = readJSON(ADDRESSES_FILE, []);
+    const id = parseInt(req.params.id);
+    const addressToDelete = addresses.find(a => a.id === id);
+    const filtered = addresses.filter(a => a.id !== id);
+    
+    // If deleted address was default, set another as default
+    if (addressToDelete && addressToDelete.isDefault && filtered.length > 0) {
+        const userAddresses = filtered.filter(a => a.username === addressToDelete.username);
+        if (userAddresses.length > 0) {
+            userAddresses[0].isDefault = true;
+        }
+    }
+    
+    writeJSON(ADDRESSES_FILE, filtered);
+    res.json({ success: true });
+});
+
+// Set default address
+app.patch('/addresses/:id/default', (req, res) => {
+    const addresses = readJSON(ADDRESSES_FILE, []);
+    const id = parseInt(req.params.id);
+    const index = addresses.findIndex(a => a.id === id);
+    
+    if (index === -1) {
+        return res.status(404).json({ message: "Address not found" });
+    }
+    
+    const username = addresses[index].username;
+    addresses.forEach(a => {
+        if (a.username === username) a.isDefault = false;
+    });
+    addresses[index].isDefault = true;
+    
+    writeJSON(ADDRESSES_FILE, addresses);
+    res.json(addresses[index]);
+});
 
 // ============ USER ROUTES ============
 
@@ -169,9 +286,14 @@ app.delete('/users/:id', (req, res) => {
     orders = orders.filter(o => o.username !== deletedUser?.username);
     writeJSON(ORDERS_FILE, orders);
     
+    // Delete user's addresses
+    let addresses = readJSON(ADDRESSES_FILE, []);
+    addresses = addresses.filter(a => a.username !== deletedUser?.username);
+    writeJSON(ADDRESSES_FILE, addresses);
+    
     res.json({ 
         success: true, 
-        message: `User ${deletedUser?.username} deleted along with their orders`
+        message: `User ${deletedUser?.username} deleted along with their orders and addresses`
     });
 });
 
@@ -670,6 +792,7 @@ app.listen(PORT, () => {
     console.log(`📁 Data file: ${DATA_FILE}`);
     console.log(`📁 Orders file: ${ORDERS_FILE}`);
     console.log(`📁 Cancellation requests file: ${CANCELLATION_REQUESTS_FILE}`);
+    console.log(`📁 Addresses file: ${ADDRESSES_FILE}`);
     console.log(`\n💰 PAYMENT MODE: TEST (Razorpay)`);
     console.log(`\n🌐 OPEN IN BROWSER:`);
     console.log(`   - Admin Panel: http://localhost:${PORT}/admin.html`);
