@@ -303,33 +303,44 @@ app.post('/order', (req, res) => {
     const products = data.products || [];
     const users = data.users || [];
     
-    const { productId, quantity, username, customerName, address, phone, payment_id, payment_status } = req.body;
+    // NEW: Accept array of items
+    const { items, username, customerName, address, phone, payment_id, payment_status } = req.body;
     
     const user = users.find(u => u.username === username);
-    if (!user) {
-        return res.status(401).json({ message: "User account no longer exists" });
-    }
-    if (user.status !== 'Verified') {
-        return res.status(401).json({ message: "Account not verified" });
+    if (!user) return res.status(401).json({ message: "User not found" });
+    if (user.status !== 'Verified') return res.status(401).json({ message: "Account not verified" });
+    
+    // Create SINGLE order ID for ALL items
+    const orderId = Date.now();
+    let totalAmount = 0;
+    const orderItems = [];
+    
+    // Process each item in the cart
+    for (const item of items) {
+        const product = products.find(p => p.id === item.productId);
+        if (!product) continue;
+        
+        totalAmount += product.price * item.quantity;
+        
+        orderItems.push({
+            productId: product.id,
+            productName: product.name,
+            description: product.description || '',
+            quantity: item.quantity,
+            price: product.price,
+            subtotal: product.price * item.quantity
+        });
     }
     
-    const product = products.find(p => p.id === productId);
-    
-    if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-    }
-    
+    // Create ONE order containing all items
     const newOrder = {
-        orderId: Date.now(),
+        orderId: orderId,
         username: username || 'Guest',
         customerName: customerName || 'N/A',
         address: address || 'No Address',
         phone: phone || 'N/A',
-        productId: product.id,
-        productName: product.name,
-        description: product.description || '',
-        quantity: Number(quantity),
-        totalPrice: product.price * Number(quantity),
+        items: orderItems,  // Array of items
+        totalAmount: totalAmount,
         date: new Date().toLocaleString(),
         status: "Pending",
         trackingId: "",
@@ -340,10 +351,9 @@ app.post('/order', (req, res) => {
     orders.push(newOrder);
     writeJSON(ORDERS_FILE, orders);
     
-    console.log(`✅ Order created for ${username}: ${product.name} x ${quantity}`);
+    console.log(`✅ Order #${orderId} created for ${username} with ${orderItems.length} items, total: ₹${totalAmount}`);
     res.status(201).json(newOrder);
 });
-
 app.patch('/history/:id', (req, res) => {
     let orders = readJSON(ORDERS_FILE, []);
     const orderId = parseInt(req.params.id);
